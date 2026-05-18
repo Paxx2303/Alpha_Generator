@@ -1,0 +1,41 @@
+config_version: 1
+
+models:
+  - name: qwen-free-9router
+    display_name: Qwen Free via 9Router
+    use: langchain_openai:ChatOpenAI
+    model: $DEERFLOW_MODEL_NAME
+    api_key: $NINE_ROUTER_API_KEY
+    base_url: $NINE_ROUTER_BASE_URL
+    request_timeout: 600.0
+    max_retries: 2
+    max_tokens: 8192
+    temperature: 0.2
+    supports_thinking: false
+    supports_vision: false
+
+title:
+  enabled: true
+  max_words: 6
+  max_chars: 60
+  model_name: null
+
+summarization:
+  enabled: true
+  model_name: null
+  trigger:
+    - type: tokens
+      value: 12000
+  keep:
+    type: messages
+    value: 10
+
+memory:
+  enabled: true
+  storage_path: memory.json
+  debounce_seconds: 30
+  model_name: null
+  max_facts: 100
+  fact_confidence_threshold: 0.7
+  injection_enabled: true
+

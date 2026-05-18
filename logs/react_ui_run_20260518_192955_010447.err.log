@@ -1,0 +1,3 @@
+2026-05-18 19:29:57,786 | INFO | pipeline.alpha_pipeline | Running alpha pipeline for strategy=momentum count=20 run_id=pipeline-momentum-20260518122957-af59fbdc
+2026-05-18 19:30:00,703 | INFO | api_layer.session_manager | Authenticated with WorldQuant API.
+2026-05-18 19:30:03,173 | INFO | orchestration.hermes_bridge | Hermes unavailable; falling back to local heuristic response.

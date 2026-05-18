@@ -1,0 +1,11 @@
+[
+  {
+    "pattern": "Excessive turnover",
+    "reason": "Short lookback and overly reactive expressions lead to unstable turnover."
+  },
+  {
+    "pattern": "High self-correlation",
+    "reason": "Minor variants of the same operator stack fail diversity checks."
+  }
+]
+

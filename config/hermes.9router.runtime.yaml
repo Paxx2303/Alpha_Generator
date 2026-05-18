@@ -1,0 +1,27 @@
+model:
+  provider: openrouter
+  default: openrouter/owl-alpha
+
+providers:
+  openrouter:
+    name: OpenRouter
+    base_url: https://openrouter.ai/api/v1
+    key_env: OPENROUTER_API_KEY
+    transport: openai_chat
+
+terminal:
+  backend: local
+  timeout: 180
+  env_passthrough:
+    - WQ_USERNAME
+    - WQ_PASSWORD
+    - OPENROUTER_BASE_URL
+    - OPENROUTER_API_KEY
+
+auxiliary:
+  web_summarization:
+    provider: main
+  image_analysis:
+    provider: main
+  title_generation:
+    provider: main

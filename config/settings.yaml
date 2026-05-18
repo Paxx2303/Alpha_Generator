@@ -1,0 +1,96 @@
+app:
+  name: wq-alpha-system
+  timezone: Asia/Bangkok
+  dry_run: true
+  log_level: INFO
+
+worldquant:
+  base_url: ${WQ_BASE_URL}
+  delay_seconds: 2
+  daily_submit_limit: 3
+
+pipeline:
+  llm_batch: 10
+  template_batch: 5
+  genetic_batch: 5
+  schedule:
+    research: "06:00"
+    analysis: "07:00"
+    generation: "08:00"
+    simulation: "09:30"
+    submission: "11:00"
+    summary: "12:00"
+  pre_simulation_review: true
+  post_simulation_review: true
+  failure_recovery_max_attempts: 2
+  pre_backtest:
+    enabled: true
+    start: "2019-01-01"
+    interval: "1d"
+    cash: 10000
+    commission: 0.002
+    rank_window: 63
+    zscore_window: 20
+    min_score: 0.52
+    min_sharpe: 0.20
+    min_fitness: 0.15
+    min_returns: 0.01
+    max_drawdown: 0.35
+    max_live_candidates: 6
+    min_symbol_coverage: 2
+    upper_signal: 0.60
+    lower_signal: 0.40
+    symbols:
+      momentum: ["SPY", "QQQ", "IWM"]
+      mean_reversion: ["SPY", "DIA", "QQQ"]
+      volume: ["SPY", "IWM", "XLF", "XLK"]
+      default: ["SPY", "QQQ", "IWM"]
+
+database:
+  alpha_store: database/alpha_store.db
+  performance_log: database/performance_log.db
+
+knowledge_base:
+  root: knowledge_base
+  max_results: 5
+  daily_research_dir: knowledge_base/research_feeds/daily
+
+integrations:
+  router:
+    name: 9router
+    base_url: ${NINE_ROUTER_BASE_URL}
+    api_key: ${NINE_ROUTER_API_KEY}
+  openrouter_fallback:
+    enabled: true
+    base_url: ${OPENROUTER_BASE_URL}
+    model: ${OPENROUTER_MODEL_NAME}
+  hermes:
+    enabled: true
+    command: ${HERMES_COMMAND}
+    model: ${HERMES_MODEL_NAME}
+    config_template: config/hermes.9router.example.yaml
+    container_name: wq-hermes-agent
+  deerflow:
+    enabled: true
+    command: ${DEERFLOW_COMMAND}
+    model: ${DEERFLOW_MODEL_NAME}
+    config_path: ${DEER_FLOW_CONFIG_PATH}
+    project_root: ${DEER_FLOW_PROJECT_ROOT}
+    config_template: config/deerflow.9router.example.yaml
+    gateway_container: deerflow-agent
+    gateway_url: http://localhost:8010/api/chat/stream
+
+research:
+  market_queries:
+    - "WorldQuant Brain alpha"
+    - "quantitative finance factor investing"
+    - "equity market regime momentum reversal"
+  rss_feeds:
+    - "https://news.google.com/rss/search?q=WorldQuant+Brain+alpha"
+    - "https://news.google.com/rss/search?q=quantitative+finance+factor+investing"
+  arxiv_queries:
+    - "alpha factor investing"
+    - "quantitative trading market regime"
+
+notifications:
+  telegram_enabled: false

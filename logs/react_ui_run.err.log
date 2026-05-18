@@ -1,0 +1,118 @@
+2026-05-18 19:55:56,813 | INFO | pipeline.alpha_pipeline | Running alpha pipeline for strategy=momentum count=20 run_id=pipeline-momentum-20260518125556-34ffd793
+2026-05-18 19:55:59,906 | INFO | api_layer.session_manager | Authenticated with WorldQuant API.
+2026-05-18 19:56:00,875 | INFO | orchestration.hermes_bridge | Hermes unavailable; falling back to local heuristic response.
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:00,931 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(ts_mean(returns, 5)) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:00,948 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(ts_mean(returns, 5)) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:00,973 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(ts_mean(returns, 5)) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:00,984 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(close / ts_mean(close, 10) - 1) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:00,994 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(close / ts_mean(close, 10) - 1) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,005 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(close / ts_mean(close, 10) - 1) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,019 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(ts_delta(close, 20) / ts_std_dev(close, 20)) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,030 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(ts_delta(close, 20) / ts_std_dev(close, 20)) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,042 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(ts_delta(close, 20) / ts_std_dev(close, 20)) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,053 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(ts_mean(returns, 60)) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,063 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(ts_mean(returns, 60)) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,072 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(ts_mean(returns, 60)) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,084 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(close / ts_mean(close, 5) - 1) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,094 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(close / ts_mean(close, 5) - 1) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,105 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(close / ts_mean(close, 5) - 1) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,116 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(ts_mean(returns, 10)) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,127 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(ts_mean(returns, 10)) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,137 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(ts_mean(returns, 10)) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,149 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(close / ts_mean(close, 20) - 1) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,159 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(close / ts_mean(close, 20) - 1) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,169 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(close / ts_mean(close, 20) - 1) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,182 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(ts_delta(volume, 5) * -ts_delta(close, 5)) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,193 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(ts_delta(volume, 5) * -ts_delta(close, 5)) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,204 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(ts_delta(volume, 5) * -ts_delta(close, 5)) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,216 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(close / ts_mean(close, 15) - 1) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,226 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(close / ts_mean(close, 15) - 1) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,236 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(close / ts_mean(close, 15) - 1) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,253 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(ts_delta(close, 25) / ts_std_dev(close, 20)) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,266 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(ts_delta(close, 25) / ts_std_dev(close, 20)) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,278 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(ts_delta(close, 25) / ts_std_dev(close, 20)) error=could not convert string to float: 'IWM'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,289 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=rank(ts_mean(returns, 65)) error=could not convert string to float: 'SPY'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,299 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=rank(ts_mean(returns, 65)) error=could not convert string to float: 'QQQ'
+C:\Using\Alpha_Generator\pipeline\analyzer\local_backtester.py:292: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  frame = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+2026-05-18 19:56:01,310 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=rank(ts_mean(returns, 65)) error=could not convert string to float: 'IWM'
+Traceback (most recent call last):
+  File "C:\Using\Alpha_Generator\main.py", line 170, in <module>
+    main()
+  File "C:\Using\Alpha_Generator\main.py", line 166, in main
+    run_pipeline(args)
+  File "C:\Using\Alpha_Generator\main.py", line 42, in run_pipeline
+    report = pipeline.run_once(
+  File "C:\Using\Alpha_Generator\pipeline\alpha_pipeline.py", line 166, in run_once
+    promoted_candidates, screened_out = self._rank_candidates_for_live_simulation(
+  File "C:\Using\Alpha_Generator\pipeline\alpha_pipeline.py", line 390, in _rank_candidates_for_live_simulation
+    self._persist_screened_candidate(
+  File "C:\Using\Alpha_Generator\pipeline\alpha_pipeline.py", line 316, in _persist_screened_candidate
+    alpha_run_id = self.store.insert_alpha(
+  File "C:\Using\Alpha_Generator\database\storage.py", line 239, in insert_alpha
+    cursor = conn.execute(
+sqlite3.OperationalError: 29 values for 30 columns

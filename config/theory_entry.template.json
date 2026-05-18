@@ -1,0 +1,22 @@
+{
+  "id": "custom-theory-id",
+  "domain": "Behavioral",
+  "title": "Custom Theory Title",
+  "sector_tags": [
+    "Technology",
+    "Large Cap"
+  ],
+  "core_principle": "State the core financial or statistical principle here.",
+  "alpha_implication": [
+    "Explain the first implication for alpha design.",
+    "Explain the second implication for alpha design."
+  ],
+  "example_expression": "rank(ts_delta(close, 20) / ts_std_dev(close, 20))",
+  "agent_reasoning": [
+    "Explain how the agent moves from the theory to the expression family.",
+    "Explain why the operator and horizon make sense."
+  ],
+  "source": "cli_json",
+  "created_by": "user",
+  "status": "active"
+}

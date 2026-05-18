@@ -1,0 +1,67 @@
+defaults:
+  region: USA
+  universe: TOP3000
+  strategy_type: momentum
+  neutralization: INDUSTRY
+  language: fast_expression
+
+quality_gate:
+  sharpe_min: 1.5
+  fitness_min: 1.0
+  returns_min: 0.05
+  sub_universe_sharpe_min: 0.70
+  turnover_min: 0.01
+  turnover_max: 0.70
+  drawdown_max: 0.30
+  self_correlation_max: 0.70
+
+generation:
+  lookbacks: [5, 10, 20, 60]
+  decay_windows: [3, 5, 10]
+  operators:
+    momentum:
+      - rank(ts_mean(returns, {lookback}))
+      - rank(close / ts_mean(close, {lookback}) - 1)
+      - rank(ts_delta(close, {lookback}) / ts_std_dev(close, {lookback}))
+    mean_reversion:
+      - rank(-ts_delta(close, {lookback}))
+      - rank(-(close / ts_mean(close, {lookback}) - 1))
+      - rank(-zscore(ts_delta(vwap, {lookback})))
+    volume:
+      - rank(ts_corr(volume, returns, {lookback}))
+      - rank(volume / ts_mean(volume, {lookback}))
+      - rank(ts_delta(volume, {lookback}))
+
+brute_force:
+  max_candidates: 24
+  lookbacks: [3, 5, 10, 20, 40, 60, 120]
+  decay_values: [2, 4, 6]
+  truncation_values: [0.05, 0.08]
+  neutralizations: [SUBINDUSTRY, INDUSTRY]
+  delays: [1]
+  template_families:
+    momentum:
+      return_persistence:
+        - rank(ts_mean(returns, {lookback}))
+        - rank(ts_delta(close, {lookback}) / ts_std_dev(close, {lookback}))
+      price_vs_mean:
+        - rank(close / ts_mean(close, {lookback}) - 1)
+      volume_confirmation:
+        - rank(ts_corr(volume, returns, {lookback}))
+        - rank(volume / ts_mean(volume, {lookback}))
+    mean_reversion:
+      short_reversal:
+        - rank(-ts_delta(close, {lookback}))
+        - rank(-(close / ts_mean(close, {lookback}) - 1))
+      vwap_reversal:
+        - rank(-ts_delta(vwap, {lookback}))
+      liquidity_snapback:
+        - rank(-(volume / ts_mean(volume, {lookback}) - 1))
+    volume:
+      flow_acceleration:
+        - rank(ts_delta(volume, {lookback}))
+        - rank(ts_corr(volume, returns, {lookback}))
+      volume_vs_mean:
+        - rank(volume / ts_mean(volume, {lookback}))
+      price_volume_dislocation:
+        - rank(ts_delta(volume, {lookback}) / ts_std_dev(close, {lookback}))
