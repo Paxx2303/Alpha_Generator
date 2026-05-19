@@ -126,10 +126,40 @@ def schedule_pipeline(args: argparse.Namespace) -> None:
         time.sleep(1)
 
 
+def run_continuous(args: argparse.Namespace) -> None:
+    """Run research + simulation loop 24/7 with short sleep between cycles."""
+    import time
+
+    config = load_config()
+    if args.dry_run:
+        config.settings.setdefault("app", {})["dry_run"] = True
+        config.env["WQ_DRY_RUN"] = "true"
+    configure_logging(config.settings["app"].get("log_level", "INFO"))
+    pipeline = AlphaPipeline(config)
+    interval_seconds = int(config.settings.get("pipeline", {}).get("continuous_interval_seconds", 10))
+
+    logging.info("Continuous 24/7 mode started. Sleeping %s seconds between cycles.", interval_seconds)
+    while True:
+        try:
+            logging.info("=== Continuous cycle started ===")
+            pipeline.daily_researcher.refresh()
+            pipeline.knowledge_base.load_all()
+            pipeline.run_once(
+                strategy_type=args.strategy_type or "momentum",
+                count=args.count or 8,
+                submit_enabled=not args.no_submit,
+            )
+            logging.info("=== Continuous cycle finished. Sleeping %s seconds ===", interval_seconds)
+        except Exception as exc:
+            logging.exception("Continuous cycle failed: %s", exc)
+        time.sleep(interval_seconds)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="WorldQuant Alpha System scaffold")
     parser.add_argument("--run-once", action="store_true", help="Run the pipeline immediately.")
     parser.add_argument("--schedule", action="store_true", help="Run the daily scheduler.")
+    parser.add_argument("--continuous", action="store_true", help="Run research + simulation 24/7 continuously.")
     parser.add_argument("--serve-ui", action="store_true", help="Serve the React monitor API and built frontend.")
     parser.add_argument("--dry-run", action="store_true", help="Force dry-run mode.")
     parser.add_argument("--no-submit", action="store_true", help="Disable submission step.")
@@ -161,6 +191,9 @@ def main() -> None:
         return
     if args.schedule:
         schedule_pipeline(args)
+        return
+    if args.continuous:
+        run_continuous(args)
         return
     if args.run_once or not args.schedule:
         run_pipeline(args)

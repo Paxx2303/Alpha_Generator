@@ -18,19 +18,7 @@ quality_gate:
 generation:
   lookbacks: [5, 10, 20, 60]
   decay_windows: [3, 5, 10]
-  operators:
-    momentum:
-      - rank(ts_mean(returns, {lookback}))
-      - rank(close / ts_mean(close, {lookback}) - 1)
-      - rank(ts_delta(close, {lookback}) / ts_std_dev(close, {lookback}))
-    mean_reversion:
-      - rank(-ts_delta(close, {lookback}))
-      - rank(-(close / ts_mean(close, {lookback}) - 1))
-      - rank(-zscore(ts_delta(vwap, {lookback})))
-    volume:
-      - rank(ts_corr(volume, returns, {lookback}))
-      - rank(volume / ts_mean(volume, {lookback}))
-      - rank(ts_delta(volume, {lookback}))
+  # Templates removed - agents now research web and generate original alphas
 
 brute_force:
   max_candidates: 24

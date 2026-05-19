@@ -103,6 +103,13 @@ class ExpressionSeriesEvaluator:
                 window = self._coerce_int(args[1]) if len(args) > 1 else self.zscore_window
                 rolling_std = series.rolling(window).std(ddof=0).replace(0.0, np.nan)
                 return (series - series.rolling(window).mean()) / rolling_std
+            if func == "ts_rank":
+                series = self._coerce_series(args[0])
+                window = self._coerce_int(args[1])
+                return series.rolling(window).rank(pct=True)
+            if func == "abs":
+                value = self._coerce_series(args[0])
+                return value.abs()
             raise ValueError(f"Unsupported function '{node.func.id}' in local backtest evaluator.")
         raise ValueError(f"Unsupported expression node '{type(node).__name__}'.")
 

@@ -3,9 +3,13 @@ from __future__ import annotations
 import logging
 import subprocess
 import shutil
+from pathlib import Path
 
 from .openai_fallback import OpenAIFallbackClient
 from pipeline.models import AgentReview, AlphaCandidate, SimulationMetrics
+from knowledge_base.alpha_theory_rag import get_theory_context_for_review
+from knowledge_base.theory_researcher import TheoryResearcher
+from knowledge_base.data_researcher import DataResearcher
 
 
 LOGGER = logging.getLogger(__name__)
@@ -119,22 +123,32 @@ class HermesBridge:
         stage: str,
         context: str,
         metrics: SimulationMetrics | None = None,
+        knowledge_root: Path | None = None,
     ) -> AgentReview:
+        theory = ""
+        if knowledge_root:
+            theory = get_theory_context_for_review(knowledge_root)
+
         prompt = (
-            f"You are reviewing a WorldQuant alpha at stage={stage}.\n"
+            f"You are a quant reviewer. Stage={stage}.\n"
             f"Expression: {candidate.expression}\n"
-            f"Strategy type: {candidate.strategy_type}\n"
-            f"Metadata: {candidate.metadata}\n"
+            f"Strategy: {candidate.strategy_type}\n"
         )
         if metrics is not None:
             prompt += (
-                f"Metrics: sharpe={metrics.sharpe}, fitness={metrics.fitness}, returns={metrics.annual_returns}, "
-                f"turnover={metrics.turnover}, drawdown={metrics.drawdown}, self_corr={metrics.self_correlation}\n"
-                f"Checks: {metrics.checks}\n"
+                f"Metrics: Sharpe={metrics.sharpe:.2f}, Fitness={metrics.fitness:.2f}, "
+                f"Turnover={metrics.turnover:.2f}, SelfCorr={metrics.self_correlation:.2f}\n"
             )
         prompt += (
-            "Return a short verdict line in the form PASS/WARN/FAIL, then one short paragraph of reasons.\n"
-            f"Context:\n{context[:4000]}"
+            "THEORY CHECKLIST (answer briefly):\n"
+            "1. Economic hypothesis? (volume confirmation / over-reaction / liquidity provision / etc.)\n"
+            "2. Regime fit? (bull / bear / high-vol)\n"
+            "3. Decay risk? (short lookback only = high decay)\n"
+            "4. Turnover realism given operators?\n"
+            "5. Motif repetition vs recent alphas?\n\n"
+            f"Theory Grounding (RAG):\n{theory}\n\n"
+            "Return: VERDICT (PASS/WARN/FAIL) + one paragraph.\n"
+            f"Context:\n{context[:3000]}"
         )
         result = self.ask(prompt).strip()
         verdict = "WARN"
@@ -185,3 +199,13 @@ class HermesBridge:
             timeout=15,
         )
         return self.container_name in completed.stdout.splitlines()
+
+    def research_new_theory(self, topic: str, knowledge_root: Path) -> str:
+        """Hermes can autonomously research new theoretical topics."""
+        researcher = TheoryResearcher(knowledge_root)
+        return researcher.research(topic, max_results=4)
+
+    def research_data_context(self, knowledge_root: Path, strategy_type: str = "momentum") -> str:
+        """Hermes can research data characteristics for the target universe."""
+        data_researcher = DataResearcher(knowledge_root)
+        return data_researcher.build_data_context(strategy_type)

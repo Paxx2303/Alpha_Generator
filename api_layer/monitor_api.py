@@ -36,15 +36,6 @@ from pipeline.models import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SAFE_PATTERNS = (
-    "rank(ts_mean(returns, N))\n"
-    "rank(ts_delta(close, N) / ts_std_dev(close, N))\n"
-    "rank(close / ts_mean(close, N) - 1)\n"
-    "rank(ts_corr(volume, returns, N))\n"
-    "rank(volume / ts_mean(volume, N))\n"
-    "rank(-ts_delta(close, N))\n"
-    "rank(-ts_delta(vwap, N))"
-)
 CANONICAL_SPACES = re.compile(r"\s+")
 TOKEN_PATTERN = re.compile(r"[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?")
 STRATEGY_OPTIONS = ["momentum", "mean_reversion", "volume"]
@@ -1040,13 +1031,14 @@ def build_generation_prompt(strategy_type: str, objective: str, count: int, cont
         "Exploration": "Explore diverse operator families and avoid duplicate motifs.",
     }
     return (
-        f"Generate {count} distinct WorldQuant FASTEXPR alphas for {strategy_type}.\n"
+        f"Generate {count} original WorldQuant FASTEXPR alphas for {strategy_type}.\n"
         f"{objective_map.get(objective, objective_map['Balanced'])}\n"
-        "Use only the safe templates and fields below.\n"
-        "Replace N with one lookback from 5, 10, 20, 60.\n"
-        "Do not use unsupported functions. Return exactly one expression per line.\n\n"
-        f"Safe templates:\n{SAFE_PATTERNS}\n\n"
-        f"Context:\n{context[:5000]}"
+        "You must research recent market regimes and academic papers before generating.\n"
+        "Create novel expressions without using any pre-defined templates.\n"
+        "Use operators such as ts_mean, ts_delta, ts_std_dev, ts_corr, rank, zscore, etc.\n"
+        "Replace N with lookback from 5, 10, 20, 60.\n"
+        "Return exactly one expression per line. No explanations.\n\n"
+        f"Research Context:\n{context[:5000]}"
     )
 
 

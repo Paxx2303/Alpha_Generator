@@ -14,10 +14,11 @@ from config import AppConfig
 from database import AlphaStore
 from dashboard.theory_catalog import THEORY_CATALOG
 from knowledge_base import WQKnowledgeBase
+from knowledge_base.theory_accuracy_evaluator import TheoryAccuracyEvaluator
 from orchestration.openai_fallback import OpenAIFallbackClient
 from orchestration import DeerFlowBridge, HermesBridge, TaskRouter
 from pipeline.analyzer import AlphaAnalyzer, CorrelationChecker, LocalBacktester, PatternFinder
-from pipeline.generator import ExpressionValidator, GeneticEngine, LLMGenerator, TemplateEngine
+from pipeline.generator import ExpressionValidator, GeneticEngine, LLMGenerator
 from pipeline.models import (
     AgentReview,
     AlphaCandidate,
@@ -93,8 +94,7 @@ class AlphaPipeline:
 
         self.wq_scraper = WQScraper(self.client)
         self.paper_scraper = PaperScraper(config.knowledge_root / "research_papers")
-        self.template_engine = TemplateEngine(config.alpha["generation"])
-        self.llm_generator = LLMGenerator(self.hermes)
+        self.llm_generator = LLMGenerator(self.hermes, wq_client=self.client)
         self.genetic_engine = GeneticEngine()
         self.validator = ExpressionValidator()
         self.simulator = Simulator(self.client)
@@ -107,6 +107,7 @@ class AlphaPipeline:
         self.alpha_analyzer = AlphaAnalyzer()
         self.pattern_finder = PatternFinder()
         self.correlation_checker = CorrelationChecker()
+        self.theory_evaluator = TheoryAccuracyEvaluator()
         self.local_backtester = LocalBacktester(
             config.root / "runtime" / "proxy_backtests",
             settings=self.config.settings.get("pipeline", {}).get("pre_backtest", {}),
@@ -157,7 +158,7 @@ class AlphaPipeline:
             )
 
             tracker.set_stage("generate", "Generating and deduplicating candidate alphas.")
-            candidates = self._generate_candidates(strategy_type, context)
+            candidates = self._generate_candidates(strategy_type, context, self.config.knowledge_root)
             tracker.event("generate", "INFO", "candidate_generation", f"Generated {len(candidates)} raw candidates.")
             candidates = self._deduplicate(candidates)[:total_count]
             tracker.event("generate", "INFO", "candidate_dedup", f"Kept {len(candidates)} unique candidates after deduplication.")
@@ -241,11 +242,26 @@ class AlphaPipeline:
         theory_context = self.knowledge_base.get_theory_context(
             f"WorldQuant theory {strategy_type} alpha signal fitness turnover liquidity momentum mean reversion"
         )
+
+        # Recent approved motifs to avoid repetition
+        recent = self.store.list_recent(limit=8)
+        recent_motifs = "\n".join([r.get("expression", "")[:80] for r in recent if r.get("expression")]) or "None"
+
+        # Extract simple regime hint from research digest
+        regime_hint = ""
+        lower_digest = research_digest.lower()
+        if "high vol" in lower_digest or "vix" in lower_digest:
+            regime_hint = "High volatility regime — prefer volatility-normalized and volume-confirmed signals."
+        elif "low vol" in lower_digest or "bull" in lower_digest:
+            regime_hint = "Low volatility / bull regime — momentum and trend signals tend to perform better."
+
         return (
             f"{alpha_context}\n\nResearch summary:\n{research_summary}\n\n"
             f"Daily research digest:\n{research_digest}\n\n"
             f"Theory context:\n{theory_context}\n\n"
-            f"Failure patterns:\n{failure_context}"
+            f"Failure patterns:\n{failure_context}\n\n"
+            f"RECENT APPROVED MOTIFS (avoid similar):\n{recent_motifs}\n\n"
+            f"REGIME GUIDANCE:\n{regime_hint or 'Normal regime — balance momentum, reversion, and volume signals.'}"
         )
 
     def add_or_update_theory(
@@ -278,15 +294,80 @@ class AlphaPipeline:
         )
         self.knowledge_base.load_all()
 
-    def _generate_candidates(self, strategy_type: str, context: str) -> list[AlphaCandidate]:
+    def _generate_candidates(self, strategy_type: str, context: str, knowledge_root: Path | None = None) -> list[AlphaCandidate]:
         pipeline_cfg = self.config.settings["pipeline"]
-        template_candidates = self.template_engine.generate(strategy_type, pipeline_cfg["template_batch"])
-        llm_candidates = self.llm_generator.generate(strategy_type, pipeline_cfg["llm_batch"], context)
+        llm_candidates = self.llm_generator.generate(
+            strategy_type, pipeline_cfg["llm_batch"], context, knowledge_root=knowledge_root
+        )
         genetic_candidates = self.genetic_engine.evolve(
-            template_candidates + llm_candidates,
+            llm_candidates,
             pipeline_cfg["genetic_batch"],
         )
-        return template_candidates + llm_candidates + genetic_candidates
+        return llm_candidates + genetic_candidates
+
+    def _generate_with_retry(
+        self,
+        strategy_type: str,
+        base_context: str,
+        research_refs: list[dict[str, Any]] | None,
+        tracker: WorkflowTracker | None = None,
+    ) -> AlphaCandidate | None:
+        """
+        Generate an alpha with DeerFlow pre-simulation review.
+        If DeerFlow gives FAIL or metrics are too low, retry up to MAX_GENERATION_RETRIES.
+        After 3 failures, research new theory and try one more time with different approach.
+        """
+        attempt = 0
+        while attempt < self.MAX_GENERATION_RETRIES:
+            attempt += 1
+
+            # Generate new candidate
+            candidates = self._generate_candidates(strategy_type, base_context)
+            if not candidates:
+                continue
+
+            candidate = candidates[0]
+
+            # Pre-simulation review by DeerFlow
+            review = self.deerflow.review_alpha(
+                candidate, "pre_simulation", base_context,
+                knowledge_root=self.config.knowledge_root
+            )
+
+            # Simulate to get metrics
+            metrics = self.simulator.run(candidate)
+            history = self.store.list_recent(limit=300)
+            metrics.self_correlation = max(
+                metrics.self_correlation,
+                self.correlation_checker.estimate_self_correlation(candidate, history),
+            )
+
+            is_too_low = (metrics.sharpe < self.LOW_METRIC_THRESHOLD and
+                          metrics.fitness < self.LOW_METRIC_THRESHOLD)
+
+            if review.verdict == "FAIL" or is_too_low:
+                if tracker:
+                    tracker.event(
+                        "generate",
+                        "WARN",
+                        "deerflow_rejected",
+                        f"Attempt {attempt}: DeerFlow={review.verdict}, Sharpe={metrics.sharpe:.2f}, Fitness={metrics.fitness:.2f}",
+                        alpha_expression=candidate.expression,
+                    )
+                # Retry with new research if last attempt
+                if attempt >= self.MAX_GENERATION_RETRIES - 1:
+                    # Research new theory
+                    new_theory = self.hermes.research_new_theory(
+                        f"better {strategy_type} alpha with higher sharpe and fitness",
+                        self.config.knowledge_root
+                    )
+                    base_context += f"\n\nNEW RESEARCH INSIGHT:\n{new_theory}"
+                continue
+
+            # Good candidate found
+            return candidate
+
+        return None
 
     @staticmethod
     def _pre_backtest_metrics(result: Any) -> SimulationMetrics:
@@ -311,6 +392,26 @@ class AlphaPipeline:
         research_refs: list[dict[str, Any]] | None,
     ) -> None:
         metrics = self._pre_backtest_metrics(result)
+
+        # Auto sign-flip if both Sharpe and Fitness are strongly negative (< -1.25)
+        if metrics.sharpe < -1.25 and metrics.fitness < -1.25:
+            flipped_expr = f"-{candidate.expression}" if not candidate.expression.startswith("-") else candidate.expression[1:]
+            if flipped_expr != candidate.expression:
+                flipped_candidate = AlphaCandidate(
+                    expression=flipped_expr,
+                    source=candidate.source,
+                    strategy_type=candidate.strategy_type,
+                    rationale="Auto sign-flipped from strongly negative result",
+                    metadata={**candidate.metadata, "sign_flipped": True, "original_expression": candidate.expression},
+                )
+                flipped_result = self.local_backtester.evaluate(flipped_candidate, self.store.list_recent(limit=300))
+                if flipped_result.passed or (flipped_result.estimated_metrics.get("sharpe", -10) > -1.0 and flipped_result.estimated_metrics.get("fitness", -10) > -0.8):
+                    # Persist the flipped version instead
+                    self._persist_screened_candidate(
+                        flipped_candidate, flipped_result,
+                        tracker=tracker, base_context=base_context, research_refs=research_refs
+                    )
+                    return
         reasons = result.reasons or [f"Composite local backtest score {result.score:.2f} did not qualify for live simulation."]
         status = "screened_out"
         alpha_run_id = self.store.insert_alpha(
@@ -387,6 +488,22 @@ class AlphaPipeline:
                     payload=self.local_backtester.as_payload(result),
                 )
         for candidate, result in blocked:
+            metrics = self._pre_backtest_metrics(result)
+            # If pre-backtest is strongly negative → flip sign and simulate directly
+            if metrics.sharpe < -1.25 and metrics.fitness < -1.0:
+                flipped_expr = f"-{candidate.expression}" if not candidate.expression.startswith("-") else candidate.expression[1:]
+                if flipped_expr != candidate.expression:
+                    flipped_candidate = AlphaCandidate(
+                        expression=flipped_expr,
+                        source=candidate.source,
+                        strategy_type=candidate.strategy_type,
+                        rationale="Sign-flipped for direct live simulation (pre-backtest strongly negative)",
+                        metadata={**candidate.metadata, "sign_flipped": True, "original_expression": candidate.expression},
+                    )
+                    # Directly simulate the flipped version (bypass pre-backtest)
+                    self._simulate_and_store(flipped_candidate, tracker=tracker, base_context=base_context, research_refs=research_refs)
+                    continue
+            # Normal screening path
             self._persist_screened_candidate(
                 candidate,
                 result,
@@ -395,6 +512,92 @@ class AlphaPipeline:
                 research_refs=research_refs,
             )
         return [candidate for candidate, _ in promoted], len(blocked)
+
+    MAX_GENERATION_RETRIES = 3
+    LOW_METRIC_THRESHOLD = -0.8   # If both Sharpe and Fitness below this → reject
+
+    def _simulate_and_store(
+        self,
+        candidate: AlphaCandidate,
+        *,
+        tracker: WorkflowTracker | None,
+        base_context: str,
+        research_refs: list[dict[str, Any]] | None,
+    ) -> None:
+        """Directly simulate a candidate (bypass pre-backtest) and store result.
+        If DeerFlow pre-review fails or metrics are too low, retry generation.
+        """
+        # Pre-simulation DeerFlow review + retry logic
+        final_candidate = self._generate_with_retry(
+            candidate.strategy_type,
+            base_context,
+            research_refs,
+            tracker=tracker,
+        ) or candidate   # fallback to original if retry fails
+
+        metrics = self.simulator.run(final_candidate)
+        history = self.store.list_recent(limit=300)
+        metrics.self_correlation = max(
+            metrics.self_correlation,
+            self.correlation_checker.estimate_self_correlation(final_candidate, history),
+        )
+        gate_reasons = self.quality_gate.evaluate(metrics)
+        status = "approved" if not gate_reasons else "tested"
+
+        pre_reviews = [
+            self.hermes.review_alpha(final_candidate, "pre_simulation", base_context, knowledge_root=self.config.knowledge_root),
+            self.deerflow.review_alpha(final_candidate, "pre_simulation", base_context, knowledge_root=self.config.knowledge_root),
+        ]
+        post_reviews = [
+            self.hermes.review_alpha(final_candidate, "post_simulation", base_context, metrics, knowledge_root=self.config.knowledge_root),
+            self.deerflow.review_alpha(final_candidate, "post_simulation", base_context, metrics, knowledge_root=self.config.knowledge_root),
+        ]
+
+        notes = "; ".join(
+            gate_reasons
+            + [f"{r.agent}:{r.stage}:{r.verdict}" for r in pre_reviews + post_reviews]
+        )
+
+        alpha_run_id = self.store.insert_alpha(
+            final_candidate,
+            metrics,
+            status,
+            notes=notes,
+            run_id=tracker.run_id if tracker else None,
+            generation_source=self._generation_source(final_candidate),
+            origin_agent=self._origin_agent(final_candidate),
+            pre_sim_confidence=average_stage_confidence(pre_reviews, "pre_simulation"),
+            post_sim_confidence=average_stage_confidence(post_reviews, "post_simulation"),
+            pre_sim_verdict=aggregate_stage_verdict(pre_reviews, "pre_simulation"),
+            post_sim_verdict=aggregate_stage_verdict(post_reviews, "post_simulation"),
+            run_tags=self._candidate_run_tags(candidate, tracker.run_id if tracker else None),
+            gate_failure_reason=gate_reasons[0] if gate_reasons else None,
+            pre_backtest_score=None,
+            pre_backtest_passed=None,
+            pre_backtest_metrics={},
+        )
+
+        # Record theory accuracy for applied theories
+        self.theory_evaluator.record_theory_application(
+            theory_name="volume_correlation" if "volume" in final_candidate.expression.lower() else "general",
+            sharpe=metrics.sharpe,
+            fitness=metrics.fitness,
+            turnover=metrics.turnover,
+        )
+
+        if tracker is not None:
+            tracker.alpha_explanation(
+                alpha_run_id,
+                candidate,
+                thresholds=self.quality_gate.thresholds,
+                prompt_context=base_context,
+                research_refs=research_refs,
+                stage_notes={
+                    "status": status,
+                    "direct_simulation": True,
+                    "sign_flipped": True,
+                },
+            )
 
     def _evaluate_candidates(
         self,
@@ -410,6 +613,8 @@ class AlphaPipeline:
         recovery_notes: list[str] = []
         history = self.store.list_recent(limit=200)
         queue: deque[AlphaCandidate] = deque(candidates)
+        alpha_run_id = None
+        final_candidate = None  # Initialize to avoid NameError
         seen_expressions = {item["expression"] for item in history if item.get("expression")}
         recovery_budget = int(self.config.settings["pipeline"].get("failure_recovery_max_attempts", 2))
         max_total = target_count + max(recovery_budget, 0)
@@ -680,40 +885,40 @@ class AlphaPipeline:
                 pre_backtest_passed=bool(pre_backtest.passed),
                 pre_backtest_metrics=self.local_backtester.as_payload(pre_backtest).get("estimated_metrics", {}),
             )
-            if tracker is not None:
-                tracker.alpha_explanation(
-                    alpha_run_id,
-                    candidate,
-                    thresholds=self.quality_gate.thresholds,
-                    prompt_context=base_context,
-                    research_refs=research_refs,
-                    agent_reviews=agent_reviews,
-                    stage_notes={
-                        "pre_backtest": self.local_backtester.as_payload(pre_backtest),
-                        "gate_reasons": gate_reasons,
-                        "gate_failures": gate_failures,
-                        "gate_warnings": gate_warnings,
-                        "needs_review": needs_review,
-                        "status": status,
-                        "metrics": asdict(metrics),
-                    },
+        if tracker is not None:
+            tracker.alpha_explanation(
+                alpha_run_id,
+                final_candidate,
+                thresholds=self.quality_gate.thresholds,
+                prompt_context=base_context,
+                research_refs=research_refs,
+                agent_reviews=agent_reviews,
+                stage_notes={
+                    "pre_backtest": self.local_backtester.as_payload(pre_backtest),
+                    "gate_reasons": gate_reasons,
+                    "gate_failures": gate_failures,
+                    "gate_warnings": gate_warnings,
+                    "needs_review": needs_review,
+                    "status": status,
+                    "metrics": asdict(metrics),
+                },
+            )
+            for failure in gate_failures:
+                tracker.event(
+                    "filter",
+                    "WARNING",
+                    "GATE_FAIL",
+                    str(failure["message"]),
+                    alpha_expression=final_candidate.expression,
+                    alpha_run_id=alpha_run_id,
+                    payload=failure,
                 )
-                for failure in gate_failures:
-                    tracker.event(
-                        "filter",
-                        "WARNING",
-                        "GATE_FAIL",
-                        str(failure["message"]),
-                        alpha_expression=candidate.expression,
-                        alpha_run_id=alpha_run_id,
-                        payload=failure,
-                    )
-                for warning in gate_warnings:
-                    tracker.event(
-                        "filter",
-                        "WARNING",
-                        "GATE_WARNING",
-                        str(warning["message"]),
+            for warning in gate_warnings:
+                tracker.event(
+                    "filter",
+                    "WARNING",
+                    "GATE_WARNING",
+                    str(warning["message"]),
                         alpha_expression=candidate.expression,
                         alpha_run_id=alpha_run_id,
                         payload={**warning, "needs_review": True},
@@ -985,8 +1190,8 @@ class AlphaPipeline:
             else self.config.settings["pipeline"].get("post_simulation_review", True)
         )
         if enabled:
-            reviews.append(self.hermes.review_alpha(candidate, stage, context, metrics))
-            reviews.append(self.deerflow.review_alpha(candidate, stage, context, metrics))
+            reviews.append(self.hermes.review_alpha(candidate, stage, context, metrics, knowledge_root=self.config.knowledge_root))
+            reviews.append(self.deerflow.review_alpha(candidate, stage, context, metrics, knowledge_root=self.config.knowledge_root))
         return reviews
 
     @staticmethod
@@ -1007,3 +1212,7 @@ class AlphaPipeline:
             seen.add(candidate.expression)
             unique.append(candidate)
         return unique
+
+    def get_theory_accuracy_report(self) -> Dict[str, Any]:
+        """Return current theory performance evaluation."""
+        return self.theory_evaluator.evaluate()

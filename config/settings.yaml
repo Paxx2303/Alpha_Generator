@@ -11,8 +11,8 @@ worldquant:
 
 pipeline:
   llm_batch: 10
-  template_batch: 5
   genetic_batch: 5
+  continuous_interval_seconds: 10
   schedule:
     research: "06:00"
     analysis: "07:00"

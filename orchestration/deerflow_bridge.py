@@ -6,11 +6,15 @@ import os
 import shutil
 import subprocess
 import uuid
+from pathlib import Path
 
 import requests
 
 from .openai_fallback import OpenAIFallbackClient
 from pipeline.models import AgentReview, AlphaCandidate, SimulationMetrics
+from knowledge_base.alpha_theory_rag import get_theory_context_for_review
+from knowledge_base.theory_researcher import TheoryResearcher
+from knowledge_base.data_researcher import DataResearcher
 
 
 LOGGER = logging.getLogger(__name__)
@@ -107,6 +111,7 @@ class DeerFlowBridge:
         stage: str,
         context: str,
         metrics: SimulationMetrics | None = None,
+        knowledge_root: Path | None = None,
     ) -> AgentReview:
         if not self.available():
             summary = (
@@ -115,19 +120,30 @@ class DeerFlowBridge:
             )
             return AgentReview(agent="deerflow", stage=stage, verdict="WARN", summary=summary, confidence=0.42)
 
+        theory = ""
+        if knowledge_root:
+            theory = get_theory_context_for_review(knowledge_root)
+
         prompt = (
             f"Review this WorldQuant alpha at stage={stage}.\n"
             f"Expression: {candidate.expression}\n"
-            f"Strategy type: {candidate.strategy_type}\n"
-            f"Metadata: {candidate.metadata}\n"
+            f"Strategy: {candidate.strategy_type}\n"
         )
         if metrics is not None:
             prompt += (
-                f"Metrics: sharpe={metrics.sharpe}, fitness={metrics.fitness}, returns={metrics.annual_returns}, "
-                f"turnover={metrics.turnover}, drawdown={metrics.drawdown}, self_corr={metrics.self_correlation}\n"
-                f"Checks: {metrics.checks}\n"
+                f"Metrics: Sharpe={metrics.sharpe:.2f}, Fitness={metrics.fitness:.2f}, "
+                f"Turnover={metrics.turnover:.2f}, SelfCorr={metrics.self_correlation:.2f}\n"
             )
-        prompt += "Respond with PASS/WARN/FAIL and concise reasoning."
+        prompt += (
+            "THEORY CHECKLIST:\n"
+            "1. Clear economic hypothesis?\n"
+            "2. Regime robustness?\n"
+            "3. Alpha decay risk?\n"
+            "4. Turnover realistic?\n"
+            "5. Motif repetition?\n\n"
+            f"Theory Grounding (RAG):\n{theory}\n\n"
+            "Return VERDICT + brief reasoning."
+        )
         result = self.run_research(prompt) or "WARN: DeerFlow returned no structured review."
         verdict = "WARN"
         upper = result.upper()
@@ -194,6 +210,16 @@ class DeerFlowBridge:
             return ""
         LOGGER.warning("DeerFlow falling back to OpenRouter model %s", self.fallback_client.model)
         return self.fallback_client.chat(prompt)
+
+    def research_new_theory(self, topic: str, knowledge_root: Path) -> str:
+        """DeerFlow can autonomously research new theoretical topics."""
+        researcher = TheoryResearcher(knowledge_root)
+        return researcher.research(topic, max_results=4)
+
+    def research_data_context(self, knowledge_root: Path, strategy_type: str = "momentum") -> str:
+        """DeerFlow can research data characteristics for the target universe."""
+        data_researcher = DataResearcher(knowledge_root)
+        return data_researcher.build_data_context(strategy_type)
 
     def _gateway_running(self) -> bool:
         completed = subprocess.run(
