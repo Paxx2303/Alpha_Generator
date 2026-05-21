@@ -50,21 +50,17 @@ class WorldQuantClient:
         session_manager: WQSessionManager,
         rate_limiter: RateLimiter,
         base_url: str,
-        dry_run: bool = True,
         queue_dir: str | Path | None = None,
     ) -> None:
         self.session_manager = session_manager
         self.rate_limiter = rate_limiter
         self.base_url = base_url.rstrip("/")
-        self.dry_run = dry_run
         default_queue_dir = Path(__file__).resolve().parents[1] / "runtime" / "simulation_fifo"
         self.queue_dir = Path(queue_dir) if queue_dir is not None else default_queue_dir
         self.queue_dir.mkdir(parents=True, exist_ok=True)
         self.queue_lock_path = self.queue_dir / "active.lock"
 
     def _request(self, method: str, endpoint: str, **kwargs: Any) -> Any:
-        if self.dry_run:
-            raise RuntimeError("HTTP requests are disabled in dry-run mode.")
         raw_response = kwargs.pop("_raw_response", False)
         self.rate_limiter.wait()
         session = self.session_manager.ensure_session()
@@ -83,12 +79,6 @@ class WorldQuantClient:
         return response.text
 
     def list_leaderboard(self) -> list[dict[str, Any]]:
-        if self.dry_run:
-            return [
-                {"name": "alpha_momentum_sector_neutral", "sharpe": 2.13, "turnover": 0.24},
-                {"name": "alpha_volume_reversal", "sharpe": 1.86, "turnover": 0.31},
-                {"name": "alpha_quality_low_vol", "sharpe": 1.72, "turnover": 0.18},
-            ]
         payload = self._request(
             "GET",
             "users/self/alphas?limit=5&offset=0&order=-dateCreated&hidden=false",
@@ -96,46 +86,27 @@ class WorldQuantClient:
         return list(payload.get("results", []))
 
     def simulate_expression(self, candidate: AlphaCandidate) -> SimulationMetrics:
-        if not self.dry_run:
-            with self._simulation_slot(candidate):
-                alpha_details = self._simulate_live_alpha(candidate)
-            checks = {item["name"]: item for item in alpha_details.get("is", {}).get("checks", [])}
+        with self._simulation_slot(candidate):
+            alpha_details = self._simulate_live_alpha(candidate)
+        checks = {item["name"]: item for item in alpha_details.get("is", {}).get("checks", [])}
 
-            sharpe = float(alpha_details.get("is", {}).get("sharpe", 0.0))
-            fitness = float(alpha_details.get("is", {}).get("fitness", 0.0))
-            annual_returns = float(alpha_details.get("is", {}).get("returns", 0.0) or 0.0)
-            turnover_raw = float(alpha_details.get("is", {}).get("turnover", 0.0) or 0.0)
-            turnover = turnover_raw / 100 if turnover_raw > 1 else turnover_raw
-            drawdown = float(alpha_details.get("is", {}).get("drawdown", 0.0) or 0.0)
-            self_corr = float(checks.get("SELF_CORRELATION", {}).get("value", 0.0) or 0.0)
-            notes = self._build_notes(alpha_details)
-            return SimulationMetrics(
-                sharpe=sharpe,
-                fitness=fitness,
-                annual_returns=annual_returns,
-                turnover=turnover,
-                drawdown=drawdown,
-                self_correlation=self_corr,
-                notes=notes,
-                checks=alpha_details.get("is", {}).get("checks", []),
-            )
-
-        digest = hashlib.sha256(candidate.expression.encode("utf-8")).digest()
-        values = [byte / 255 for byte in digest[:6]]
-        sharpe = round(0.8 + values[0] * 2.2, 3)
-        fitness = round(0.5 + values[1] * 1.8, 3)
-        annual_returns = round(0.02 + values[2] * 0.18, 3)
-        turnover = round(0.01 + values[3] * 0.79, 3)
-        drawdown = round(0.05 + values[4] * 0.35, 3)
-        self_correlation = round(values[5] * 0.95, 3)
+        sharpe = float(alpha_details.get("is", {}).get("sharpe", 0.0))
+        fitness = float(alpha_details.get("is", {}).get("fitness", 0.0))
+        annual_returns = float(alpha_details.get("is", {}).get("returns", 0.0) or 0.0)
+        turnover_raw = float(alpha_details.get("is", {}).get("turnover", 0.0) or 0.0)
+        turnover = turnover_raw / 100 if turnover_raw > 1 else turnover_raw
+        drawdown = float(alpha_details.get("is", {}).get("drawdown", 0.0) or 0.0)
+        self_corr = float(checks.get("SELF_CORRELATION", {}).get("value", 0.0) or 0.0)
+        notes = self._build_notes(alpha_details)
         return SimulationMetrics(
             sharpe=sharpe,
             fitness=fitness,
             annual_returns=annual_returns,
             turnover=turnover,
             drawdown=drawdown,
-            self_correlation=self_correlation,
-            notes="Generated from deterministic dry-run simulator.",
+            self_correlation=self_corr,
+            notes=notes,
+            checks=alpha_details.get("is", {}).get("checks", []),
         )
 
     @contextmanager
@@ -149,18 +120,16 @@ class WorldQuantClient:
                     acquired = True
                     break
                 time.sleep(SIMULATION_QUEUE_POLL_SECONDS)
+            yield
+        finally:
+            # Always remove the ticket so a failed/aborted simulation does not
+            # block the FIFO queue indefinitely for subsequent runs.
             try:
                 ticket.unlink(missing_ok=True)
             except OSError:
-                LOGGER.warning("Failed to remove simulation queue ticket %s after lock acquisition.", ticket)
-            yield
-        finally:
-            if not acquired:
-                try:
-                    ticket.unlink(missing_ok=True)
-                except OSError:
-                    LOGGER.warning("Failed to remove simulation queue ticket %s.", ticket)
-            self._release_queue_lock()
+                LOGGER.warning("Failed to remove simulation queue ticket %s.", ticket)
+            if acquired:
+                self._release_queue_lock()
 
     def _enqueue_simulation(self, candidate: AlphaCandidate) -> Path:
         stamp = f"{time.time_ns():020d}"
@@ -216,10 +185,6 @@ class WorldQuantClient:
             LOGGER.warning("Simulation FIFO cleanup encountered a filesystem error.", exc_info=True)
 
     def submit_alpha(self, candidate: AlphaCandidate) -> dict[str, Any]:
-        if self.dry_run:
-            submission_id = hashlib.md5(candidate.expression.encode("utf-8")).hexdigest()[:12]
-            LOGGER.info("Dry-run submission prepared for %s", candidate.expression)
-            return {"submission_id": submission_id, "status": "queued", "dry_run": True}
 
         if not candidate.alpha_id:
             raise ValueError("Alpha must be simulated successfully before submission.")
@@ -311,6 +276,22 @@ class WorldQuantClient:
 
         if latest_payload is None:
             raise TimeoutError(f"Timed out loading alpha details for {alpha_id}.")
+        # If core IS metrics are already populated, return the payload even if some
+        # checks (e.g. SELF_CORRELATION) are still PENDING. The simulation itself
+        # has already completed on WorldQuant Brain and the alpha is visible on the
+        # web UI; only the post-simulation correlation check is lagging.
+        is_block = latest_payload.get("is") or {}
+        has_core_metrics = (
+            is_block.get("sharpe") is not None
+            and is_block.get("fitness") is not None
+            and is_block.get("turnover") is not None
+        )
+        if has_core_metrics:
+            LOGGER.warning(
+                "Alpha %s checks still pending but core IS metrics are available; returning partial result.",
+                alpha_id,
+            )
+            return latest_payload
         notes = self._build_notes(latest_payload)
         if notes:
             raise TimeoutError(f"Timed out waiting for alpha checks to settle for {alpha_id}: {notes}")

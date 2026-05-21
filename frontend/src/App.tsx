@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
   Link,
@@ -55,14 +55,16 @@ type PendingRun = {
 }
 
 const navItems = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/alphas', label: 'Alphas' },
-  { to: '/research', label: 'Research' },
-  { to: '/logs', label: 'Logs' },
-  { to: '/system-analysis', label: 'System Analysis' },
-  { to: '/settings', label: 'Settings' },
-  { to: '/theories', label: 'Theory Explorer' },
-  { to: '/studio', label: 'Agent Studio' },
+  { to: '/', label: 'Dashboard', icon: 'ti ti-layout-dashboard' },
+  { to: '/alphas', label: 'Alphas', icon: 'ti ti-table' },
+  { to: '/simulating', label: 'Simulating Now', icon: 'ti ti-cpu' },
+  { to: '/theories', label: 'Theory Explorer', icon: 'ti ti-brain' },
+  { to: '/skills', label: 'Agent Skills', icon: 'ti ti-award' },
+  { to: '/studio', label: 'Agent Studio', icon: 'ti ti-messages' },
+  { to: '/research', label: 'Research', icon: 'ti ti-search' },
+  { to: '/logs', label: 'Logs', icon: 'ti ti-terminal' },
+  { to: '/system-analysis', label: 'Gap Analysis', icon: 'ti ti-chart-bar' },
+  { to: '/settings', label: 'Settings', icon: 'ti ti-settings' },
 ]
 
 type AnalysisSignal = {
@@ -103,6 +105,14 @@ type ActionStep = {
   routeLabel?: string
 }
 
+type WorkflowStepStatus = 'done' | 'active' | 'idle' | 'blocked'
+
+type WorkflowStep = {
+  label: string
+  detail: string
+  status: WorkflowStepStatus
+}
+
 const systemSignals: AnalysisSignal[] = [
   { label: 'Generation breadth', value: 'Strong', detail: 'Templates, LLM flow, reviews, and simulation are wired.', tone: 'success' },
   { label: 'Operator visibility', value: 'Thin', detail: 'Polling and file-based memory still hide why a run went well or badly.', tone: 'warning' },
@@ -137,7 +147,7 @@ const uiGaps: AnalysisGap[] = [
 const backendGaps: AnalysisGap[] = [
   {
     title: 'No origin tracking per alpha candidate',
-    summary: 'The system does not yet persist whether an expression came from Hermes, DeerFlow, template logic, or a genetic branch.',
+    summary: 'The system does not yet persist whether an expression came from DeerFlow, template logic, or a genetic branch.',
     impact: 'We cannot compare source quality or learn which generator family is actually outperforming.',
   },
   {
@@ -182,7 +192,7 @@ const benchmarkBlocks: BenchmarkBlock[] = [
     tag: 'Experiment tracking',
     summary: 'This is the clearest operational gap. The pipeline runs, but it cannot yet explain itself the way a strong experiment system should.',
     rows: [
-      { label: 'Per-step latency and cost', reference: 'Tracked', current: 'Missing', status: 'missing', note: 'We do not know how long Hermes or DeerFlow spend, or which stage is most expensive.' },
+      { label: 'Per-step latency and cost', reference: 'Tracked', current: 'Missing', status: 'missing', note: 'We do not know how long DeerFlow spends, or which stage is most expensive.' },
       { label: 'Sweep comparison', reference: 'Tracked', current: 'Ad hoc', status: 'partial', note: 'Brute-force exploration exists, but not as a visual experiment matrix.' },
       { label: 'Run tagging', reference: 'Versioned', current: 'Missing', status: 'missing', note: 'Runs are not tied to research artifact version, git state, or seed lineage.' },
     ],
@@ -367,6 +377,43 @@ function MetricCard({ label, value, detail }: { label: string; value: string; de
   )
 }
 
+function WorkflowStepRail({ steps }: { steps: WorkflowStep[] }) {
+  return (
+    <div className="workflow-step-rail" aria-label="Workflow steps">
+      {steps.map((step, index) => (
+        <article key={step.label} className={`workflow-step-card step-${step.status}`}>
+          <span className="workflow-step-index">{index + 1}</span>
+          <div>
+            <strong>{step.label}</strong>
+            <p>{step.detail}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function CommandCard(props: {
+  title: string
+  detail: string
+  actionLabel: string
+  disabled?: boolean
+  tone?: 'primary' | 'neutral'
+  onAction: () => void
+}) {
+  return (
+    <article className={`command-card tone-${props.tone ?? 'neutral'}`}>
+      <div>
+        <p className="eyebrow">{props.title}</p>
+        <strong>{props.detail}</strong>
+      </div>
+      <button className="ghost-button" onClick={props.onAction} disabled={props.disabled}>
+        {props.actionLabel}
+      </button>
+    </article>
+  )
+}
+
 function AnalysisSignalCard({ signal }: { signal: AnalysisSignal }) {
   return (
     <article className={`analysis-signal-card tone-${signal.tone}`}>
@@ -387,11 +434,268 @@ function BenchmarkBadge({ status }: { status: BenchmarkRow['status'] }) {
   return <span className={`benchmark-badge is-${status}`}>{labelMap[status]}</span>
 }
 
+function renderInline(text: string): React.ReactNode {
+  if (!text) return '';
+  const parts: React.ReactNode[] = [];
+  let remaining = text;
+  while (remaining) {
+    const codeIndex = remaining.indexOf('`');
+    const boldIndex = remaining.indexOf('**');
+    const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
+    
+    let minIndex = Infinity;
+    let type: 'code' | 'bold' | 'link' | 'none' = 'none';
+    let matchLength = 0;
+    let content = '';
+    let linkUrl = '';
+    
+    if (codeIndex !== -1 && codeIndex < minIndex) {
+      const closingIndex = remaining.indexOf('`', codeIndex + 1);
+      if (closingIndex !== -1) {
+        minIndex = codeIndex;
+        type = 'code';
+        matchLength = closingIndex - codeIndex + 1;
+        content = remaining.substring(codeIndex + 1, closingIndex);
+      }
+    }
+    
+    if (boldIndex !== -1 && boldIndex < minIndex) {
+      const closingIndex = remaining.indexOf('**', boldIndex + 2);
+      if (closingIndex !== -1) {
+        minIndex = boldIndex;
+        type = 'bold';
+        matchLength = closingIndex - boldIndex + 2;
+        content = remaining.substring(boldIndex + 2, closingIndex);
+      }
+    }
+    
+    if (linkMatch && linkMatch.index !== undefined && linkMatch.index < minIndex) {
+      minIndex = linkMatch.index;
+      type = 'link';
+      matchLength = linkMatch[0].length;
+      content = linkMatch[1];
+      linkUrl = linkMatch[2];
+    }
+    
+    if (type === 'none' || minIndex === Infinity) {
+      parts.push(remaining);
+      break;
+    }
+    
+    if (minIndex > 0) {
+      parts.push(remaining.substring(0, minIndex));
+    }
+    
+    if (type === 'code') {
+      parts.push(<code key={remaining.length + minIndex} className="md-inline-code">{content}</code>);
+    } else if (type === 'bold') {
+      parts.push(<strong key={remaining.length + minIndex}>{content}</strong>);
+    } else if (type === 'link') {
+      parts.push(
+        <a key={remaining.length + minIndex} href={linkUrl} target="_blank" rel="noopener noreferrer" className="md-link">
+          {content}
+        </a>
+      );
+    }
+    
+    remaining = remaining.substring(minIndex + matchLength);
+  }
+  return parts;
+}
+
+function MarkdownRenderer({ text }: { text: string }): React.ReactNode {
+  if (!text) return null;
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  
+  let inCode = false;
+  let codeLines: string[] = [];
+  let codeLang = '';
+  
+  let inTable = false;
+  let tableRows: string[][] = [];
+  
+  let inList = false;
+  let listItems: { text: string; type: 'ul' | 'ol' }[] = [];
+  
+  let inBlockquote = false;
+  let quoteLines: string[] = [];
+
+  const flush = () => {
+    if (inCode) {
+      elements.push(
+        <pre key={elements.length} className="md-code-block">
+          {codeLang ? <div className="code-lang">{codeLang}</div> : null}
+          <code>{codeLines.join('\n')}</code>
+        </pre>
+      );
+      inCode = false;
+      codeLines = [];
+      codeLang = '';
+    }
+    if (inTable) {
+      if (tableRows.length > 0) {
+        const filteredRows = tableRows.filter(row => !row.every(cell => cell.trim().match(/^-+$/)));
+        if (filteredRows.length > 0) {
+          const headers = filteredRows[0];
+          const dataRows = filteredRows.slice(1);
+          elements.push(
+            <div key={elements.length} className="md-table-wrapper">
+              <table className="md-table">
+                <thead>
+                  <tr>
+                    {headers.map((h, i) => <th key={i}>{renderInline(h)}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {dataRows.map((row, ri) => (
+                    <tr key={ri}>
+                      {row.map((cell, ci) => <td key={ci}>{renderInline(cell)}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+      }
+      inTable = false;
+      tableRows = [];
+    }
+    if (inList) {
+      if (listItems.length > 0) {
+        const type = listItems[0].type;
+        const Tag = type === 'ol' ? 'ol' : 'ul';
+        elements.push(
+          <Tag key={elements.length} className={`md-list md-${type}`}>
+            {listItems.map((item, i) => <li key={i}>{renderInline(item.text)}</li>)}
+          </Tag>
+        );
+      }
+      inList = false;
+      listItems = [];
+    }
+    if (inBlockquote) {
+      if (quoteLines.length > 0) {
+        const fullQuote = quoteLines.join('\n');
+        let alertType: 'note' | 'tip' | 'important' | 'warning' | 'caution' | 'default' = 'default';
+        let cleanText = fullQuote;
+        const alertMatch = fullQuote.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(.*)$/is);
+        if (alertMatch) {
+          alertType = alertMatch[1].toLowerCase() as any;
+          cleanText = alertMatch[2];
+        }
+        elements.push(
+          <blockquote key={elements.length} className={`md-blockquote md-alert-${alertType}`}>
+            {alertType !== 'default' ? <strong className="alert-badge">{alertType.toUpperCase()}</strong> : null}
+            <div>{MarkdownRenderer({ text: cleanText })}</div>
+          </blockquote>
+        );
+      }
+      inBlockquote = false;
+      quoteLines = [];
+    }
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('```')) {
+      if (inCode) {
+        flush();
+      } else {
+        flush();
+        inCode = true;
+        codeLang = trimmed.slice(3).trim();
+      }
+      continue;
+    }
+
+    if (inCode) {
+      codeLines.push(line);
+      continue;
+    }
+
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      flush();
+      inTable = true;
+      const cells = line.split('|').slice(1, -1).map(c => c.trim());
+      tableRows.push(cells);
+      continue;
+    } else if (inTable) {
+      flush();
+    }
+
+    if (trimmed.startsWith('>')) {
+      if (!inBlockquote) {
+        flush();
+        inBlockquote = true;
+      }
+      const quoteText = line.replace(/^\s*>\s?/, '');
+      quoteLines.push(quoteText);
+      continue;
+    } else if (inBlockquote) {
+      if (trimmed !== '') {
+        flush();
+      }
+    }
+
+    if (trimmed === '---' || trimmed === '***' || trimmed === '___') {
+      flush();
+      elements.push(<hr key={elements.length} className="md-hr" />);
+      continue;
+    }
+
+    const headerMatch = line.match(/^(#{1,6})\s+(.*)$/);
+    if (headerMatch) {
+      flush();
+      const level = headerMatch[1].length;
+      const title = headerMatch[2];
+      const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+      elements.push(<Tag key={elements.length} className={`md-h md-${Tag}`}>{renderInline(title)}</Tag>);
+      continue;
+    }
+
+    const ulMatch = line.match(/^(\s*)[-*+]\s+(.*)$/);
+    const olMatch = line.match(/^(\s*)\d+\.\s+(.*)$/);
+    if (ulMatch) {
+      if (!inList) {
+        flush();
+        inList = true;
+      }
+      listItems.push({ text: ulMatch[2], type: 'ul' });
+      continue;
+    } else if (olMatch) {
+      if (!inList) {
+        flush();
+        inList = true;
+      }
+      listItems.push({ text: olMatch[2], type: 'ol' });
+      continue;
+    } else if (inList && trimmed === '') {
+      flush();
+      continue;
+    }
+
+    if (trimmed === '') {
+      flush();
+      continue;
+    }
+
+    flush();
+    elements.push(<p key={elements.length} className="md-p">{renderInline(line)}</p>);
+  }
+
+  flush();
+  return <div className="md-preview">{elements}</div>;
+}
+
 function DualAgentChatspace({ strategyType = 'momentum' }: { strategyType?: string }) {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<StudioChatMessage[]>([])
   const [busy, setBusy] = useState(false)
-  const feedRef = { current: null as HTMLDivElement | null }
+  const feedRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     void api.getChatMessages('dashboard', 40).then((res) => {
@@ -453,14 +757,14 @@ function DualAgentChatspace({ strategyType = 'momentum' }: { strategyType?: stri
                   <strong>{msg.role === 'user' ? 'You' : msg.agent}</strong>
                   <span>{msg.createdAt.slice(11, 19)}</span>
                 </div>
-                <p>{msg.content}</p>
+                <MarkdownRenderer text={msg.content} />
               </div>
             </article>
           ))
         ) : (
           <div className="gemini-empty">
-            <strong>Dual-Agent Chatspace</strong>
-            <p>Ask Hermes & DeerFlow anything about your alpha pipeline.</p>
+            <strong>DeerFlow Chatspace</strong>
+            <p>Ask DeerFlow anything about your alpha pipeline.</p>
           </div>
         )}
         {busy ? <div className="gemini-typing"><span /><span /><span /></div> : null}
@@ -578,62 +882,52 @@ function App() {
   }, [overviewState.data, pendingRun])
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand-block">
-          <p className="eyebrow">WQ Brain</p>
-          <h1>Alpha Monitor</h1>
-          <span className="muted">Mission-control UI for research, simulation, and explainability.</span>
-        </div>
-
-        <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.to === '/'} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="sidebar-run">
-          <p className="eyebrow">Pipeline</p>
-          {overviewState.data?.latest_run ? (
-            <>
-              <StatusPill value={String(overviewState.data.latest_run.status)} />
-              <div className="run-meta">
-                <span>{overviewState.data.latest_run.workflow_type}</span>
-                <strong>{overviewState.data.latest_run.run_id}</strong>
-                <span>{formatDateTime(overviewState.data.latest_run.started_at)}</span>
-              </div>
-            </>
-          ) : (
-            <EmptyState message="No tracked run yet." />
-          )}
-        </div>
+    <div className="app-layout">
+      <aside className="app-sidebar">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === '/'}
+            className={({ isActive }) => `sicon ${isActive ? 'active' : ''}`}
+            title={item.label}
+          >
+            <i className={item.icon}></i>
+          </NavLink>
+        ))}
       </aside>
 
-      <div className="content-shell">
-        <header className="topbar">
-          <div>
-            <p className="eyebrow">Live workspace</p>
-            <h2>{navItems.find((item) => item.to === location.pathname || (item.to !== '/' && location.pathname.startsWith(item.to)))?.label ?? 'Monitor'}</h2>
+      <div className="main-layout">
+        <header className="topbar-layout">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-primary)' }}>WQ Brain Alpha Monitor</span>
+            <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>/</span>
+            <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              {navItems.find((item) => item.to === location.pathname || (item.to !== '/' && location.pathname.startsWith(item.to)))?.label ?? 'Monitor'}
+            </span>
           </div>
-          <div className="topbar-actions">
-            <button className="ghost-button" onClick={() => void triggerRun()} disabled={runBusy}>
-              {runBusy ? 'Starting...' : 'Run now'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className={`badge ${overviewState.error ? 'b-red' : 'b-green'}`}>
+              {overviewState.error ? 'API Offline' : 'API Live'}
+            </span>
+            <button className="btn-layout btn-sm-layout" onClick={() => void triggerRun()} disabled={runBusy}>
+              {runBusy ? 'Starting...' : 'Run Now'}
             </button>
-            <button className="ghost-button danger" onClick={() => void triggerStop()}>
+            <button className="btn-layout btn-sm-layout" style={{ color: 'var(--color-text-danger)' }} onClick={() => void triggerStop()}>
               Stop
             </button>
           </div>
         </header>
 
-        {toast ? <div className="toast">{toast}</div> : null}
+        {toast ? <div className="toast" style={{ margin: '10px 14px 0 14px' }}>{toast}</div> : null}
 
-        <main className="page-content">
+        <main className="content-layout">
           <Routes>
             <Route path="/" element={<DashboardPage overviewState={overviewState} onRun={triggerRun} onStop={triggerStop} pendingRun={pendingRun} />} />
             <Route path="/alphas" element={<AlphasPage />} />
             <Route path="/alphas/:alphaId" element={<AlphaDetailPage />} />
+            <Route path="/simulating" element={<SimulatingPage overviewState={overviewState} onStop={triggerStop} />} />
+            <Route path="/skills" element={<AgentSkillsPage />} />
             <Route path="/research" element={<ResearchPage />} />
             <Route path="/logs" element={<LogsPage />} />
             <Route path="/system-analysis" element={<SystemAnalysisPage />} />
@@ -661,13 +955,6 @@ function DashboardPage(props: {
   if (props.overviewState.error && !props.overviewState.data) return <ErrorState message={props.overviewState.error} />
   const data = props.overviewState.data
   if (!data) return <EmptyState message="No dashboard data available." />
-
-  const cards = [
-    { label: 'Simulated', value: String(data.summary.simulated), detail: `${formatNumber(data.summary.average_sharpe, 2)} avg Sharpe` },
-    { label: 'Passing', value: String(data.summary.passing), detail: `${formatNumber(data.summary.best_sharpe, 2)} best Sharpe` },
-    { label: 'Submitted', value: String(data.summary.submitted), detail: 'Ready to send or already stored' },
-    { label: 'Errors', value: String(data.summary.errors), detail: 'Warnings and failed simulations' },
-  ]
   const workflowDetail = data.workflow_detail
   const currentTask = workflowDetail?.current_task
   const queue = workflowDetail?.simulation_queue
@@ -693,191 +980,157 @@ function DashboardPage(props: {
     : completedStages / totalStages
 
   return (
-    <div className="page-grid">
-      <Panel title="Pipeline Dashboard" subtitle="Real-time execution overview" actions={<button className="ghost-button" onClick={() => void props.overviewState.refetch()}>Refresh</button>}>
-        <div className="metrics-grid">
-          {cards.map((card) => (
-            <MetricCard key={card.label} label={card.label} value={card.value} detail={card.detail} />
-          ))}
+    <div style={{ padding: '0 4px' }}>
+      {/* Metrics Grid */}
+      <div className="card" style={{ display: 'flex', gap: '12px', padding: '12px', marginBottom: '12px' }}>
+        <div className="metric-widget" style={{ flex: 1 }}>
+          <div className="metric-label">Alphas simulated</div>
+          <div className="metric-val">{data.summary.simulated}</div>
+          <div className="metric-sub">{data.summary.passing} passing</div>
         </div>
-      </Panel>
+        <div className="metric-widget" style={{ flex: 1 }}>
+          <div className="metric-label">Queue count</div>
+          <div className="metric-val">{queue?.count ?? 0}</div>
+          <div className="metric-sub">{queue?.active?.expression ? 'active: ' + queue.active.expression.substring(0, 15) + '...' : 'idle'}</div>
+        </div>
+        <div className="metric-widget" style={{ flex: 1 }}>
+          <div className="metric-label">Gate pass rate</div>
+          <div className="metric-val">
+            {data.summary.simulated > 0 ? Math.round((data.summary.passing / data.summary.simulated) * 100) : 0}%
+          </div>
+          <div className="metric-sub">Structured quality gates</div>
+        </div>
+        <div className="metric-widget" style={{ flex: 1 }}>
+          <div className="metric-label">Best Sharpe</div>
+          <div className="metric-val">{formatNumber(data.summary.best_sharpe, 2)}</div>
+          <div className="metric-sub">{formatNumber(data.summary.average_sharpe, 2)} avg Sharpe</div>
+        </div>
+      </div>
 
-      <Panel title="Pipeline Status" subtitle={data.latest_run?.run_id ?? 'No active run'}>
-        <div className="progress-snapshot">
+      {/* Active Run Card */}
+      <div className="card" style={{ marginBottom: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <div>
-            <p className="eyebrow">Current task</p>
-            <strong>{visibleCurrentTask?.label ?? formatLabel(String(data.latest_run?.current_stage ?? 'idle'))}</strong>
-            <p className="muted">
-              {visibleCurrentTask?.detail || (data.latest_run ? `${formatLabel(String(data.latest_run.status))} workflow` : 'Waiting for the next workflow run.')}
-            </p>
-            {data.latest_run && !pendingRunIsAhead ? (
-              <p className="muted">
-                Started {formatDateTime(data.latest_run.started_at)}
-                {data.latest_run.finished_at ? ` · Ended ${formatDateTime(data.latest_run.finished_at)}` : ''}
-              </p>
-            ) : null}
-            {props.pendingRun && pendingRunIsAhead ? <p className="muted">Requested {formatDateTime(props.pendingRun.requestedAt)}</p> : null}
-          </div>
-          <div>
-            <div className="progress-meter">
-              <div className="progress-meter-fill" style={{ width: `${Math.max(progressRatio * 100, 8)}%` }} />
+            <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Active Run</div>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+              {data.latest_run?.run_id ?? (props.pendingRun ? 'RUN_LAUNCHING' : 'NO_ACTIVE_RUN')}
             </div>
-            <p className="muted progress-meta">
-              {data.progress.total
-                ? `${data.progress.done}/${data.progress.total} candidates processed`
-                : `${completedStages}/${totalStages} stages marked done`}
-            </p>
-            {queue?.active?.expression ? (
-              <p className="muted progress-meta">Simulating now: {queue.active.expression}</p>
-            ) : props.pendingRun ? (
-              <p className="muted progress-meta">Run request sent. Waiting for research stage to appear...</p>
-            ) : workflowDetail?.current_alpha ? (
-              <p className="muted progress-meta">Latest alpha in flow: {workflowDetail.current_alpha}</p>
-            ) : null}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className={`pulse-dot ${latestRun?.status === 'running' ? 'running' : latestRun?.status === 'error' ? 'warn' : ''}`}></span>
+            <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              {props.pendingRun ? 'Launching stage' : latestRun ? `${formatLabel(latestRun.status)} — ${formatLabel(latestRun.current_stage)}` : 'Idle'}
+            </span>
           </div>
         </div>
-        <div className="workflow-detail-grid">
-          <article className="detail-card">
-            <p className="eyebrow">Simulation queue</p>
-            <strong>
-              {queue?.active?.expression
-                ? `Running ${queue.active.expression}`
-                : props.pendingRun
-                  ? 'Waiting for first simulation task'
-                : queue?.waiting?.[0]?.expression
-                  ? `Waiting ${queue.waiting[0].expression}`
-                  : 'No queued alpha'}
-            </strong>
-            <p className="muted">
-              {queue?.active?.waiting_seconds != null
-                ? `Current alpha has held the slot for ${formatDurationSeconds(queue.active.waiting_seconds)}.`
-                : props.pendingRun
-                  ? 'The process is alive, but no alpha has entered the FIFO queue yet.'
-                : queue?.waiting?.length
-                  ? `${queue.waiting.length} alpha(s) waiting in FIFO.`
-                  : 'Simulation queue is idle.'}
-            </p>
-          </article>
-          <article className="detail-card">
-            <p className="eyebrow">Research basis</p>
-            <strong>
-              {workflowDetail?.research_basis?.[0]?.title ?? 'No research artifact yet'}
-            </strong>
-            <p className="muted">
-              {workflowDetail?.research_basis?.[0]
-                ? `${workflowDetail.research_basis[0].kind} · ${workflowDetail.research_basis[0].query_text || 'general context'}`
-                : 'Research detail will appear as soon as artifacts are persisted.'}
-            </p>
-          </article>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
+          <span>Simulation progress</span>
+          <span>{Math.round(progressRatio * 100)}% ({data.progress.total ? `${data.progress.done}/${data.progress.total} candidates` : `${completedStages}/${totalStages} stages`})</span>
         </div>
-        <div className="tracker-columns dashboard-columns">
-          <div className="log-panel">
-            <p className="eyebrow">Task timeline</p>
-            {workflowDetail?.task_timeline?.length ? (
-              workflowDetail.task_timeline.map((task) => (
-                <div key={`${task.timestamp}-${task.label}`} className="feed-item">
-                  <span>{formatDateTime(task.timestamp)}</span>
-                  <strong>{task.label}</strong>
-                  <p>{task.detail}</p>
+        <div style={{ height: '6px', background: 'var(--color-background-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${Math.max(progressRatio * 100, 4)}%`, background: '#185FA5' }}></div>
+        </div>
+      </div>
+
+      {/* Double Column Block */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+        {/* Left Column: Live Activity */}
+        <div className="card" style={{ flex: 1 }}>
+          <div className="sec">Live Activity</div>
+          {data.feed.length ? (
+            data.feed.slice(0, 6).map((item: ActivityItem, idx) => (
+              <div key={`${item.timestamp}-${item.message}-${idx}`} className="insight-row-layout">
+                <span className="insight-icon-layout">{item.icon}</span>
+                <span style={{ color: 'var(--color-text-secondary)', fontSize: '12px' }}>{item.message}</span>
+                <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--color-text-tertiary)' }}>{item.timestamp}</span>
+              </div>
+            ))
+          ) : (
+            <EmptyState message="No events yet." />
+          )}
+        </div>
+
+        {/* Right Column: Best Passing Alphas */}
+        <div className="card" style={{ flex: 1 }}>
+          <div className="sec">Best Passing Alphas</div>
+          {data.best_alpha.length ? (
+            data.best_alpha.slice(0, 6).map((item) => (
+              <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', padding: '6px 0', borderBottom: '0.5px solid var(--color-border-tertiary)' }}>
+                <span style={{ color: 'var(--color-text-primary)', fontFamily: 'monospace' }} title={item.expression}>
+                  <Link to={`/alphas/${item.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                    {item.expression.length > 35 ? item.expression.substring(0, 35) + '...' : item.expression}
+                  </Link>
+                </span>
+                <span className={`badge ${item.sharpe >= 2 ? 'b-green' : 'b-amber'}`}>
+                  Sharpe {formatNumber(item.sharpe, 2)}
+                </span>
+              </div>
+            ))
+          ) : (
+            <EmptyState message="No passing alphas yet today." />
+          )}
+        </div>
+      </div>
+
+      {/* Alerts and Controls */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+        <Panel title="Mission Control" subtitle="Next best move for the current alpha workflow">
+          <div style={{ padding: '8px 0' }}>
+            <h4 style={{ fontSize: '13px', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+              {visibleCurrentTask?.label ?? 'Ready for the next run'}
+            </h4>
+            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '12px' }}>
+              {visibleCurrentTask?.detail ??
+                (latestRun
+                  ? `${formatLabel(latestRun.status)} at ${formatLabel(latestRun.current_stage)}.`
+                  : 'Start a dry operational pass, inspect the first research basis, then move promising candidates into Studio.')}
+            </p>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                className="btn-layout btn-sm-layout"
+                style={{ background: 'var(--color-text-info)', color: '#000' }}
+                disabled={!!props.pendingRun}
+                onClick={() => void props.onRun()}
+              >
+                {props.pendingRun ? 'Launching...' : 'Run Now'}
+              </button>
+              <button
+                className="btn-layout btn-sm-layout"
+                disabled={latestRun?.status !== 'running' && !props.pendingRun}
+                onClick={() => void props.onStop()}
+              >
+                Stop Run
+              </button>
+              <button
+                className="btn-layout btn-sm-layout"
+                style={{ background: 'transparent', border: '0.5px solid var(--color-border-secondary)' }}
+                onClick={() => void props.overviewState.refetch()}
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        </Panel>
+
+        <Panel title="Alerts" subtitle="Submission and runtime signals">
+          {data.alerts.length ? (
+            <div style={{ maxHeight: '140px', overflowY: 'auto' }}>
+              {data.alerts.map((alert, idx) => (
+                <div key={`${alert.title}-${idx}`} style={{ padding: '6px 8px', borderRadius: '4px', background: alert.kind === 'error' ? '#FCEBEB' : alert.kind === 'warning' ? '#FAEEDA' : 'var(--color-background-primary)', color: alert.kind === 'error' ? '#A32D2D' : alert.kind === 'warning' ? '#854F0B' : 'var(--color-text-primary)', marginBottom: '4px', fontSize: '11px' }}>
+                  <strong>{alert.title}</strong>: {alert.body}
                 </div>
-              ))
-            ) : props.pendingRun ? (
-              <div className="feed-item">
-                <span>{formatDateTime(props.pendingRun.requestedAt)}</span>
-                <strong>Run launch requested</strong>
-                <p>
-                  {props.pendingRun.status === 'launching'
-                    ? 'Backend is receiving the run request.'
-                    : 'Backend accepted the run request and is waiting for the child pipeline process to publish research events.'}
-                </p>
-              </div>
-            ) : (
-              <EmptyState message="No task timeline yet." />
-            )}
-          </div>
-          <div className="log-panel">
-            <p className="eyebrow">Theory basis</p>
-            {workflowDetail?.theory_basis?.length ? (
-              <div className="workflow-basis-list">
-                {workflowDetail.theory_basis.map((item) => (
-                  <article key={item.title} className="detail-card">
-                    <strong>{item.title}</strong>
-                    <p>{item.reason}</p>
-                    <span className="muted">
-                      {item.count > 0 ? `${item.count} linked alpha(s)` : 'Strategy basis'}
-                    </span>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <EmptyState message="No persisted theory basis yet." />
-            )}
-          </div>
-        </div>
-      </Panel>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="No alerts yet." />
+          )}
+        </Panel>
+      </div>
 
-      <Panel title="Dual-Agent Chatspace" subtitle="Talk to Hermes and DeerFlow without leaving the dashboard">
+      {/* DeerFlow Chatspace */}
+      <Panel title="DeerFlow Chatspace" subtitle="Talk to DeerFlow without leaving the dashboard">
         <DualAgentChatspace strategyType={latestRun?.strategy_type ?? 'momentum'} />
-      </Panel>
-
-      <Panel title="Alerts" subtitle="Submission and runtime signals">
-        {data.alerts.length ? (
-          <div className="alert-list">
-            {data.alerts.map((alert) => (
-              <article key={`${alert.title}-${alert.body}`} className={`alert-card ${alert.kind}`}>
-                <strong>{alert.title}</strong>
-                <p>{alert.body}</p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <EmptyState message="No alerts yet." />
-        )}
-      </Panel>
-
-      <Panel title="Live Activity" subtitle="Recent workflow events">
-        {data.feed.length ? (
-          <div className="feed-list">
-            {data.feed.map((item: ActivityItem) => (
-              <div key={`${item.timestamp}-${item.message}`} className="feed-item">
-                <span>{item.timestamp}</span>
-                <strong>{item.icon}</strong>
-                <p>{item.message}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <EmptyState message="No events yet." />
-        )}
-      </Panel>
-
-      <Panel title="Sharpe Distribution" subtitle="Bucketed by recent alpha runs">
-        <div className="bar-list">
-          {data.histogram.map((bucket) => (
-            <div key={bucket.bucket} className="bar-item">
-              <span>{bucket.bucket}</span>
-              <div className="bar-track">
-                <div className="bar-fill" style={{ width: `${Math.max(12, bucket.count * 10)}px` }} />
-              </div>
-              <strong>{bucket.count}</strong>
-            </div>
-          ))}
-        </div>
-      </Panel>
-
-      <Panel title="Best Alpha" subtitle="Highest-fitness recent winner">
-        {data.best_alpha.length ? (
-          <Link className="alpha-hero" to={`/alphas/${data.best_alpha[0].id}`}>
-            <ExpressionCode expression={data.best_alpha[0].expression} />
-            <div className="alpha-hero-meta">
-              <span>Sharpe {formatNumber(data.best_alpha[0].sharpe)}</span>
-              <span>Fitness {formatNumber(data.best_alpha[0].fitness)}</span>
-              <span>{data.best_alpha[0].theme}</span>
-            </div>
-          </Link>
-        ) : (
-          <EmptyState message="No approved alpha yet." />
-        )}
       </Panel>
     </div>
   )
@@ -1085,9 +1338,9 @@ function AlphasPage() {
   const themes = Array.from(new Set(rows.map((item) => item.theme))).sort()
 
   return (
-    <div className="page-grid">
+    <div style={{ padding: '0 4px' }}>
       <Panel title="Alpha Pool" subtitle="Filter, compare, and inspect candidates">
-        <div className="filter-grid">
+        <div className="filter-grid" style={{ marginBottom: '14px' }}>
           <select value={status} onChange={(event) => setStatus(event.target.value)}>
             <option value="">All status</option>
             <option value="approved">Pass</option>
@@ -1114,8 +1367,8 @@ function AlphasPage() {
         </div>
 
         {rows.length ? (
-          <div className="table-shell">
-            <table className="data-table">
+          <div style={{ overflowX: 'auto' }}>
+            <table className="tbl-layout">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -1128,27 +1381,34 @@ function AlphasPage() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id}>
-                    <td>#{row.id}</td>
-                    <td>
-                      <Link to={`/alphas/${row.id}`}>{row.expression}</Link>
-                    </td>
-                    <td>{row.theme}</td>
-                    <td>{formatNumber(row.sharpe)}</td>
-                    <td>{formatNumber(row.fitness)}</td>
-                    <td>{formatPercent(row.turnover)}</td>
-                    <td>
-                      <StatusPill value={row.simulation_failed ? 'error' : row.status} />
-                      {row.needs_review ? <StatusPill value="warning" /> : null}
-                      {row.simulation_failed ? <p className="cell-note">{row.failure_note}</p> : null}
-                      {row.status === 'screened_out' && row.pre_backtest_score != null ? (
-                        <p className="cell-note">Local backtest score {formatNumber(row.pre_backtest_score)}</p>
-                      ) : null}
-                      {!row.simulation_failed && row.gate_failure_reason ? <p className="cell-note">{row.gate_failure_reason}</p> : null}
-                    </td>
-                  </tr>
-                ))}
+                {rows.map((row) => {
+                  const statusStr = String(row.status || '');
+                  const isPassing = statusStr === 'approved' || statusStr === 'submitted' || row.sharpe >= 2.0;
+                  const isFailed = statusStr === 'tested' || row.simulation_failed || statusStr === 'invalid' || statusStr === 'screened_out';
+                  const badgeClass = isPassing ? 'b-green' : isFailed ? 'b-red' : 'b-amber';
+
+                  return (
+                    <tr key={row.id}>
+                      <td>#{row.id}</td>
+                      <td style={{ fontFamily: 'monospace', fontSize: '11px' }}>
+                        <Link to={`/alphas/${row.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>{row.expression}</Link>
+                      </td>
+                      <td>{row.theme}</td>
+                      <td>{formatNumber(row.sharpe, 2)}</td>
+                      <td>{formatNumber(row.fitness, 2)}</td>
+                      <td>{formatPercent(row.turnover, 1)}</td>
+                      <td>
+                        <span className={`badge ${badgeClass}`}>{formatLabel(statusStr)}</span>
+                        {row.needs_review ? <span className="badge b-amber" style={{ marginLeft: '4px' }}>Review Required</span> : null}
+                        {row.simulation_failed ? <p className="cell-note" style={{ color: 'var(--color-text-danger)' }}>{row.failure_note}</p> : null}
+                        {row.status === 'screened_out' && row.pre_backtest_score != null ? (
+                          <p className="cell-note">Local backtest score {formatNumber(row.pre_backtest_score, 2)}</p>
+                        ) : null}
+                        {!row.simulation_failed && row.gate_failure_reason ? <p className="cell-note" style={{ color: 'var(--color-text-warning)' }}>{row.gate_failure_reason}</p> : null}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -1157,32 +1417,34 @@ function AlphasPage() {
         )}
       </Panel>
 
-      <Panel title="Correlation Snapshot" subtitle="Token-overlap proxy across recent alphas">
-        {state.data?.correlation_matrix?.length ? (
-          <div className="table-shell">
-            <table className="data-table compact">
-              <thead>
-                <tr>
-                  {Object.keys(state.data.correlation_matrix[0]).map((key) => (
-                    <th key={key}>{key}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {state.data.correlation_matrix.map((row, index) => (
-                  <tr key={`matrix-${index}`}>
-                    {Object.entries(row).map(([key, value]) => (
-                      <td key={key}>{String(value)}</td>
+      <div style={{ marginTop: '12px' }}>
+        <Panel title="Correlation Snapshot" subtitle="Token-overlap proxy across recent alphas">
+          {state.data?.correlation_matrix?.length ? (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="tbl-layout">
+                <thead>
+                  <tr>
+                    {Object.keys(state.data.correlation_matrix[0]).map((key) => (
+                      <th key={key}>{key}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <EmptyState message="Not enough recent alphas for a similarity matrix." />
-        )}
-      </Panel>
+                </thead>
+                <tbody>
+                  {state.data.correlation_matrix.map((row, index) => (
+                    <tr key={`matrix-${index}`}>
+                      {Object.entries(row).map(([key, value]) => (
+                        <td key={key}>{String(value)}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState message="Not enough recent alphas for a similarity matrix." />
+          )}
+        </Panel>
+      </div>
     </div>
   )
 }
@@ -1198,36 +1460,59 @@ function AlphaDetailPage() {
 
   const alpha = state.data.alpha
   return (
-    <div className="page-grid">
+    <div style={{ padding: '0 4px' }}>
       <Panel title="Alpha Detail" subtitle={`Alpha #${String(alpha.id)}`}>
-        <div className="alpha-detail-header">
-          <ExpressionCode expression={String(alpha.expression)} />
-          <div className="status-stack">
-            <StatusPill value={Boolean(alpha.simulation_failed) ? 'error' : String(alpha.status)} />
-            {Boolean(alpha.needs_review) ? <StatusPill value="warning" /> : null}
+        <div style={{ padding: '8px 0 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--color-border-tertiary)', marginBottom: '16px' }}>
+          <div style={{ fontFamily: 'monospace', fontSize: '14px', color: 'var(--color-text-primary)', background: 'var(--color-background-tertiary)', padding: '10px 14px', borderRadius: '6px', border: '0.5px solid var(--color-border-tertiary)', flex: 1, marginRight: '16px', overflowX: 'auto' }}>
+            {alpha.expression}
+          </div>
+          <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+            <span className={`badge ${alpha.simulation_failed ? 'b-red' : (alpha.status === 'approved' || alpha.status === 'submitted' || alpha.sharpe >= 2.0) ? 'b-green' : 'b-amber'}`}>
+              {formatLabel(alpha.simulation_failed ? 'failed' : alpha.status)}
+            </span>
+            {alpha.needs_review ? <span className="badge b-amber">Review Required</span> : null}
           </div>
         </div>
-        <div className="metrics-grid">
-          <MetricCard label="Sharpe" value={formatNumber(alpha.sharpe)} detail="Pass target ≥ 1.0" />
-          <MetricCard label="Fitness" value={formatNumber(alpha.fitness)} detail="Signal efficiency" />
-          <MetricCard label="Turnover" value={formatPercent(alpha.turnover)} detail="Execution intensity" />
-          <MetricCard label="Returns" value={formatPercent(alpha.annual_returns)} detail="Annualized return proxy" />
-          <MetricCard
-            label="Local backtest"
-            value={alpha.pre_backtest_score != null ? formatNumber(alpha.pre_backtest_score) : 'n/a'}
-            detail={alpha.pre_backtest_passed ? 'Promoted by proxy gate' : 'Blocked or not promoted'}
-          />
+
+        {/* Metrics Grid */}
+        <div className="card" style={{ display: 'flex', gap: '12px', padding: '12px', marginBottom: '12px', border: 'none', background: 'var(--color-background-secondary)' }}>
+          <div className="metric-widget" style={{ flex: 1 }}>
+            <div className="metric-label">Sharpe</div>
+            <div className="metric-val">{formatNumber(alpha.sharpe, 2)}</div>
+            <div className="metric-sub">Pass target &ge; 1.0</div>
+          </div>
+          <div className="metric-widget" style={{ flex: 1 }}>
+            <div className="metric-label">Fitness</div>
+            <div className="metric-val">{formatNumber(alpha.fitness, 2)}</div>
+            <div className="metric-sub">Signal efficiency</div>
+          </div>
+          <div className="metric-widget" style={{ flex: 1 }}>
+            <div className="metric-label">Turnover</div>
+            <div className="metric-val">{formatPercent(alpha.turnover, 1)}</div>
+            <div className="metric-sub">Execution intensity</div>
+          </div>
+          <div className="metric-widget" style={{ flex: 1 }}>
+            <div className="metric-label">Returns</div>
+            <div className="metric-val">{formatPercent(alpha.annual_returns, 1)}</div>
+            <div className="metric-sub">Annualized proxy</div>
+          </div>
+          <div className="metric-widget" style={{ flex: 1 }}>
+            <div className="metric-label">Local Backtest</div>
+            <div className="metric-val">
+              {alpha.pre_backtest_score != null ? formatNumber(alpha.pre_backtest_score, 2) : 'n/a'}
+            </div>
+            <div className="metric-sub">{alpha.pre_backtest_passed ? 'Passed proxy gate' : 'Blocked/no run'}</div>
+          </div>
         </div>
+
         {alpha.gate_failure_reason ? (
-          <div className="detail-banner warning">
-            <strong>Failure reason</strong>
-            <p>{String(alpha.gate_failure_reason)}</p>
+          <div style={{ padding: '10px 12px', borderRadius: '6px', background: '#FFF7ED', border: '0.5px solid #FFEDD5', color: '#C2410C', fontSize: '12px', marginBottom: '12px' }}>
+            <strong>Gate failure reason:</strong> {alpha.gate_failure_reason}
           </div>
         ) : null}
-        {Boolean(alpha.simulation_failed) && alpha.failure_note ? (
-          <div className="detail-banner warning">
-            <strong>Simulation error</strong>
-            <p>{String(alpha.failure_note)}</p>
+        {alpha.simulation_failed && alpha.failure_note ? (
+          <div style={{ padding: '10px 12px', borderRadius: '6px', background: '#FEF2F2', border: '0.5px solid #FEE2E2', color: '#B91C1C', fontSize: '12px', marginBottom: '12px' }}>
+            <strong>Simulation error:</strong> {alpha.failure_note}
           </div>
         ) : null}
       </Panel>
@@ -1999,11 +2284,11 @@ function StudioPage({
   )
   const [strategyType, setStrategyType] = useState('momentum')
   const [focusQuery, setFocusQuery] = useState('improve fitness over 1')
-  const [target, setTarget] = useState('Both')
+  const [target] = useState('DeerFlow')
   const [objective, setObjective] = useState('Fitness-first')
   const [count, setCount] = useState(8)
   const [prompt, setPrompt] = useState('Research how to improve fitness over 1 in WorldQuant alpha generation before creating new signals.')
-  const [chatInput, setChatInput] = useState('Hermes and DeerFlow, critique the current alpha direction and suggest the next best improvement.')
+  const [chatInput, setChatInput] = useState('DeerFlow, critique the current alpha direction and suggest the next best improvement.')
   const [manualExpression, setManualExpression] = useState('')
   const [contextBundle, setContextBundle] = useState<Record<string, string> | null>(null)
   const [responses, setResponses] = useState<Record<string, unknown> | null>(null)
@@ -2188,7 +2473,31 @@ function StudioPage({
   const activeAgents = target === 'Both' ? ['Hermes', 'DeerFlow'] : [target]
   const latestEvents = (eventsState.data?.items ?? []) as PipelineEvent[]
   const recentRuns = (runsState.data?.items ?? []) as PipelineRun[]
-  const agentLanes = ['Hermes', 'DeerFlow'].map((agent) => {
+  const selectedCandidate = candidatePool.find((item) => item.expression === selectedExpression)
+  const validCandidateCount = candidatePool.filter((item) => item.valid).length
+  const workflowSteps: WorkflowStep[] = [
+    {
+      label: 'Brief',
+      detail: contextBundle ? 'Research context is loaded' : 'Refresh context before asking agents',
+      status: busy === 'context' ? 'active' : contextBundle ? 'done' : 'idle',
+    },
+    {
+      label: 'Collaborate',
+      detail: responses ? 'Agent feedback is available' : 'Ask agents or use chatspace',
+      status: ['query', 'generate', 'chat'].includes(busy) ? 'active' : responses ? 'done' : contextBundle ? 'idle' : 'blocked',
+    },
+    {
+      label: 'Select',
+      detail: candidatePool.length ? `${validCandidateCount}/${candidatePool.length} candidates are valid` : 'No candidates collected yet',
+      status: selectedExpression ? 'done' : candidatePool.length ? 'active' : 'blocked',
+    },
+    {
+      label: 'Simulate',
+      detail: simulation ? 'Simulation result is ready' : selectedExpression ? 'Ready to simulate selected alpha' : 'Pick an expression first',
+      status: busy === 'simulate' ? 'active' : simulation ? 'done' : selectedExpression ? 'idle' : 'blocked',
+    },
+  ]
+  const agentLanes = ['DeerFlow'].map((agent) => {
     const touchedInChat = chatMessages.some((item) => item.agent === agent && item.role === 'agent')
     const thinking = ['query', 'generate', 'chat'].includes(busy) && activeAgents.includes(agent)
     return {
@@ -2200,6 +2509,51 @@ function StudioPage({
 
   return (
     <div className="page-grid">
+      <Panel title="Studio Command Center" subtitle="Move from research brief to simulated alpha without losing your place">
+        {message ? <div className="toast inline">{message}</div> : null}
+        <div className="studio-command-shell">
+          <div className="studio-hero-card">
+            <p className="eyebrow">Current mission</p>
+            <h3>{strategyType} / {objective}</h3>
+            <p>
+              Work the loop from left to right: load context, collaborate with agents, choose a candidate, then simulate. The Studio will keep the
+              active candidate and latest result visible while the workflow moves.
+            </p>
+            <div className="mission-tags">
+              <span className="tag">Target: {target}</span>
+              <span className="tag">{count} requested</span>
+              <span className="tag">{candidatePool.length} collected</span>
+              {selectedCandidate ? <span className="tag">Selected: {selectedCandidate.source}</span> : null}
+            </div>
+          </div>
+          <WorkflowStepRail steps={workflowSteps} />
+        </div>
+        <div className="command-grid">
+          <CommandCard
+            title="1. Context"
+            detail={contextBundle ? 'Context bundle refreshed' : 'Load relevant research and lessons'}
+            actionLabel={busy === 'context' ? 'Refreshing...' : 'Refresh context'}
+            disabled={busy !== ''}
+            tone="primary"
+            onAction={() => void loadContext()}
+          />
+          <CommandCard
+            title="2. Generate"
+            detail={responses ? 'Agent output is ready to review' : 'Ask agents for candidates'}
+            actionLabel={busy === 'generate' ? 'Generating...' : 'Generate pack'}
+            disabled={busy !== ''}
+            onAction={() => void runGenerate()}
+          />
+          <CommandCard
+            title="3. Simulate"
+            detail={selectedExpression ? 'Selected candidate is ready' : 'Select or add a candidate first'}
+            actionLabel={busy === 'simulate' ? 'Simulating...' : 'Simulate selected'}
+            disabled={busy !== '' || !selectedExpression}
+            onAction={() => void runSimulate()}
+          />
+        </div>
+      </Panel>
+
       <Panel title="Workflow Tracker" subtitle="See where agents and the active workflow are right now">
         <div className="tracker-shell">
           <div className="tracker-summary">
@@ -2315,8 +2669,7 @@ function StudioPage({
         </div>
       </Panel>
 
-      <Panel title="Agent Studio" subtitle="Talk to Hermes and DeerFlow, then simulate from the same workspace">
-        {message ? <div className="toast inline">{message}</div> : null}
+      <Panel title="Agent Studio" subtitle="Talk to DeerFlow, then simulate from the same workspace">
         <div className="settings-grid">
           <label>
             Strategy
@@ -2326,14 +2679,6 @@ function StudioPage({
                   {item}
                 </option>
               ))}
-            </select>
-          </label>
-          <label>
-            Target
-            <select value={target} onChange={(event) => setTarget(event.target.value)}>
-              <option value="Hermes">Hermes</option>
-              <option value="DeerFlow">DeerFlow</option>
-              <option value="Both">Both</option>
             </select>
           </label>
           <label>
@@ -2403,11 +2748,24 @@ function StudioPage({
                     <strong>{item.role === 'user' ? 'User' : item.agent}</strong>
                     <span>{item.createdAt.slice(11, 19)}</span>
                   </div>
-                  <p>{item.content}</p>
+                  <MarkdownRenderer text={item.content} />
                 </article>
               ))
             ) : (
               <EmptyState message="No chat yet. Send the first prompt to start the agent conversation." />
+            )}
+            {busy === 'chat' && (
+              <article className="chat-bubble agent">
+                <div className="chat-bubble-head">
+                  <strong>DeerFlow</strong>
+                  <span>Thinking...</span>
+                </div>
+                <div className="gemini-typing" style={{ marginTop: '0.5rem' }}>
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </article>
             )}
           </div>
 
@@ -2418,7 +2776,7 @@ function StudioPage({
                 rows={5}
                 value={chatInput}
                 onChange={(event) => setChatInput(event.target.value)}
-                placeholder="Ask Hermes, DeerFlow, or both to critique or improve the current direction."
+                placeholder="Ask DeerFlow to critique or improve the current direction."
               />
             </label>
             <div className="panel-actions">
@@ -2515,6 +2873,273 @@ function StudioPage({
           </div>
         ) : null}
       </Panel>
+    </div>
+  )
+}
+
+function SimulatingPage(props: {
+  overviewState: LoadState<OverviewResponse> & { refetch: () => Promise<void> }
+  onStop: () => Promise<void>
+}) {
+  const alphasState = usePolling(() => api.getAlphas({ limit: 50 }), [], 5000)
+
+  if (props.overviewState.loading && !props.overviewState.data) return <LoadingState message="Loading simulation status…" />
+  const data = props.overviewState.data
+  const workflowDetail = data?.workflow_detail
+  const queue = workflowDetail?.simulation_queue
+  const active = queue?.active
+
+  return (
+    <div style={{ padding: '0 4px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <div>
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Simulating Now</h2>
+          <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>Real-time cluster simulation pipeline and FIFO queue status</p>
+        </div>
+        <button
+          className="btn-layout btn-sm-layout"
+          disabled={!active}
+          onClick={() => void props.onStop()}
+        >
+          Stop Current Sim
+        </button>
+      </div>
+
+      {/* Active simulation section */}
+      <Panel title="Current Candidate Simulation" subtitle={active ? 'Simulating candidate expression on backtesting engine' : 'No active simulation'}>
+        {active ? (
+          <div style={{ padding: '8px 0' }}>
+            <div style={{ fontSize: '13px', color: 'var(--color-text-primary)', fontFamily: 'monospace', background: 'var(--color-background-tertiary)', padding: '10px', borderRadius: '6px', marginBottom: '10px', border: '0.5px solid var(--color-border-tertiary)' }}>
+              {active.expression}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+              <span>Engine Status</span>
+              <span>Running ({formatDurationSeconds(active.waiting_seconds)} active)</span>
+            </div>
+            <div className="skill-bar-wrap-layout">
+              <div className="skill-bar-layout" style={{ width: '100%', background: 'var(--color-text-info)', animation: 'pulse 2s infinite' }} />
+            </div>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+              <button
+                className="btn-layout btn-sm-layout"
+                style={{ background: 'var(--color-background-tertiary)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-primary)' }}
+                onClick={async () => {
+                  try {
+                    await api.unlockSimulationQueue();
+                    alert('Queue unlocked! The next candidate will begin simulation shortly.');
+                    void props.overviewState.refetch();
+                  } catch (e: any) {
+                    alert('Failed to unlock queue: ' + e.message);
+                  }
+                }}
+              >
+                Unlock Queue (Force Resume)
+              </button>
+              <button
+                className="btn-layout btn-sm-layout"
+                style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'rgb(239, 68, 68)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
+                onClick={async () => {
+                  if (confirm('Are you sure you want to completely reset and clear the simulation queue?')) {
+                    try {
+                      await api.clearSimulationQueue();
+                      alert('Queue fully cleared!');
+                      void props.overviewState.refetch();
+                    } catch (e: any) {
+                      alert('Failed to clear queue: ' + e.message);
+                    }
+                  }
+                }}
+              >
+                Clear Queue
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <EmptyState message="Simulation engine is currently idle." />
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px', justifyContent: 'center' }}>
+              <button
+                className="btn-layout btn-sm-layout"
+                style={{ background: 'var(--color-background-tertiary)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-primary)' }}
+                onClick={async () => {
+                  try {
+                    await api.unlockSimulationQueue();
+                    alert('Queue unlocked!');
+                    void props.overviewState.refetch();
+                  } catch (e: any) {
+                    alert('Failed to unlock queue: ' + e.message);
+                  }
+                }}
+              >
+                Unlock Queue
+              </button>
+              <button
+                className="btn-layout btn-sm-layout"
+                style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'rgb(239, 68, 68)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
+                onClick={async () => {
+                  if (confirm('Are you sure you want to completely reset and clear the simulation queue?')) {
+                    try {
+                      await api.clearSimulationQueue();
+                      alert('Queue fully cleared!');
+                      void props.overviewState.refetch();
+                    } catch (e: any) {
+                      alert('Failed to clear queue: ' + e.message);
+                    }
+                  }
+                }}
+              >
+                Clear Queue
+              </button>
+            </div>
+          </div>
+        )}
+      </Panel>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px', marginTop: '12px' }}>
+        {/* Waiting FIFO queue */}
+        <Panel title="Waiting in Queue" subtitle={`${queue?.waiting?.length ?? 0} candidates waiting`}>
+          {queue?.waiting?.length ? (
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {queue.waiting.map((item, idx) => (
+                <div key={`${item.expression}-${idx}`} style={{ padding: '8px 10px', borderRadius: '4px', background: 'var(--color-background-primary)', border: '0.5px solid var(--color-border-tertiary)', marginBottom: '6px', fontSize: '11px', fontFamily: 'monospace', color: 'var(--color-text-secondary)', wordBreak: 'break-all' }}>
+                  <span style={{ color: 'var(--color-text-tertiary)', marginRight: '6px' }}>#{idx + 1}</span>
+                  {item.expression}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="FIFO queue is empty." />
+          )}
+        </Panel>
+
+        {/* Completed today */}
+        <Panel title="Completed Today" subtitle="Recently completed simulation runs">
+          {alphasState.loading && !alphasState.data ? (
+            <LoadingState message="Loading completed simulations..." />
+          ) : alphasState.data?.items?.length ? (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="tbl-layout">
+                <thead>
+                  <tr>
+                    <th>Candidate Expression</th>
+                    <th>Sharpe</th>
+                    <th>Fitness</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {alphasState.data.items.slice(0, 15).map((alpha: any) => {
+                    const statusStr = String(alpha.status || 'unknown');
+                    const isPassing = statusStr.toLowerCase() === 'passing' || alpha.sharpe >= 2.0;
+                    const isFailed = statusStr.toLowerCase() === 'failed' || alpha.sharpe < 1.0;
+                    const badgeClass = isPassing ? 'b-green' : isFailed ? 'b-red' : 'b-amber';
+                    const statusText = isPassing ? 'Passing' : isFailed ? 'Failed' : 'Weak';
+
+                    return (
+                      <tr key={alpha.id}>
+                        <td style={{ fontFamily: 'monospace', fontSize: '11px', maxWidth: '350px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={alpha.expression}>
+                          <Link to={`/alphas/${alpha.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                            {alpha.expression}
+                          </Link>
+                        </td>
+                        <td>{formatNumber(alpha.sharpe, 2)}</td>
+                        <td>{formatNumber(alpha.fitness, 2)}</td>
+                        <td>
+                          <span className={`badge ${badgeClass}`}>{statusText}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState message="No simulations completed today yet." />
+          )}
+        </Panel>
+      </div>
+    </div>
+  )
+}
+
+function AgentSkillsPage() {
+  const theoriesState = usePolling(() => api.getTheories({ limit: 20 }), [], 15000)
+
+  const learningNotes = [
+    {
+      type: 'success',
+      text: 'Market summary: low-momentum regime confirmed via ADX < 20. Favour mean-reversion family this week.',
+    },
+    {
+      type: 'success',
+      text: 'Paper: "Short-term reversal in equities" confirms 5-day lookback optimal. Quality score 0.89.',
+    },
+    {
+      type: 'warning',
+      text: 'Tech sector showing momentum divergence — avoid pure mean-rev in tech names. Monitor.',
+    },
+    {
+      type: 'success',
+      text: 'Recovery note: after gate fail on vol sig, increase decay parameter from 0.05 to 0.08.',
+    },
+    {
+      type: 'info',
+      text: 'Analysis: Mean-reversion signals show higher efficacy when volatility is above 20-day median.',
+    }
+  ]
+
+  return (
+    <div style={{ padding: '0 4px' }}>
+      <div style={{ marginBottom: '12px' }}>
+        <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Agent Skills</h2>
+        <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>Skill proficiencies and operational insights learned by DeerFlow</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+        {/* DeerFlow Notes */}
+        <div className="card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <span style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--color-background-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-warning)' }}>
+              <i className="ti ti-brain"></i>
+            </span>
+            <div>
+              <div className="sec" style={{ margin: 0, padding: 0, border: 'none' }}>DeerFlow — theory explorer & alpha builder</div>
+              <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>Mines academic literature, generates alphas, and evaluates performance</span>
+            </div>
+          </div>
+
+          <div className="sec" style={{ fontSize: '11px', textTransform: 'uppercase', marginBottom: '6px' }}>DeerFlow — learning notes & insights</div>
+          <div>
+            {learningNotes.map((note, idx) => (
+              <div key={idx} className="insight-row-layout">
+                <span className="insight-icon-layout">
+                  <i className={note.type === 'warning' ? 'ti ti-alert-triangle' : 'ti ti-check'} style={{ color: note.type === 'warning' ? 'var(--color-text-warning)' : 'var(--color-text-success)' }}></i>
+                </span>
+                <span style={{ color: 'var(--color-text-secondary)', fontSize: '11.5px', lineHeight: '1.4' }}>{note.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Theories mapped to skills */}
+      <div style={{ marginTop: '12px' }}>
+        <Panel title="Active Knowledge Base" subtitle="Strategy theories currently mapped to DeerFlow exploration pipeline">
+          {theoriesState.loading && !theoriesState.data ? (
+            <LoadingState message="Loading knowledge base theories..." />
+          ) : theoriesState.data?.items?.length ? (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '6px 0' }}>
+              {theoriesState.data.items.map((theory) => (
+                <span key={theory.id} className="theory-tag-layout" title={theory.core_principle}>
+                  {theory.title}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="No theories registered in active knowledge base." />
+          )}
+        </Panel>
+      </div>
     </div>
   )
 }

@@ -1,0 +1,38 @@
+2026-05-19 21:03:34,150 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:05:59,696 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:06:09,487 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:07:32,249 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=FAIL confidence=0.360 expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:08:51,354 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=post_simulation strategy=momentum expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:09:35,421 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=post_simulation verdict=PASS confidence=0.740 expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:11:21,412 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:11:39,771 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:12:39,789 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=FAIL confidence=0.360 expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:14:01,855 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=post_simulation strategy=momentum expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:14:13,687 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:14:45,404 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=post_simulation verdict=PASS confidence=0.740 expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:16:37,155 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:16:46,460 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:17:55,501 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=WARN confidence=0.550 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:18:55,911 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=post_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:19:09,033 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:19:41,352 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=post_simulation verdict=PASS confidence=0.820 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:20:52,724 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:20:53,583 | WARNING | orchestration.deerflow_bridge | DeerFlow gateway returned no text and local CLI is unavailable.
+2026-05-19 21:23:16,655 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:23:25,635 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:24:15,951 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=PASS confidence=0.740 expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:25:38,140 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=post_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:26:31,228 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:26:53,247 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=post_simulation verdict=WARN confidence=0.550 expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:30:03,572 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:32:45,963 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 5) / ts_std_dev(returns, 20)) * rank(1 - ts_corr(volume, returns, 60)).
+2026-05-19 21:33:30,539 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=PASS confidence=0.740 expression=rank(ts_mean(returns, 5) / ts_std_dev(returns, 20)) * rank(1 - ts_corr(volume, returns, 60)).
+2026-05-19 23:01:26,510 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=zscore(rank(ts_delta(close, 10) / ts_std_dev(close, 60))) * rank(volume / ts_mean(volume, 20)).
+2026-05-19 23:01:40,781 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 23:02:53,801 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=PASS confidence=0.740 expression=zscore(rank(ts_delta(close, 10) / ts_std_dev(close, 60))) * rank(volume / ts_mean(volume, 20)).
+2026-05-20 08:50:12,121 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-20 08:52:12,822 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20)).
+2026-05-20 08:53:04,937 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-20 08:53:38,049 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=WARN confidence=0.550 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20)).
+2026-05-20 13:16:52,178 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-20 14:02:35,857 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha

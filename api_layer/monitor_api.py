@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 import json
@@ -854,9 +854,7 @@ def load_context_bundle(
 
 def query_agents(pipeline: AlphaPipeline, target: str, prompt: str) -> dict[str, str]:
     responses: dict[str, str] = {}
-    if target in {"Hermes", "Both"}:
-        responses["Hermes"] = pipeline.hermes.ask(prompt).strip()
-    if target in {"DeerFlow", "Both"}:
+    if target in {"DeerFlow", "Both", "Hermes"}:
         responses["DeerFlow"] = pipeline.deerflow.run_research(prompt).strip()
     return responses
 
@@ -906,9 +904,13 @@ def simulate_candidate(
     candidate = create_candidate(expression, strategy_type, metadata)
     validation_errors = validator.validate(expression)
     history = pipeline.store.list_recent(limit=300)
-    pre_backtest = pipeline.local_backtester.evaluate(candidate, history) if not validation_errors else None
+    pre_backtest_enabled = bool(pipeline.config.settings.get("pipeline", {}).get("pre_backtest", {}).get("enabled", True))
+    pre_backtest = (
+        pipeline.local_backtester.evaluate(candidate, history)
+        if pre_backtest_enabled and not validation_errors
+        else None
+    )
     pre_reviews = [
-        pipeline.hermes.review_alpha(candidate, "pre_simulation", review_context),
         pipeline.deerflow.review_alpha(candidate, "pre_simulation", review_context),
     ]
     alpha_run_id: int | None = None
@@ -936,7 +938,7 @@ def simulate_candidate(
             pre_backtest_passed=bool(pre_backtest.passed) if pre_backtest is not None else None,
             pre_backtest_metrics=pipeline.local_backtester.as_payload(pre_backtest).get("estimated_metrics", {}) if pre_backtest is not None else {},
         )
-    elif not pre_backtest.passed:
+    elif pre_backtest_enabled and pre_backtest is not None and not pre_backtest.passed:
         metrics = pipeline._pre_backtest_metrics(pre_backtest)
         gate_reasons = list(pre_backtest.reasons)
         status = "screened_out"
@@ -969,7 +971,6 @@ def simulate_candidate(
         gate_reasons = pipeline.quality_gate.evaluate(metrics)
         status = "approved" if not gate_reasons else "tested"
         post_reviews = [
-            pipeline.hermes.review_alpha(candidate, "post_simulation", review_context, metrics),
             pipeline.deerflow.review_alpha(candidate, "post_simulation", review_context, metrics),
         ]
         notes = "; ".join(gate_reasons + [f"{review.agent}:{review.stage}:{review.verdict}" for review in pre_reviews + post_reviews])
@@ -988,9 +989,9 @@ def simulate_candidate(
             pre_sim_verdict=aggregate_stage_verdict(pre_reviews, "pre_simulation"),
             post_sim_verdict=aggregate_stage_verdict(post_reviews, "post_simulation"),
             run_tags={"workflow_type": "studio_simulation", "strategy_type": strategy_type, "source": "studio"},
-            pre_backtest_score=float(pre_backtest.score),
-            pre_backtest_passed=bool(pre_backtest.passed),
-            pre_backtest_metrics=pipeline.local_backtester.as_payload(pre_backtest).get("estimated_metrics", {}),
+            pre_backtest_score=float(pre_backtest.score) if pre_backtest is not None else None,
+            pre_backtest_passed=bool(pre_backtest.passed) if pre_backtest is not None else None,
+            pre_backtest_metrics=pipeline.local_backtester.as_payload(pre_backtest).get("estimated_metrics", {}) if pre_backtest is not None else {},
         )
     if alpha_run_id is not None:
         pipeline.store.save_alpha_explanation(
@@ -1003,7 +1004,7 @@ def simulate_candidate(
                 agent_reviews=[serialize_review(review) for review in pre_reviews + post_reviews],
                 stage_notes={
                     "status": status,
-                    "pre_backtest": pipeline.local_backtester.as_payload(pre_backtest) if pre_backtest is not None else {},
+                    "pre_backtest": pipeline.local_backtester.as_payload(pre_backtest) if pre_backtest is not None else {"enabled": False},
                     "validation_errors": validation_errors,
                     "gate_reasons": gate_reasons,
                     "metrics": serialize_metrics(metrics),
@@ -1981,6 +1982,106 @@ def create_app(root: Path | None = None) -> FastAPI:
             payload.metadata,
             payload.review_context,
         )
+
+    @app.get("/api/simulation-queue")
+    def get_simulation_queue() -> dict[str, Any]:
+        return simulation_queue_state(app_root)
+
+    @app.post("/api/simulation-queue/unlock")
+    def unlock_simulation_queue() -> dict[str, Any]:
+        queue_dir = app_root / "runtime" / "simulation_fifo"
+        active_lock = queue_dir / "active.lock"
+        existed = active_lock.exists()
+        active_lock.unlink(missing_ok=True)
+        return {"status": "ok", "unlocked": existed}
+
+    @app.post("/api/simulation-queue/clear")
+    def clear_all_simulation_queue() -> dict[str, Any]:
+        queue_dir = app_root / "runtime" / "simulation_fifo"
+        if queue_dir.exists():
+            active_lock = queue_dir / "active.lock"
+            active_lock.unlink(missing_ok=True)
+            for ticket in queue_dir.glob("*.ticket"):
+                ticket.unlink(missing_ok=True)
+        return {"status": "ok", "cleared": True}
+
+    # Job Queue Management Endpoints
+    @app.get("/api/job-queue/status")
+    def get_job_queue_status() -> dict[str, Any]:
+        """Lấy trạng thái hàng đợi job"""
+        from runtime.queue_manager import QueueManager
+        queue_dir = app_root / "runtime" / "job_queue"
+        queue_manager = QueueManager(queue_dir)
+        return queue_manager.get_queue_status()
+
+    @app.post("/api/job-queue/add")
+    def add_job_to_queue(
+        job_type: str,
+        strategy_type: str,
+        count: int,
+        submit_enabled: bool = True,
+        dry_run: bool = False,
+    ) -> dict[str, Any]:
+        """Thêm job vào hàng đợi"""
+        from runtime.queue_manager import QueueManager
+        queue_dir = app_root / "runtime" / "job_queue"
+        queue_manager = QueueManager(queue_dir)
+        
+        job = queue_manager.create_job(
+            job_type=job_type,
+            strategy_type=strategy_type,
+            count=count,
+            submit_enabled=submit_enabled,
+            dry_run=dry_run,
+        )
+        
+        return {
+            "status": "queued",
+            "job_id": job.job_id,
+            "job_type": job.job_type,
+            "strategy_type": job.strategy_type,
+            "count": job.count,
+        }
+
+    @app.get("/api/job-queue/job/{job_id}")
+    def get_job_details(job_id: str) -> dict[str, Any]:
+        """Lấy chi tiết của một job"""
+        from runtime.queue_manager import QueueManager
+        queue_dir = app_root / "runtime" / "job_queue"
+        queue_manager = QueueManager(queue_dir)
+        
+        job = queue_manager._load_job(job_id)
+        if not job:
+            raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+        
+        return job.to_dict()
+
+    @app.post("/api/job-queue/cleanup")
+    def cleanup_job_queue(max_age_seconds: int = 604800) -> dict[str, Any]:
+        """Cleanup old jobs (default: 7 days)"""
+        from runtime.queue_manager import QueueManager
+        queue_dir = app_root / "runtime" / "job_queue"
+        queue_manager = QueueManager(queue_dir)
+        
+        removed = queue_manager.cleanup_old_jobs(max_age_seconds=max_age_seconds)
+        return {"status": "ok", "removed": removed}
+
+    @app.delete("/api/job-queue/job/{job_id}")
+    def delete_job(job_id: str) -> dict[str, Any]:
+        """Xóa một job"""
+        from runtime.queue_manager import QueueManager
+        queue_dir = app_root / "runtime" / "job_queue"
+        queue_manager = QueueManager(queue_dir)
+        
+        job = queue_manager._load_job(job_id)
+        if not job:
+            raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+        
+        if job.status == "running":
+            raise HTTPException(status_code=400, detail="Cannot delete running job")
+        
+        queue_manager._delete_job(job_id)
+        return {"status": "ok", "deleted": job_id}
 
     frontend_dist = app_root / "frontend" / "dist"
     assets_dir = frontend_dist / "assets"

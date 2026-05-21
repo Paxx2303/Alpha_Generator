@@ -1,0 +1,8 @@
+﻿python : 2026-05-19 23:16:41,222 | INFO | root | Queued pipeline FIFO ticket 
+01779207401220983300_25440_88b20433343a4c82890d93f074d1ec02.ticket for pipeline:momentum.
+At line:1 char:1
++ python main.py --run-once --count 3 --strategy-type momentum 2>&1 | O ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026-05-19 23:1...eline:momentum.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

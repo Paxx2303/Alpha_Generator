@@ -1,0 +1,57 @@
+============================================================
+GENERATING ALPHAS VIA HERMES + OPENROUTER
+============================================================
+
+Raw response:
+3 novel WorldQuant FASTEXPR momentum alphas:
+
+```
+rank(-ts_delta(close, 5)) * rank(ts_delta(volume, 5)) * zscore(ts_std_dev(close, 20))
+```
+
+```
+rank(ts_corr(volume, ts_delta(close, 1), 10)) * rank(close / ts_mean(close, 60) - 1) * rank(volume / ts_mean(volume, 20))
+```
+
+```
+ts_rank(volume / ts_mean(volume, 10) - ts_delta(close, 5) / ts_std_dev(close, 20), 60) * rank(-ts_corr(close, volume, 20))
+```
+
+**Design rationale (brief):**
+
+1. **Alpha 1** — Volume-confirmed short-term reversal with volatility regime scaling. The `zscore(ts_std_dev(close, 20))` acts as a regime filter: amplifies signals in high-vol regimes where reversals are stronger, suppresses in calm markets. Uses the NBER 2024 HVRP pattern with vol-normalization for robustness.
+
+2. **Alpha 2** — Volume-return momentum correlation combined with medium-term price dislocation and volume surge. The `ts_corr(volume, ts_delta(close,1), 10)` captures whether volume confirms or diverges from daily returns. The `close/ts_mean(close,60)` provides a slow momentum anchor while `volume/ts_mean(volume,20)` catches volume spikes. Triple-rank structure reduces noise.
+
+3. **Alpha 3** — Time-series ranked volume-price dislocation with correlation regime filter. The inner expression `volume/ts_mean(volume,10) - ts_delta(close,5)/ts_std_dev(close,20)` measures the gap between volume intensity and price move magnitude (normalized). The `ts_rank(..., 60)` provides a slow, stable ranking. The `-ts_corr(close,volume,20)` flips sign so that negative correlation (the HVRP signal from NBER 2024) produces positive alpha values.
+
+Parsed 3 expressions:
+  1. rank(-ts_delta(close, 5)) * rank(ts_delta(volume, 5)) * zscore(ts_std_dev(close, 20))
+  2. rank(ts_corr(volume, ts_delta(close, 1), 10)) * rank(close / ts_mean(close, 60) - 1) * rank(volume / ts_mean(volume, 20))
+  3. ts_rank(volume / ts_mean(volume, 10) - ts_delta(close, 5) / ts_std_dev(close, 20), 60) * rank(-ts_corr(close, volume, 20))
+
+============================================================
+SIMULATING ON REAL WORLDQUANT BRAIN
+============================================================
+
+[1/3] Simulating: rank(-ts_delta(close, 5)) * rank(ts_delta(volume, 5)) * zscore(ts_std_dev(close, 20))
+  ERROR: Timed out waiting for alpha checks to settle for omn0Mb8v: Sub-universe Sharpe of -0.07 is below cutoff of 0.0. SELF_CORRELATION is still pending.
+
+[2/3] Simulating: rank(ts_corr(volume, ts_delta(close, 1), 10)) * rank(close / ts_mean(close, 60) - 1) * rank(volume / ts_mean(volume, 20))
+  ERROR: Timed out waiting for alpha checks to settle for MPbNqzPr: SELF_CORRELATION is still pending.
+
+[3/3] Simulating: ts_rank(volume / ts_mean(volume, 10) - ts_delta(close, 5) / ts_std_dev(close, 20), 60) * rank(-ts_corr(close, volume, 20))
+  ERROR: Timed out waiting for alpha checks to settle for vR5X9b6b: SELF_CORRELATION is still pending.
+
+============================================================
+SUMMARY
+============================================================
+
+1. rank(-ts_delta(close, 5)) * rank(ts_delta(volume, 5)) * zscore(ts_std_dev(close, 20))
+   ERROR: Timed out waiting for alpha checks to settle for omn0Mb8v: Sub-universe Sharpe of -0.07 is below cutoff of 0.0. SELF_CORRELATION is still pending.
+
+2. rank(ts_corr(volume, ts_delta(close, 1), 10)) * rank(close / ts_mean(close, 60) - 1) * rank(volume / ts_mean(volume, 20))
+   ERROR: Timed out waiting for alpha checks to settle for MPbNqzPr: SELF_CORRELATION is still pending.
+
+3. ts_rank(volume / ts_mean(volume, 10) - ts_delta(close, 5) / ts_std_dev(close, 20), 60) * rank(-ts_corr(close, volume, 20))
+   ERROR: Timed out waiting for alpha checks to settle for vR5X9b6b: SELF_CORRELATION is still pending.

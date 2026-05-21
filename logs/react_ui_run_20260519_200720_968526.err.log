@@ -1,0 +1,10 @@
+2026-05-19 20:07:29,868 | INFO | pipeline.alpha_pipeline | Running alpha pipeline for strategy=momentum count=3 run_id=pipeline-momentum-20260519130729-defe5948
+2026-05-19 20:07:45,869 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 20:08:47,740 | INFO | api_layer.session_manager | Dry-run mode enabled; skipping WorldQuant login.
+2026-05-19 20:09:33,863 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=Here are 10 novel FASTEXPR momentum alphas: error=invalid syntax (<unknown>, line 1)
+2026-05-19 20:09:33,882 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=Here are 10 novel FASTEXPR momentum alphas: error=invalid syntax (<unknown>, line 1)
+2026-05-19 20:09:33,902 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=Here are 10 novel FASTEXPR momentum alphas: error=invalid syntax (<unknown>, line 1)
+2026-05-19 20:09:33,921 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=SPY expression=``` error=invalid syntax (<unknown>, line 1)
+2026-05-19 20:09:33,937 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=QQQ expression=``` error=invalid syntax (<unknown>, line 1)
+2026-05-19 20:09:33,955 | WARNING | pipeline.analyzer.local_backtester | Local backtest failed for symbol=IWM expression=``` error=invalid syntax (<unknown>, line 1)
+Backtest.run:   0%|          | 0/1435 [00:00<?, ?bar/s]                                                       Backtest.run:   0%|          | 0/1435 [00:00<?, ?bar/s]                                                       Backtest.run:   0%|          | 0/1435 [00:00<?, ?bar/s]                                                       

@@ -1,0 +1,93 @@
+2026-05-19 21:03:21,711 | INFO | root | Continuous 24/7 mode started. Sleeping 60 seconds between cycles.
+2026-05-19 21:03:21,712 | INFO | root | === Continuous cycle started ===
+2026-05-19 21:03:21,714 | INFO | root | Queued pipeline FIFO ticket 01779199401713842100_26172_4e7bb8b0efea46ad9d4b2f513d320852.ticket for continuous:momentum.
+2026-05-19 21:03:21,716 | WARNING | root | Removing pipeline FIFO lock held by dead pid=11016.
+2026-05-19 21:03:21,717 | WARNING | root | Removing stale pipeline FIFO lock at C:\Using\Alpha_Generator\runtime\pipeline_fifo\active.lock.
+2026-05-19 21:03:21,719 | INFO | root | Acquired pipeline FIFO slot for continuous:momentum.
+2026-05-19 21:03:23,994 | INFO | pipeline.alpha_pipeline | Running alpha pipeline for strategy=momentum count=3 run_id=pipeline-momentum-20260519140323-e83c475a
+2026-05-19 21:03:34,150 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:03:40,350 | INFO | api_layer.session_manager | Dry-run mode enabled; skipping WorldQuant login.
+2026-05-19 21:03:41,747 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=23179.
+2026-05-19 21:04:52,403 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=3057.
+2026-05-19 21:04:52,489 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:04:52,491 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5663.
+2026-05-19 21:05:59,695 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=4483.
+2026-05-19 21:05:59,696 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=PASS confidence=0.760 expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:05:59,696 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:06:09,487 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:07:32,249 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=FAIL confidence=0.360 expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:07:32,255 | INFO | orchestration.hermes_bridge | Hermes review started; stage=post_simulation strategy=momentum expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:07:32,257 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5660.
+2026-05-19 21:08:51,353 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=5603.
+2026-05-19 21:08:51,353 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=post_simulation verdict=PASS confidence=0.840 expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:08:51,354 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=post_simulation strategy=momentum expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:09:35,421 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=post_simulation verdict=PASS confidence=0.740 expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:09:41,499 | INFO | pipeline.research.daily_researcher | Failure recovery research written to C:\Using\Alpha_Generator\knowledge_base\research_feeds\daily\failure_recovery\20260519_210935_momentum.md
+2026-05-19 21:09:41,777 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=7514.
+2026-05-19 21:10:31,527 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2772.
+2026-05-19 21:10:33,529 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:10:33,531 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5695.
+2026-05-19 21:11:21,410 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2723.
+2026-05-19 21:11:21,411 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=WARN confidence=0.640 expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:11:21,412 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:11:39,771 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:12:39,789 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=FAIL confidence=0.360 expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:12:39,799 | INFO | orchestration.hermes_bridge | Hermes review started; stage=post_simulation strategy=momentum expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:12:39,801 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5676.
+2026-05-19 21:14:01,853 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=3811.
+2026-05-19 21:14:01,854 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=post_simulation verdict=PASS confidence=0.760 expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:14:01,855 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=post_simulation strategy=momentum expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:14:13,687 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:14:45,404 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=post_simulation verdict=PASS confidence=0.740 expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:14:51,756 | INFO | pipeline.research.daily_researcher | Failure recovery research written to C:\Using\Alpha_Generator\knowledge_base\research_feeds\daily\failure_recovery\20260519_211445_momentum.md
+2026-05-19 21:14:52,075 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=7498.
+2026-05-19 21:15:32,127 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=1980.
+2026-05-19 21:15:34,328 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:15:34,329 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5603.
+2026-05-19 21:16:37,153 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=3934.
+2026-05-19 21:16:37,154 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=PASS confidence=0.760 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:16:37,155 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:16:46,460 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:17:55,501 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=WARN confidence=0.550 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:17:55,509 | INFO | orchestration.hermes_bridge | Hermes review started; stage=post_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:17:55,511 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5630.
+2026-05-19 21:18:55,910 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=3281.
+2026-05-19 21:18:55,910 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=post_simulation verdict=PASS confidence=0.840 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:18:55,911 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=post_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:19:09,033 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:19:41,352 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=post_simulation verdict=PASS confidence=0.820 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:19:42,040 | INFO | root | Released pipeline FIFO slot for continuous:momentum.
+2026-05-19 21:19:42,041 | INFO | root | === Continuous cycle finished. Sleeping 60 seconds ===
+2026-05-19 21:20:42,047 | INFO | root | === Continuous cycle started ===
+2026-05-19 21:20:42,060 | INFO | root | Queued pipeline FIFO ticket 01779200442058823400_26172_7094b5558de844fea1379daab4c73d05.ticket for continuous:momentum.
+2026-05-19 21:20:42,063 | INFO | root | Acquired pipeline FIFO slot for continuous:momentum.
+2026-05-19 21:20:44,284 | INFO | pipeline.alpha_pipeline | Running alpha pipeline for strategy=momentum count=3 run_id=pipeline-momentum-20260519142044-a4865d23
+2026-05-19 21:20:52,724 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:20:53,576 | WARNING | orchestration.openai_fallback | OpenRouter fallback request failed: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-19 21:20:53,583 | WARNING | orchestration.deerflow_bridge | DeerFlow gateway returned no text and local CLI is unavailable.
+2026-05-19 21:20:55,117 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=22798.
+2026-05-19 21:22:02,302 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2455.
+2026-05-19 21:22:02,382 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:22:02,384 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5615.
+2026-05-19 21:23:16,654 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=4678.
+2026-05-19 21:23:16,654 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=WARN confidence=0.560 expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:23:16,655 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:23:25,635 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:24:15,951 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=pre_simulation verdict=PASS confidence=0.740 expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:24:15,959 | INFO | orchestration.hermes_bridge | Hermes review started; stage=post_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:24:15,961 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5636.
+2026-05-19 21:25:38,129 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=5406.
+2026-05-19 21:25:38,137 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=post_simulation verdict=PASS confidence=0.760 expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:25:38,140 | INFO | orchestration.deerflow_bridge | DeerFlow review started; stage=post_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:26:31,228 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 21:26:53,247 | INFO | orchestration.deerflow_bridge | DeerFlow review completed; stage=post_simulation verdict=WARN confidence=0.550 expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:26:58,890 | INFO | pipeline.research.daily_researcher | Failure recovery research written to C:\Using\Alpha_Generator\knowledge_base\research_feeds\daily\failure_recovery\20260519_212653_momentum.md
+2026-05-19 21:26:59,262 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=7523.
+2026-05-19 21:27:59,198 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2174.
+2026-05-19 21:28:04,453 | INFO | pipeline.research.daily_researcher | Failure recovery research written to C:\Using\Alpha_Generator\knowledge_base\research_feeds\daily\failure_recovery\20260519_212801_momentum.md
+2026-05-19 21:28:04,695 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=8212.
+2026-05-19 21:29:21,602 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=1760.
+2026-05-19 21:29:24,312 | INFO | root | Released pipeline FIFO slot for continuous:momentum.
+2026-05-19 21:29:24,313 | INFO | root | === Continuous cycle finished. Sleeping 60 seconds ===
+2026-05-19 21:30:24,321 | INFO | root | === Continuous cycle started ===
+2026-05-19 21:30:24,324 | INFO | root | Queued pipeline FIFO ticket 01779201024322889000_26172_56443ca83b30475caabceeefae2fbd82.ticket for continuous:momentum.

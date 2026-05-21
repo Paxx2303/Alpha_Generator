@@ -18,6 +18,8 @@ from knowledge_base.data_researcher import DataResearcher
 
 
 LOGGER = logging.getLogger(__name__)
+RESEARCH_TIMEOUT_SECONDS = 180
+REVIEW_TIMEOUT_SECONDS = 45
 
 
 def _estimate_confidence(text: str, verdict: str) -> float:
@@ -57,7 +59,7 @@ class DeerFlowBridge:
     def available(self) -> bool:
         return self.enabled and (shutil.which(self.command) is not None or self._gateway_running())
 
-    def run_research(self, task: str) -> str:
+    def run_research(self, task: str, timeout_seconds: int = RESEARCH_TIMEOUT_SECONDS) -> str:
         if not self.available():
             LOGGER.info("DeerFlow unavailable; returning mock research summary.")
             return (
@@ -67,7 +69,7 @@ class DeerFlowBridge:
 
         gateway_running = self._gateway_running()
         if gateway_running:
-            result = self._run_via_gateway(task)
+            result = self._run_via_gateway(task, timeout_seconds=timeout_seconds)
             if result:
                 return result
             fallback = self._fallback(task, "deerflow gateway returned no text", force=True)
@@ -113,12 +115,26 @@ class DeerFlowBridge:
         metrics: SimulationMetrics | None = None,
         knowledge_root: Path | None = None,
     ) -> AgentReview:
+        LOGGER.info(
+            "DeerFlow review started; stage=%s strategy=%s expression=%s.",
+            stage,
+            candidate.strategy_type,
+            candidate.expression[:180],
+        )
         if not self.available():
             summary = (
                 f"DeerFlow unavailable at {stage}; local fallback suggests reviewing "
                 f"turnover, self-correlation, and operator diversity for {candidate.expression}."
             )
-            return AgentReview(agent="deerflow", stage=stage, verdict="WARN", summary=summary, confidence=0.42)
+            review = AgentReview(agent="deerflow", stage=stage, verdict="WARN", summary=summary, confidence=0.42)
+            LOGGER.info(
+                "DeerFlow review completed; stage=%s verdict=%s confidence=%.3f expression=%s.",
+                stage,
+                review.verdict,
+                review.confidence,
+                candidate.expression[:180],
+            )
+            return review
 
         theory = ""
         if knowledge_root:
@@ -144,27 +160,78 @@ class DeerFlowBridge:
             f"Theory Grounding (RAG):\n{theory}\n\n"
             "Return VERDICT + brief reasoning."
         )
-        result = self.run_research(prompt) or "WARN: DeerFlow returned no structured review."
+        result = self.run_research(prompt, timeout_seconds=REVIEW_TIMEOUT_SECONDS) or "WARN: DeerFlow returned no structured review."
         verdict = "WARN"
         upper = result.upper()
         if "FAIL" in upper:
             verdict = "FAIL"
         elif "PASS" in upper:
             verdict = "PASS"
-        return AgentReview(
+        review = AgentReview(
             agent="deerflow",
             stage=stage,
             verdict=verdict,
             summary=result[:1200],
             confidence=_estimate_confidence(result, verdict),
         )
+        LOGGER.info(
+            "DeerFlow review completed; stage=%s verdict=%s confidence=%.3f expression=%s.",
+            stage,
+            review.verdict,
+            review.confidence,
+            candidate.expression[:180],
+        )
+        return review
 
-    def _run_via_gateway(self, task: str) -> str:
+    def _get_skills_context(self) -> str:
+        root_dir = Path(self.project_root) if self.project_root else Path(__file__).resolve().parents[1]
+        skills_dir = root_dir / "skills"
+        if not skills_dir.exists():
+            return "No skills found."
+        
+        context_parts = []
+        for path in sorted(skills_dir.glob("*.md")):
+            try:
+                content = path.read_text(encoding="utf-8", errors="ignore").strip()
+                context_parts.append(f"Skill file: {path.name}\n{content}\n")
+            except Exception as e:
+                LOGGER.warning("Failed to read skill file %s: %s", path.name, e)
+        return "\n---\n".join(context_parts)
+
+    def _get_system_prompt(self) -> str:
+        skills_context = self._get_skills_context()
+        return (
+            "You are DeerFlow, a state-of-the-art quantitative research AI agent designed for the WorldQuant Brain platform.\n"
+            "The Hermes agent has been completely removed from this system; you are the sole agent responsible for researching, building, reviewing, and optimizing alphas.\n\n"
+            "Here are the existing agent skills and files located in the project's 'skills/' directory:\n"
+            f"{skills_context}\n\n"
+            "Core Rules for Alpha Expressions:\n"
+            "1. Valid Operators only: ts_corr, ts_covariance, ts_rank, ts_scale, ts_arg_max, ts_arg_min, ts_decay_linear, ts_mean, ts_std_dev, ts_delta, ts_delay, ts_zscore, ts_regression, ts_sum, ts_av_diff, ts_backfill, trade_when, rank, normalize, zscore, winsorize, scale, quantile, group_neutralize, group_rank, group_zscore, abs, log, sign, sqrt, power, max, min, if_else.\n"
+            "2. Forbidden Operators: ts_log_returns, ts_min, ts_max, delay, stddev, correlation, delta.\n\n"
+            "When replying in Vietnamese, you MUST adhere to these terminology rules:\n"
+            "- Keep 'Sharpe' or 'Sharpe ratio' as 'Sharpe' (NEVER translate to 'sắc nét', 'nhọn', or 'nhạy bén').\n"
+            "- Keep 'Fitness' as 'Fitness' (NEVER translate to 'thể hình' or 'thể lực').\n"
+            "- Translate 'Turnover' to 'Tỷ lệ vòng quay giao dịch' or keep as 'Turnover' (NEVER translate to 'doanh thu').\n"
+            "- Translate 'Turnover band' to 'Dải vòng quay giao dịch' or 'Turnover band' (NEVER translate to 'doanh thu của ban nhạc').\n"
+            "- Translate 'Drawdown' to 'Mức sụt giảm tài sản (Drawdown)'.\n"
+            "- Keep 'ts_decay_linear' or translate to 'Suy giảm tuyến tính' (NEVER translate to 'Phân rã tuyến tính' or 'phân rã Tuyến').\n"
+            "- Keep 'Neutralization' or translate to 'Trung hòa (Neutralization)'.\n"
+            "- Translate 'Lookback' to 'Khoảng thời gian nhìn lại' or 'Lookback window'.\n\n"
+            "Formatting Guidelines for your responses:\n"
+            "- Always format markdown tables cleanly with proper header separators (e.g. | Header 1 | Header 2 | followed by |---|---|).\n"
+            "- Ensure clear spacing and visual separation between sections.\n"
+            "- Avoid raw code concatenation; use proper markdown blocks with syntax highlighting where appropriate."
+        )
+
+    def _run_via_gateway(self, task: str, timeout_seconds: int = RESEARCH_TIMEOUT_SECONDS) -> str:
         prompt = task.strip()
         if "DO NOT CALL TOOLS" not in prompt.upper():
             prompt += "\n\nReply in plain text only. Do not call tools."
         payload = {
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": [
+                {"role": "system", "content": self._get_system_prompt()},
+                {"role": "user", "content": prompt}
+            ],
             "chat_session_id": f"alpha-generator-{uuid.uuid4()}",
             "files": [],
             "enable_background_investigation": False,
@@ -178,7 +245,7 @@ class DeerFlowBridge:
                 self.gateway_url,
                 json=payload,
                 stream=True,
-                timeout=(10, 180),
+                timeout=(10, timeout_seconds),
             ) as response:
                 response.raise_for_status()
                 for raw_line in response.iter_lines(decode_unicode=True):
@@ -192,8 +259,6 @@ class DeerFlowBridge:
                     content = event.get("content")
                     if isinstance(content, str) and content:
                         chunks.append(content)
-                    if event.get("finish_reason"):
-                        break
         except requests.RequestException as exc:
             fallback = self._fallback(task, str(exc), force=True)
             if fallback:
@@ -209,7 +274,7 @@ class DeerFlowBridge:
         if not force and error_text and not self.fallback_client.should_fallback(error_text):
             return ""
         LOGGER.warning("DeerFlow falling back to OpenRouter model %s", self.fallback_client.model)
-        return self.fallback_client.chat(prompt)
+        return self.fallback_client.chat(prompt, system_prompt=self._get_system_prompt())
 
     def research_new_theory(self, topic: str, knowledge_root: Path) -> str:
         """DeerFlow can autonomously research new theoretical topics."""

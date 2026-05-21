@@ -1,0 +1,69 @@
+2026-05-19 21:03:41,747 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=23179.
+2026-05-19 21:04:52,403 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=3057.
+2026-05-19 21:04:52,489 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:04:52,491 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5663.
+2026-05-19 21:05:59,695 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=4483.
+2026-05-19 21:05:59,696 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=PASS confidence=0.760 expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:07:32,255 | INFO | orchestration.hermes_bridge | Hermes review started; stage=post_simulation strategy=momentum expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:07:32,257 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5660.
+2026-05-19 21:08:51,353 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=5603.
+2026-05-19 21:08:51,353 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=post_simulation verdict=PASS confidence=0.840 expression=rank(ts_delta(close, 20) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20) - ts_corr(volume, returns, 5)).
+2026-05-19 21:09:41,777 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=7514.
+2026-05-19 21:10:31,527 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2772.
+2026-05-19 21:10:33,529 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:10:33,531 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5695.
+2026-05-19 21:11:21,410 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2723.
+2026-05-19 21:11:21,411 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=WARN confidence=0.640 expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:12:39,799 | INFO | orchestration.hermes_bridge | Hermes review started; stage=post_simulation strategy=momentum expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:12:39,801 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5676.
+2026-05-19 21:14:01,853 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=3811.
+2026-05-19 21:14:01,854 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=post_simulation verdict=PASS confidence=0.760 expression=rank(ts_mean(returns, 20) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_mean(volume, 5) / ts_mean(volume, 60)).
+2026-05-19 21:14:52,075 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=7498.
+2026-05-19 21:15:32,127 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=1980.
+2026-05-19 21:15:34,328 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:15:34,329 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5603.
+2026-05-19 21:16:37,153 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=3934.
+2026-05-19 21:16:37,154 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=PASS confidence=0.760 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:17:55,509 | INFO | orchestration.hermes_bridge | Hermes review started; stage=post_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:17:55,511 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5630.
+2026-05-19 21:18:55,910 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=3281.
+2026-05-19 21:18:55,910 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=post_simulation verdict=PASS confidence=0.840 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 20)) * rank(ts_corr(volume, returns, 60)).
+2026-05-19 21:20:55,117 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=22798.
+2026-05-19 21:22:02,302 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2455.
+2026-05-19 21:22:02,382 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:22:02,384 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5615.
+2026-05-19 21:23:16,654 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=4678.
+2026-05-19 21:23:16,654 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=WARN confidence=0.560 expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:24:15,959 | INFO | orchestration.hermes_bridge | Hermes review started; stage=post_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:24:15,961 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5636.
+2026-05-19 21:25:38,129 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=5406.
+2026-05-19 21:25:38,137 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=post_simulation verdict=PASS confidence=0.760 expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(1 - ts_corr(volume, returns, 5)).
+2026-05-19 21:26:59,262 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=7523.
+2026-05-19 21:27:59,198 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2174.
+2026-05-19 21:28:04,695 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=8212.
+2026-05-19 21:29:21,602 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=1760.
+2026-05-19 21:31:27,560 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=27898.
+2026-05-19 21:32:00,160 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=1031.
+2026-05-19 21:32:00,283 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 5) / ts_std_dev(returns, 20)) * rank(1 - ts_corr(volume, returns, 60)).
+2026-05-19 21:32:00,284 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5615.
+2026-05-19 21:32:45,962 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2802.
+2026-05-19 21:32:45,962 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=PASS confidence=0.760 expression=rank(ts_mean(returns, 5) / ts_std_dev(returns, 20)) * rank(1 - ts_corr(volume, returns, 60)).
+2026-05-19 22:59:34,830 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=7250.
+2026-05-19 23:00:37,126 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2974.
+2026-05-19 23:00:42,762 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=zscore(rank(ts_delta(close, 10) / ts_std_dev(close, 60))) * rank(volume / ts_mean(volume, 20)).
+2026-05-19 23:00:42,766 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5619.
+2026-05-19 23:01:26,483 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2358.
+2026-05-19 23:01:26,497 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=PASS confidence=0.760 expression=zscore(rank(ts_delta(close, 10) / ts_std_dev(close, 60))) * rank(volume / ts_mean(volume, 20)).
+2026-05-20 08:42:05,988 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=29637.
+2026-05-20 08:42:06,167 | INFO | orchestration.hermes_bridge | Hermes unavailable; falling back to local heuristic response.
+2026-05-20 08:50:25,443 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=23218.
+2026-05-20 08:51:36,136 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=1909.
+2026-05-20 08:51:36,175 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_delta(close, 10) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20)).
+2026-05-20 08:51:36,175 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5603.
+2026-05-20 08:52:12,821 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=2342.
+2026-05-20 08:52:12,821 | INFO | orchestration.hermes_bridge | Hermes review completed; stage=pre_simulation verdict=PASS confidence=0.760 expression=rank(ts_delta(close, 10) / ts_std_dev(close, 60)) * rank(ts_corr(volume, returns, 20)).
+2026-05-20 13:17:29,487 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=25740.
+2026-05-20 13:18:25,531 | INFO | orchestration.hermes_bridge | Hermes prompt completed; chars=1121.
+2026-05-20 13:18:25,602 | INFO | orchestration.hermes_bridge | Hermes review started; stage=pre_simulation strategy=momentum expression=rank(ts_mean(returns, 10) / ts_std_dev(returns, 60)) * rank(volume / ts_mean(volume, 20) - ts_delta(close, 5) / ts_std_dev(close, 20)).
+2026-05-20 13:18:25,612 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=5699.
+2026-05-20 14:03:08,759 | INFO | orchestration.hermes_bridge | Hermes prompt started; chars=32747.

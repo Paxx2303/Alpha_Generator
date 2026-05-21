@@ -1,0 +1,5 @@
+2026-05-20 16:31:23,399 | INFO | root | Queued pipeline FIFO ticket 01779269483398279800_23188_bc51ba8297464024bc6d79587b7dfbd9.ticket for pipeline:momentum.
+2026-05-20 16:31:23,400 | WARNING | root | Removing pipeline FIFO lock held by dead pid=10340.
+2026-05-20 16:31:23,400 | WARNING | root | Removing stale pipeline FIFO lock at C:\Using\Alpha_Generator\runtime\pipeline_fifo\active.lock.
+2026-05-20 16:31:23,403 | INFO | root | Acquired pipeline FIFO slot for pipeline:momentum.
+2026-05-20 16:31:28,649 | INFO | pipeline.alpha_pipeline | Running alpha pipeline for strategy=momentum count=15 run_id=pipeline-momentum-20260520093128-ef3efb72

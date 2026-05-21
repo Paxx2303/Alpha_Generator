@@ -88,7 +88,8 @@ class DataResearcher:
 
         try:
             # Example endpoint (adjust if needed)
-            resp = self.wq_client.session.get(
+            session = self.wq_client.session_manager.ensure_session()
+            resp = session.get(
                 f"{self.wq_client.base_url}/universes/{universe}/stats",
                 timeout=10,
             )
@@ -114,7 +115,8 @@ class DataResearcher:
             return None
 
         try:
-            resp = self.wq_client.session.get(
+            session = self.wq_client.session_manager.ensure_session()
+            resp = session.get(
                 f"{self.wq_client.base_url}/market/regime",
                 timeout=10,
             )

@@ -1,0 +1,10 @@
+2026-05-19 20:57:55,562 | INFO | root | Continuous 24/7 mode started. Sleeping 60 seconds between cycles.
+2026-05-19 20:57:55,563 | INFO | root | === Continuous cycle started ===
+2026-05-19 20:57:55,566 | INFO | root | Queued pipeline FIFO ticket 01779199075564928500_11016_dca148f9495d45e4b604ab37dcc0ab60.ticket for continuous:momentum.
+2026-05-19 20:57:55,567 | WARNING | root | Removing pipeline FIFO lock held by dead pid=25576.
+2026-05-19 20:57:55,568 | WARNING | root | Removing stale pipeline FIFO lock at C:\Using\Alpha_Generator\runtime\pipeline_fifo\active.lock.
+2026-05-19 20:57:55,571 | INFO | root | Acquired pipeline FIFO slot for continuous:momentum.
+2026-05-19 20:57:58,951 | INFO | pipeline.alpha_pipeline | Running alpha pipeline for strategy=momentum count=3 run_id=pipeline-momentum-20260519135758-a9dc0c27
+2026-05-19 20:58:24,071 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
+2026-05-19 20:58:51,060 | INFO | api_layer.session_manager | Dry-run mode enabled; skipping WorldQuant login.
+2026-05-19 21:00:35,709 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha

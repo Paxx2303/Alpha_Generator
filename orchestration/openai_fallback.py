@@ -40,7 +40,7 @@ class OpenAIFallbackClient:
         normalized = error_text.lower()
         return any(marker in normalized for marker in FALLBACK_ERROR_MARKERS)
 
-    def chat(self, prompt: str) -> str:
+    def chat(self, prompt: str, system_prompt: str = "") -> str:
         if not self.available():
             return ""
 
@@ -50,9 +50,14 @@ class OpenAIFallbackClient:
             "HTTP-Referer": "https://local.alpha-generator",
             "X-OpenRouter-Title": self.app_name,
         }
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
         payload = {
             "model": self.model,
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": messages,
         }
         try:
             response = requests.post(

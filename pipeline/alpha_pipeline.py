@@ -16,8 +16,9 @@ from dashboard.theory_catalog import THEORY_CATALOG
 from knowledge_base import WQKnowledgeBase
 from knowledge_base.theory_accuracy_evaluator import TheoryAccuracyEvaluator
 from orchestration.openai_fallback import OpenAIFallbackClient
-from orchestration import DeerFlowBridge, HermesBridge, TaskRouter
+from orchestration import DeerFlowBridge, TaskRouter
 from pipeline.analyzer import AlphaAnalyzer, CorrelationChecker, LocalBacktester, PatternFinder
+from pipeline.models import PreBacktestResult, PreBacktestMetrics
 from pipeline.generator import ExpressionValidator, GeneticEngine, LLMGenerator
 from pipeline.models import (
     AgentReview,
@@ -53,11 +54,9 @@ class AlphaPipeline:
             session_manager=session_manager,
             rate_limiter=rate_limiter,
             base_url=config.settings["worldquant"]["base_url"],
-            dry_run=config.dry_run,
             queue_dir=config.root / "runtime" / "simulation_fifo",
         )
 
-        hermes_cfg = config.settings["integrations"]["hermes"]
         deer_cfg = config.settings["integrations"]["deerflow"]
         fallback_cfg = config.settings["integrations"].get("openrouter_fallback", {})
         fallback_client = OpenAIFallbackClient(
@@ -65,12 +64,6 @@ class AlphaPipeline:
             base_url=fallback_cfg.get("base_url", "https://openrouter.ai/api/v1"),
             model=fallback_cfg.get("model", "openrouter/owl-alpha"),
             enabled=bool(fallback_cfg.get("enabled", True)),
-        )
-        self.hermes = HermesBridge(
-            command=hermes_cfg.get("command", "hermes"),
-            enabled=bool(hermes_cfg.get("enabled", True)),
-            container_name=hermes_cfg.get("container_name", "wq-hermes-agent"),
-            fallback_client=fallback_client,
         )
         self.deerflow = DeerFlowBridge(
             command=deer_cfg.get("command", "deerflow"),
@@ -82,7 +75,7 @@ class AlphaPipeline:
             model=deer_cfg.get("model") or None,
             fallback_client=fallback_client,
         )
-        self.task_router = TaskRouter(self.hermes, self.deerflow)
+        self.task_router = TaskRouter(self.deerflow)
         self.store.sync_theory_catalog(THEORY_CATALOG, source="dashboard_catalog", created_by="system")
         self.performance_store.sync_theory_catalog(THEORY_CATALOG, source="dashboard_catalog", created_by="system")
         self.knowledge_base = WQKnowledgeBase(config.knowledge_root, theory_store=self.store)
@@ -94,7 +87,7 @@ class AlphaPipeline:
 
         self.wq_scraper = WQScraper(self.client)
         self.paper_scraper = PaperScraper(config.knowledge_root / "research_papers")
-        self.llm_generator = LLMGenerator(self.hermes, wq_client=self.client)
+        self.llm_generator = LLMGenerator(self.deerflow, wq_client=self.client)
         self.genetic_engine = GeneticEngine()
         self.validator = ExpressionValidator()
         self.simulator = Simulator(self.client)
@@ -122,9 +115,11 @@ class AlphaPipeline:
     ) -> dict[str, Any]:
         defaults = self.config.alpha_defaults
         strategy_type = strategy_type or defaults.get("strategy_type", "momentum")
-        pipeline_cfg = self.config.settings["pipeline"]
+        pipeline_cfg = self.config.settings.get("pipeline", {})
         total_count = count or (
-            pipeline_cfg["template_batch"] + pipeline_cfg["llm_batch"] + pipeline_cfg["genetic_batch"]
+            int(pipeline_cfg.get("template_batch", 0))
+            + int(pipeline_cfg.get("llm_batch", 0))
+            + int(pipeline_cfg.get("genetic_batch", 0))
         )
 
         tracker = WorkflowTracker(
@@ -163,14 +158,15 @@ class AlphaPipeline:
             candidates = self._deduplicate(candidates)[:total_count]
             tracker.event("generate", "INFO", "candidate_dedup", f"Kept {len(candidates)} unique candidates after deduplication.")
 
-            tracker.set_stage("pre_backtest", "Running local proxy backtests and ranking candidates before WorldQuant simulation.")
-            promoted_candidates, screened_out = self._rank_candidates_for_live_simulation(
-                candidates,
-                strategy_type=strategy_type,
-                base_context=context,
-                tracker=tracker,
-                research_refs=[{"artifact_id": digest_ref, "kind": "daily_digest"}, {"artifact_id": summary_ref, "kind": "market_summary"}],
-                target_count=total_count,
+            # Pre-backtest stage removed: local proxy backtests were not predictive
+            # of WorldQuant Brain metrics, so all candidates go straight to simulation.
+            promoted_candidates = candidates
+            screened_out = 0
+            tracker.event(
+                "pre_backtest",
+                "INFO",
+                "removed",
+                "Pre-backtest stage removed; candidates go directly to WorldQuant simulation.",
             )
 
             tracker.set_stage("simulate", "Running pre-reviews, simulation, and post-reviews.")
@@ -182,6 +178,7 @@ class AlphaPipeline:
                 target_count=total_count,
                 tracker=tracker,
                 research_refs=[{"artifact_id": digest_ref, "kind": "daily_digest"}, {"artifact_id": summary_ref, "kind": "market_summary"}],
+                skip_pre_backtest=True,
             )
 
             tracker.set_stage("filter", "Finalizing quality-gate outcomes and report summary.")
@@ -215,26 +212,9 @@ class AlphaPipeline:
             raise
 
     def _research_market(self, strategy_type: str) -> str:
-        router_target = self.task_router.route("research")
-        if router_target == "deerflow":
-            return self.deerflow.run_research(
-                f"Summarize current {strategy_type} alpha ideas, common operator patterns, and failure modes."
-            )
-
-        try:
-            leaderboard = self.wq_scraper.leaderboard_snapshot()
-            papers = self.paper_scraper.discover_sources()
-            return (
-                f"Leaderboard samples: {json.dumps(leaderboard[:3])}. "
-                f"Research sources discovered: {len(papers)}."
-            )
-        except Exception as exc:
-            LOGGER.warning("Research market snapshot failed; falling back to local-only research context. error=%s", exc)
-            papers = self.paper_scraper.discover_sources()
-            return (
-                f"External leaderboard snapshot unavailable ({exc}). "
-                f"Fallback to local research only. Research sources discovered: {len(papers)}."
-            )
+        return self.deerflow.run_research(
+            f"Summarize current {strategy_type} alpha ideas, common operator patterns, and failure modes."
+        )
 
     def _build_context(self, strategy_type: str, research_summary: str, research_digest: str) -> str:
         alpha_context = self.knowledge_base.get_alpha_context(strategy_type)
@@ -295,13 +275,13 @@ class AlphaPipeline:
         self.knowledge_base.load_all()
 
     def _generate_candidates(self, strategy_type: str, context: str, knowledge_root: Path | None = None) -> list[AlphaCandidate]:
-        pipeline_cfg = self.config.settings["pipeline"]
+        pipeline_cfg = self.config.settings.get("pipeline", {})
         llm_candidates = self.llm_generator.generate(
-            strategy_type, pipeline_cfg["llm_batch"], context, knowledge_root=knowledge_root
+            strategy_type, int(pipeline_cfg.get("llm_batch", 0)), context, knowledge_root=knowledge_root
         )
         genetic_candidates = self.genetic_engine.evolve(
             llm_candidates,
-            pipeline_cfg["genetic_batch"],
+            int(pipeline_cfg.get("genetic_batch", 0)),
         )
         return llm_candidates + genetic_candidates
 
@@ -357,7 +337,7 @@ class AlphaPipeline:
                 # Retry with new research if last attempt
                 if attempt >= self.MAX_GENERATION_RETRIES - 1:
                     # Research new theory
-                    new_theory = self.hermes.research_new_theory(
+                    new_theory = self.deerflow.research_new_theory(
                         f"better {strategy_type} alpha with higher sharpe and fitness",
                         self.config.knowledge_root
                     )
@@ -462,6 +442,28 @@ class AlphaPipeline:
         target_count: int,
     ) -> tuple[list[AlphaCandidate], int]:
         del strategy_type
+        pre_backtest_cfg = self.config.settings.get("pipeline", {}).get("pre_backtest", {})
+        if not bool(pre_backtest_cfg.get("enabled", True)):
+            promoted = candidates[:target_count]
+            if tracker is not None:
+                tracker.event(
+                    "pre_backtest",
+                    "INFO",
+                    "prebacktest_skipped",
+                    f"Pre-backtest disabled; sending {len(promoted)} candidates directly to WQB simulation FIFO.",
+                    payload={"promoted": len(promoted), "blocked": 0, "pre_backtest_enabled": False},
+                )
+                for candidate in promoted:
+                    tracker.event(
+                        "pre_backtest",
+                        "INFO",
+                        "prebacktest_bypassed",
+                        "Candidate bypassed local pretest and entered simulation queue.",
+                        alpha_expression=candidate.expression,
+                        payload={"pre_backtest_enabled": False},
+                    )
+            return promoted, 0
+
         history = self.store.list_recent(limit=300)
         max_promoted = min(target_count, self.local_backtester.max_live_candidates)
         promoted, blocked = self.local_backtester.rank_candidates(candidates, history, max_promoted=max_promoted)
@@ -545,11 +547,9 @@ class AlphaPipeline:
         status = "approved" if not gate_reasons else "tested"
 
         pre_reviews = [
-            self.hermes.review_alpha(final_candidate, "pre_simulation", base_context, knowledge_root=self.config.knowledge_root),
             self.deerflow.review_alpha(final_candidate, "pre_simulation", base_context, knowledge_root=self.config.knowledge_root),
         ]
         post_reviews = [
-            self.hermes.review_alpha(final_candidate, "post_simulation", base_context, metrics, knowledge_root=self.config.knowledge_root),
             self.deerflow.review_alpha(final_candidate, "post_simulation", base_context, metrics, knowledge_root=self.config.knowledge_root),
         ]
 
@@ -608,19 +608,39 @@ class AlphaPipeline:
         target_count: int,
         tracker: WorkflowTracker | None = None,
         research_refs: list[dict[str, Any]] | None = None,
+        skip_pre_backtest: bool = False,
     ) -> tuple[list[EvaluatedAlpha], list[str]]:
         evaluated: list[EvaluatedAlpha] = []
         recovery_notes: list[str] = []
         history = self.store.list_recent(limit=200)
         queue: deque[AlphaCandidate] = deque(candidates)
         alpha_run_id = None
-        final_candidate = None  # Initialize to avoid NameError
+        agent_reviews: list = []
+        default_pre_backtest = PreBacktestResult(
+            passed=False,
+            promoted=False,
+            score=0.0,
+            confidence=0.0,
+            reasons=["default"],
+            evidence=[],
+            theory_ids=[],
+            analogs=[],
+            highest_similarity=0.0,
+            estimated_metrics=PreBacktestMetrics(0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+        )
+        gate_reasons: list[str] = []
+        gate_failures: list[dict] = []
+        gate_warnings: list[dict] = []
+        status = "tested"
+        needs_review = False
+        metrics = SimulationMetrics(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, "")
         seen_expressions = {item["expression"] for item in history if item.get("expression")}
-        recovery_budget = int(self.config.settings["pipeline"].get("failure_recovery_max_attempts", 2))
+        recovery_budget = int(self.config.settings.get("pipeline", {}).get("failure_recovery_max_attempts", 2))
         max_total = target_count + max(recovery_budget, 0)
 
         while queue and len(evaluated) < max_total:
             candidate = queue.popleft()
+            pre_backtest = default_pre_backtest
             if candidate.expression in seen_expressions:
                 continue
             seen_expressions.add(candidate.expression)
@@ -699,8 +719,10 @@ class AlphaPipeline:
                 )
                 continue
 
-            pre_backtest = self.local_backtester.evaluate(candidate, history)
-            if not pre_backtest.passed:
+            pre_backtest_enabled = bool(self.config.settings.get("pipeline", {}).get("pre_backtest", {}).get("enabled", True)) and not skip_pre_backtest
+            if pre_backtest_enabled:
+                pre_backtest = self.local_backtester.evaluate(candidate, history)
+            if pre_backtest_enabled and not pre_backtest.passed:
                 self._persist_screened_candidate(
                     candidate,
                     pre_backtest,
@@ -779,9 +801,9 @@ class AlphaPipeline:
                     pre_sim_verdict=aggregate_stage_verdict(agent_reviews, "pre_simulation"),
                     run_tags=self._candidate_run_tags(candidate, tracker.run_id if tracker else None),
                     gate_failure_reason=gate_reasons[0] if gate_reasons else None,
-                    pre_backtest_score=float(pre_backtest.score),
-                    pre_backtest_passed=bool(pre_backtest.passed),
-                    pre_backtest_metrics=self.local_backtester.as_payload(pre_backtest).get("estimated_metrics", {}),
+                    pre_backtest_score=float(pre_backtest.score) if pre_backtest_enabled else None,
+                    pre_backtest_passed=bool(pre_backtest.passed) if pre_backtest_enabled else None,
+                    pre_backtest_metrics=self.local_backtester.as_payload(pre_backtest).get("estimated_metrics", {}) if pre_backtest_enabled else {},
                 )
                 if tracker is not None:
                     tracker.alpha_explanation(
@@ -791,7 +813,10 @@ class AlphaPipeline:
                         prompt_context=base_context,
                         research_refs=research_refs,
                         agent_reviews=agent_reviews,
-                        stage_notes={"simulation_error": gate_reasons, "pre_backtest": self.local_backtester.as_payload(pre_backtest)},
+                        stage_notes={
+                            "simulation_error": gate_reasons,
+                            "pre_backtest": self.local_backtester.as_payload(pre_backtest) if pre_backtest_enabled else {"enabled": False},
+                        },
                     )
                     tracker.event(
                         "simulate",
@@ -824,6 +849,15 @@ class AlphaPipeline:
             )
             post_reviews = self._agent_reviews(candidate, "post_simulation", metrics.notes or candidate.expression, metrics)
             agent_reviews.extend(post_reviews)
+            if tracker is not None:
+                tracker.event(
+                    "simulate",
+                    "INFO",
+                    "post_review",
+                    "Completed post-WQB simulation reviews.",
+                    alpha_expression=candidate.expression,
+                    payload={"reviews": [asdict(review) for review in post_reviews]},
+                )
             gate_assessment = self.quality_gate.assess(metrics)
             gate_failures = gate_assessment["failures"]
             gate_warnings = gate_assessment["warnings"]
@@ -881,44 +915,44 @@ class AlphaPipeline:
                 gate_failure_reason=gate_reasons[0] if gate_reasons else None,
                 needs_review=needs_review,
                 submitted_at=submitted_at,
-                pre_backtest_score=float(pre_backtest.score),
-                pre_backtest_passed=bool(pre_backtest.passed),
-                pre_backtest_metrics=self.local_backtester.as_payload(pre_backtest).get("estimated_metrics", {}),
+                pre_backtest_score=float(pre_backtest.score) if pre_backtest_enabled else None,
+                pre_backtest_passed=bool(pre_backtest.passed) if pre_backtest_enabled else None,
+                pre_backtest_metrics=self.local_backtester.as_payload(pre_backtest).get("estimated_metrics", {}) if pre_backtest_enabled else {},
             )
-        if tracker is not None:
-            tracker.alpha_explanation(
-                alpha_run_id,
-                final_candidate,
-                thresholds=self.quality_gate.thresholds,
-                prompt_context=base_context,
-                research_refs=research_refs,
-                agent_reviews=agent_reviews,
-                stage_notes={
-                    "pre_backtest": self.local_backtester.as_payload(pre_backtest),
-                    "gate_reasons": gate_reasons,
-                    "gate_failures": gate_failures,
-                    "gate_warnings": gate_warnings,
-                    "needs_review": needs_review,
-                    "status": status,
-                    "metrics": asdict(metrics),
-                },
-            )
-            for failure in gate_failures:
-                tracker.event(
-                    "filter",
-                    "WARNING",
-                    "GATE_FAIL",
-                    str(failure["message"]),
-                    alpha_expression=final_candidate.expression,
-                    alpha_run_id=alpha_run_id,
-                    payload=failure,
+            if tracker is not None:
+                tracker.alpha_explanation(
+                    alpha_run_id,
+                    candidate,
+                    thresholds=self.quality_gate.thresholds,
+                    prompt_context=base_context,
+                    research_refs=research_refs,
+                    agent_reviews=agent_reviews,
+                    stage_notes={
+                        "pre_backtest": self.local_backtester.as_payload(pre_backtest) if pre_backtest_enabled else {"enabled": False},
+                        "gate_reasons": gate_reasons,
+                        "gate_failures": gate_failures,
+                        "gate_warnings": gate_warnings,
+                        "needs_review": needs_review,
+                        "status": status,
+                        "metrics": asdict(metrics),
+                    },
                 )
-            for warning in gate_warnings:
-                tracker.event(
-                    "filter",
-                    "WARNING",
-                    "GATE_WARNING",
-                    str(warning["message"]),
+                for failure in gate_failures:
+                    tracker.event(
+                        "filter",
+                        "WARNING",
+                        "GATE_FAIL",
+                        str(failure["message"]),
+                        alpha_expression=candidate.expression,
+                        alpha_run_id=alpha_run_id,
+                        payload=failure,
+                    )
+                for warning in gate_warnings:
+                    tracker.event(
+                        "filter",
+                        "WARNING",
+                        "GATE_WARNING",
+                        str(warning["message"]),
                         alpha_expression=candidate.expression,
                         alpha_run_id=alpha_run_id,
                         payload={**warning, "needs_review": True},
@@ -977,6 +1011,19 @@ class AlphaPipeline:
         if recovery_note:
             recovery_notes.append(recovery_note)
         if recovery_candidate is not None and recovery_candidate.expression not in seen_expressions:
+            pre_backtest_enabled = bool(self.config.settings.get("pipeline", {}).get("pre_backtest", {}).get("enabled", True))
+            if not pre_backtest_enabled:
+                queue.append(recovery_candidate)
+                if tracker is not None:
+                    tracker.event(
+                        "pre_backtest",
+                        "INFO",
+                        "prebacktest_bypassed",
+                        "Recovery candidate bypassed local pretest and entered simulation queue.",
+                        alpha_expression=recovery_candidate.expression,
+                        payload={"pre_backtest_enabled": False},
+                    )
+                return recovery_budget - 1
             pre_backtest = self.local_backtester.evaluate(recovery_candidate, history)
             if pre_backtest.passed:
                 queue.append(recovery_candidate)
@@ -1029,17 +1076,22 @@ class AlphaPipeline:
             paper_section_lines.append("")
         paper_section = "\n".join(paper_section_lines).strip()
 
-        remediation_prompt = (
-            f"A WorldQuant alpha failed.\n"
+        # Single Step: DeerFlow reviews the failure and regenerates one improved expression directly.
+        deerflow_regen_prompt = (
+            f"A WorldQuant alpha failed simulation and needs recovery.\n"
             f"Failed expression: {failed_candidate.expression}\n"
             f"Failure reasons: {'; '.join(failure_reasons)}\n\n"
-            f"Market research:\n{market_research[:5000]}\n\n"
+            f"Market research:\n{market_research[:3000]}\n\n"
             f"{paper_section}\n\n"
-            "Write a short remediation note with concrete operator, turnover, correlation, and drawdown adjustments. "
-            "Then provide one improved expression on a final line prefixed with EXPRESSION: . "
+            "Based on the failure reasons, market research, and paper lessons above, write a short remediation note, "
+            "then provide ONE improved expression on a final line prefixed with EXPRESSION: . "
             "Use only rank, zscore, ts_mean, ts_delta, ts_std_dev, ts_corr, close, returns, volume, vwap."
         )
-        remediation = self.hermes.ask(remediation_prompt).strip()
+        deerflow_regen = self.deerflow.run_research(deerflow_regen_prompt).strip()
+        remediation = (
+            "## DeerFlow Recovery & Regeneration\n"
+            f"{deerflow_regen}"
+        )
         note_path = self._write_failure_recovery_note(
             strategy_type=strategy_type,
             failed_candidate=failed_candidate,
@@ -1062,7 +1114,7 @@ class AlphaPipeline:
                 metadata={
                     **failed_candidate.metadata,
                     "generation_source": "failure_recovery",
-                    "origin_agent": "hermes",
+                    "origin_agent": "deerflow",
                     "recovery_note": str(note_path),
                 },
             ),
@@ -1119,8 +1171,7 @@ class AlphaPipeline:
             with fails_path.open("a", encoding="utf-8") as handle:
                 handle.write("\n" + "\n".join(fail_lines) + "\n")
 
-        if memory_lines:
-            self.hermes.remember("\n".join(memory_lines))
+        pass
 
     def _build_run_tags(
         self,
@@ -1159,9 +1210,7 @@ class AlphaPipeline:
         if explicit:
             return explicit
         source = str(candidate.source or "").lower()
-        if source in {"llm", "hermes", "hermes_llm"}:
-            return "hermes"
-        if source in {"deerflow", "deerflow_llm"}:
+        if source in {"llm", "hermes", "hermes_llm", "deerflow", "deerflow_llm"}:
             return "deerflow"
         if source == "react_ui":
             return "studio"
@@ -1185,12 +1234,12 @@ class AlphaPipeline:
     ) -> list[AgentReview]:
         reviews: list[AgentReview] = []
         enabled = (
-            self.config.settings["pipeline"].get("pre_simulation_review", True)
+            self.config.settings.get("pipeline", {}).get("pre_simulation_review", True)
             if stage == "pre_simulation"
-            else self.config.settings["pipeline"].get("post_simulation_review", True)
+            else self.config.settings.get("pipeline", {}).get("post_simulation_review", True)
         )
         if enabled:
-            reviews.append(self.hermes.review_alpha(candidate, stage, context, metrics, knowledge_root=self.config.knowledge_root))
+            # Reviewer responsibility is handled by DeerFlow only.
             reviews.append(self.deerflow.review_alpha(candidate, stage, context, metrics, knowledge_root=self.config.knowledge_root))
         return reviews
 

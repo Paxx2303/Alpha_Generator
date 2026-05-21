@@ -83,4 +83,7 @@ export const api = {
     request<Record<string, unknown>>('/chat/messages', { method: 'POST', body: JSON.stringify(payload) }),
   clearChatMessages: (session = 'studio') =>
     request<{ status: string }>(`/chat/messages?session=${session}`, { method: 'DELETE' }),
+  getSimulationQueue: () => request<{ active: any; waiting: any[]; count: number }>('/simulation-queue'),
+  unlockSimulationQueue: () => request<{ status: string; unlocked: boolean }>('/simulation-queue/unlock', { method: 'POST' }),
+  clearSimulationQueue: () => request<{ status: string; cleared: boolean }>('/simulation-queue/clear', { method: 'POST' }),
 }

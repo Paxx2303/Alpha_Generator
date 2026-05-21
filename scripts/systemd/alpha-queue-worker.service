@@ -1,0 +1,36 @@
+[Unit]
+Description=Alpha Queue Worker - Process alpha generation jobs from queue
+After=network.target
+
+[Service]
+Type=simple
+User=alpha
+Group=alpha
+WorkingDirectory=/path/to/Alpha_Generator
+Environment="PATH=/path/to/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+
+# Main command
+ExecStart=/path/to/venv/bin/python main.py --queue-worker --poll-interval 5.0
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=200
+StartLimitBurst=5
+
+# Logging
+StandardOutput=append:/path/to/Alpha_Generator/logs/queue_worker.log
+StandardError=append:/path/to/Alpha_Generator/logs/queue_worker_error.log
+
+# Resource limits
+LimitNOFILE=65536
+MemoryLimit=4G
+CPUQuota=200%
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
