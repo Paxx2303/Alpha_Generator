@@ -1,0 +1,714 @@
+{
+  "metadata": {
+    "split": "test",
+    "document_count": 39,
+    "source_dataset": "alpha_research_dataset.json"
+  },
+  "documents": [
+    {
+      "id": "research_insights_Tracking_Error_1",
+      "metadata": {
+        "filename": "Tracking_Error_1.md",
+        "category": "research_insights",
+        "title": "Tracking Error",
+        "source_url": "",
+        "word_count": 129,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Tracking Error\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nThe standard deviation of the difference between portfolio returns and benchmark returns.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Tracking Error} = \\sqrt{\\frac{\\sum_{i=1}^n (R_{p,i} - R_{b,i})^2}{n-1}}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nMeasures benchmark deviation. Low tracking error indicates index-like behavior.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Trend_Following",
+      "metadata": {
+        "filename": "Trend_Following.md",
+        "category": "research_insights",
+        "title": "Trend Following",
+        "source_url": "",
+        "word_count": 133,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Trend Following\n\n**Category:** Trading Strategies & Concepts  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA strategy that attempts to capture gains through the analysis of an asset's momentum in a particular direction.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Signal} = \\text{sign}(P_t - \\text{Moving Average}_t)$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nLonger-term momentum. WQ Brain: `sign(close - ts_mean(close, 50))`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Trend_Following_1",
+      "metadata": {
+        "filename": "Trend_Following_1.md",
+        "category": "research_insights",
+        "title": "Trend Following",
+        "source_url": "",
+        "word_count": 133,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Trend Following\n\n**Category:** Trading Strategies & Concepts  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA strategy that attempts to capture gains through the analysis of an asset's momentum in a particular direction.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Signal} = \\text{sign}(P_t - \\text{Moving Average}_t)$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nLonger-term momentum. WQ Brain: `sign(close - ts_mean(close, 50))`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Treynor_Ratio",
+      "metadata": {
+        "filename": "Treynor_Ratio.md",
+        "category": "research_insights",
+        "title": "Treynor Ratio",
+        "source_url": "",
+        "word_count": 136,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Treynor Ratio\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nMeasures the risk-adjusted return of a portfolio based on systematic risk (Beta) rather than total risk.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Treynor} = \\frac{R_p - R_f}{\\beta_p}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nUseful for diversified portfolios. High Treynor indicates strong performance per unit of market risk.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Treynor_Ratio_1",
+      "metadata": {
+        "filename": "Treynor_Ratio_1.md",
+        "category": "research_insights",
+        "title": "Treynor Ratio",
+        "source_url": "",
+        "word_count": 136,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Treynor Ratio\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nMeasures the risk-adjusted return of a portfolio based on systematic risk (Beta) rather than total risk.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Treynor} = \\frac{R_p - R_f}{\\beta_p}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nUseful for diversified portfolios. High Treynor indicates strong performance per unit of market risk.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Triple_Exponential_Moving_Average",
+      "metadata": {
+        "filename": "Triple_Exponential_Moving_Average.md",
+        "category": "research_insights",
+        "title": "Triple Exponential Moving Average",
+        "source_url": "",
+        "word_count": 134,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Triple Exponential Moving Average\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nAn even faster moving average that reduces lag further by using triple-smoothed EMAs.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{TEMA} = (3 \\times \\text{EMA}) - (3 \\times \\text{EMA}(\\text{EMA})) + \\text{EMA}(\\text{EMA}(\\text{EMA}))$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nZero-lag trend filtering. In WQ Brain: nested recursive logic.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Triple_Exponential_Moving_Average_1",
+      "metadata": {
+        "filename": "Triple_Exponential_Moving_Average_1.md",
+        "category": "research_insights",
+        "title": "Triple Exponential Moving Average",
+        "source_url": "",
+        "word_count": 134,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Triple Exponential Moving Average\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nAn even faster moving average that reduces lag further by using triple-smoothed EMAs.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{TEMA} = (3 \\times \\text{EMA}) - (3 \\times \\text{EMA}(\\text{EMA})) + \\text{EMA}(\\text{EMA}(\\text{EMA}))$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nZero-lag trend filtering. In WQ Brain: nested recursive logic.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Underfitting",
+      "metadata": {
+        "filename": "Underfitting.md",
+        "category": "research_insights",
+        "title": "Underfitting",
+        "source_url": "",
+        "word_count": 141,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Underfitting\n\n**Category:** Quantitative & Statistical Analysis  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nOccurs when a model is too simple to capture the underlying structure of the data, resulting in poor in-sample and out-of-sample performance.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Error}_{in} \\gg 0 \\text{ and } \\text{Error}_{out} \\gg 0$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nResolved by incorporating more predictive features and adjusting lookback windows.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Underfitting_1",
+      "metadata": {
+        "filename": "Underfitting_1.md",
+        "category": "research_insights",
+        "title": "Underfitting",
+        "source_url": "",
+        "word_count": 141,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Underfitting\n\n**Category:** Quantitative & Statistical Analysis  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nOccurs when a model is too simple to capture the underlying structure of the data, resulting in poor in-sample and out-of-sample performance.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Error}_{in} \\gg 0 \\text{ and } \\text{Error}_{out} \\gg 0$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nResolved by incorporating more predictive features and adjusting lookback windows.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Understanding_Robust_Alpha_Research_From_Data_Exploration_to_Validation",
+      "metadata": {
+        "filename": "Understanding_Robust_Alpha_Research_From_Data_Exploration_to_Validation.md",
+        "category": "research_insights",
+        "title": "Understanding Robust Alpha Research: From Data Exploration to Validation",
+        "source_url": "https://support.worldquantbrain.com/hc/en-us/community/posts/37469966954519-Understanding-Robust-Alpha-Research-From-Data-Exploration-to-Validation",
+        "word_count": 103,
+        "has_formulas": false,
+        "has_code": false,
+        "key_concepts": [
+          "Post Content",
+          "Comments",
+          "Comment by Emmanuel Bani Menza(EM97072) 2 months ago",
+          "Comment by MB96681 1 month ago",
+          "Comment by Aliyi Abdurezak sali(AA35371) 1 month ago"
+        ]
+      },
+      "content": "# Understanding Robust Alpha Research: From Data Exploration to Validation\n\n**Source:** https://support.worldquantbrain.com/hc/en-us/community/posts/37469966954519-Understanding-Robust-Alpha-Research-From-Data-Exploration-to-Validation  \n**Metadata:** AV19939 4 months ago\n\n## Post Content\n\nThis post discusses a structured approach to alpha research, including how to explore diverse datasets, form economically grounded hypotheses, construct signals, and evaluate them for robustness across different market regimes. It also highlights common pitfalls such as overfitting and the importance of disciplined validation and documentation.\n\n## Comments\n\n### Comment by Emmanuel Bani Menza(EM97072) 2 months ago\nI've liked the explanation\n\n---\n\n### Comment by MB96681 1 month ago\nVery nice\n\n---\n\n### Comment by Aliyi Abdurezak sali(AA35371) 1 month ago\nOk\n\n---"
+    },
+    {
+      "id": "research_insights_Unit_Root_Test",
+      "metadata": {
+        "filename": "Unit_Root_Test.md",
+        "category": "research_insights",
+        "title": "Unit Root Test",
+        "source_url": "",
+        "word_count": 139,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Unit Root Test\n\n**Category:** Quantitative & Statistical Analysis  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA statistical test to determine whether a time series variable is non-stationary and has a unit root.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\Delta Y_t = \\gamma Y_{t-1} + \\epsilon_t \\text{ (ADF Test)}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nUsed to verify stationarity of spreads in mean reversion strategies.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Unit_Root_Test_1",
+      "metadata": {
+        "filename": "Unit_Root_Test_1.md",
+        "category": "research_insights",
+        "title": "Unit Root Test",
+        "source_url": "",
+        "word_count": 139,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Unit Root Test\n\n**Category:** Quantitative & Statistical Analysis  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA statistical test to determine whether a time series variable is non-stationary and has a unit root.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\Delta Y_t = \\gamma Y_{t-1} + \\epsilon_t \\text{ (ADF Test)}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nUsed to verify stationarity of spreads in mean reversion strategies.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Value_at_Risk",
+      "metadata": {
+        "filename": "Value_at_Risk.md",
+        "category": "research_insights",
+        "title": "Value at Risk",
+        "source_url": "",
+        "word_count": 145,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Value at Risk\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA statistic that quantifies the maximum potential loss of a portfolio over a specific timeframe at a given confidence level.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{VaR}_{\\alpha} = \\inf \\{ L \\mid P(Loss > L) \\le 1 - \\alpha \\}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nKey institutional risk measure. Guides truncation and leverage limits.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Value_at_Risk_1",
+      "metadata": {
+        "filename": "Value_at_Risk_1.md",
+        "category": "research_insights",
+        "title": "Value at Risk",
+        "source_url": "",
+        "word_count": 145,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Value at Risk\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA statistic that quantifies the maximum potential loss of a portfolio over a specific timeframe at a given confidence level.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{VaR}_{\\alpha} = \\inf \\{ L \\mid P(Loss > L) \\le 1 - \\alpha \\}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nKey institutional risk measure. Guides truncation and leverage limits.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Volatility",
+      "metadata": {
+        "filename": "Volatility.md",
+        "category": "research_insights",
+        "title": "Volatility",
+        "source_url": "",
+        "word_count": 136,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Volatility\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA statistical measure of the dispersion of returns for a given security or market index.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Volatility} = \\sigma \\times \\sqrt{252} \\text{ (Annualized)}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nMeasures risk. WQ Brain normalizes formulas by volatility: `signal / (ts_std_dev(returns, 20) + 0.001)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Volatility_1",
+      "metadata": {
+        "filename": "Volatility_1.md",
+        "category": "research_insights",
+        "title": "Volatility",
+        "source_url": "",
+        "word_count": 136,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Volatility\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA statistical measure of the dispersion of returns for a given security or market index.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Volatility} = \\sigma \\times \\sqrt{252} \\text{ (Annualized)}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nMeasures risk. WQ Brain normalizes formulas by volatility: `signal / (ts_std_dev(returns, 20) + 0.001)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Volume_of_Trade",
+      "metadata": {
+        "filename": "Volume_of_Trade.md",
+        "category": "research_insights",
+        "title": "Volume of Trade",
+        "source_url": "",
+        "word_count": 205,
+        "has_formulas": false,
+        "has_code": false,
+        "key_concepts": [
+          "Key Concepts"
+        ]
+      },
+      "content": "# Volume of Trade\n\n**Source:** Investopedia / Quantitative Finance Reference\n\n**Volume of trade**, commonly referred to as **trading volume**, is a measure of the total number of shares, contracts, or units of a security that are traded during a specific period of time.\n\n### Key Concepts\n* **Definition:** It represents the total activity or market participation for a security. If 1 million shares of a stock change hands in a single day, the daily trading volume is 1 million.\n* **Liquidity Indicator:** Higher trading volumes generally indicate greater liquidity, which makes it easier for buyers and sellers to execute transactions at stable prices. Low volume can signal a lack of interest or liquidity, potentially leading to wider spreads and greater price slippage.\n* **Market Context:** Traders and analysts often use volume to confirm price trends. A price move accompanied by high volume is typically viewed as more significant or \"confirmed\" than one occurring on low volume.\n* **Common Patterns:** Trading volume often spikes during the market open and market close, as well as around major news releases or economic data.\n\nWhile Investopedia is a primary source for this financial definition, the concept is fundamental across all financial markets, including stocks, bonds, options, futures, and commodities.\n"
+    },
+    {
+      "id": "research_insights_Volume_Price_Trend",
+      "metadata": {
+        "filename": "Volume_Price_Trend.md",
+        "category": "research_insights",
+        "title": "Volume Price Trend",
+        "source_url": "",
+        "word_count": 138,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Volume Price Trend\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nAn indicator that combines price percentage change and volume to confirm trend strength and detect divergence.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{VPT}_t = \\text{VPT}_{t-1} + \\left(\\frac{\\text{Close}_t - \\text{Close}_{t-1}}{\\text{Close}_{t-1}}\\right) \\times \\text{Volume}_t$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nVolume-weighted momentum. In WQ Brain: `ts_sum(ts_delta(close, 1) / ts_delay(close, 1) * volume, n)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Volume_Price_Trend_1",
+      "metadata": {
+        "filename": "Volume_Price_Trend_1.md",
+        "category": "research_insights",
+        "title": "Volume Price Trend",
+        "source_url": "",
+        "word_count": 138,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Volume Price Trend\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nAn indicator that combines price percentage change and volume to confirm trend strength and detect divergence.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{VPT}_t = \\text{VPT}_{t-1} + \\left(\\frac{\\text{Close}_t - \\text{Close}_{t-1}}{\\text{Close}_{t-1}}\\right) \\times \\text{Volume}_t$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nVolume-weighted momentum. In WQ Brain: `ts_sum(ts_delta(close, 1) / ts_delay(close, 1) * volume, n)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Volume_Weighted_Average_Price",
+      "metadata": {
+        "filename": "Volume_Weighted_Average_Price.md",
+        "category": "research_insights",
+        "title": "Volume Weighted Average Price",
+        "source_url": "",
+        "word_count": 145,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Volume Weighted Average Price\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA technical analysis indicator showing the average price a security has traded at, weighted by volume.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{VWAP} = \\frac{\\sum (\\text{Price} \\times \\text{Volume})}{\\sum \\text{Volume}}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nIdentifies fair value. In WQ Brain: `vwap` data field. Deviation: `(vwap - close) / close` is an excellent mean reversion signal.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Volume_Weighted_Average_Price_1",
+      "metadata": {
+        "filename": "Volume_Weighted_Average_Price_1.md",
+        "category": "research_insights",
+        "title": "Volume Weighted Average Price",
+        "source_url": "",
+        "word_count": 145,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Volume Weighted Average Price\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA technical analysis indicator showing the average price a security has traded at, weighted by volume.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{VWAP} = \\frac{\\sum (\\text{Price} \\times \\text{Volume})}{\\sum \\text{Volume}}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nIdentifies fair value. In WQ Brain: `vwap` data field. Deviation: `(vwap - close) / close` is an excellent mean reversion signal.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Weighted_Moving_Average",
+      "metadata": {
+        "filename": "Weighted_Moving_Average.md",
+        "category": "research_insights",
+        "title": "Weighted Moving Average",
+        "source_url": "",
+        "word_count": 128,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Weighted Moving Average\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA moving average that assigns linearly decreasing weights to older data points.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{WMA} = \\frac{\\sum_{i=1}^n i \\times P_i}{\\sum_{i=1}^n i}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nIdentical to linear decay. In WQ Brain: `ts_decay_linear(close, n)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Weighted_Moving_Average_1",
+      "metadata": {
+        "filename": "Weighted_Moving_Average_1.md",
+        "category": "research_insights",
+        "title": "Weighted Moving Average",
+        "source_url": "",
+        "word_count": 128,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Weighted Moving Average\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA moving average that assigns linearly decreasing weights to older data points.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{WMA} = \\frac{\\sum_{i=1}^n i \\times P_i}{\\sum_{i=1}^n i}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nIdentical to linear decay. In WQ Brain: `ts_decay_linear(close, n)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Williams_Percent_R",
+      "metadata": {
+        "filename": "Williams_Percent_R.md",
+        "category": "research_insights",
+        "title": "Williams Percent R",
+        "source_url": "",
+        "word_count": 144,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Williams Percent R\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA momentum indicator that reflects the level of the close relative to the highest high for the lookback period.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Williams } \\%\\text{R} = \\frac{\\text{Highest High} - \\text{Close}}{\\text{Highest High} - \\text{Lowest Low}} \\times -100$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nSimilar to Stochastic %K but inverted. In WQ Brain: `-ts_scale(close, n)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Williams_Percent_R_1",
+      "metadata": {
+        "filename": "Williams_Percent_R_1.md",
+        "category": "research_insights",
+        "title": "Williams Percent R",
+        "source_url": "",
+        "word_count": 144,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Williams Percent R\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA momentum indicator that reflects the level of the close relative to the highest high for the lookback period.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Williams } \\%\\text{R} = \\frac{\\text{Highest High} - \\text{Close}}{\\text{Highest High} - \\text{Lowest Low}} \\times -100$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nSimilar to Stochastic %K but inverted. In WQ Brain: `-ts_scale(close, n)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Win_Rate",
+      "metadata": {
+        "filename": "Win_Rate.md",
+        "category": "research_insights",
+        "title": "Win Rate",
+        "source_url": "",
+        "word_count": 135,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Win Rate\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nThe percentage of winning trades out of the total number of trades executed.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Win Rate} = \\frac{\\text{Winning Trades}}{\\text{Total Trades}} \\times 100$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nHigh win rate is psychologically satisfying, but profitability also depends on Risk-Reward Ratio.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Win_Rate_1",
+      "metadata": {
+        "filename": "Win_Rate_1.md",
+        "category": "research_insights",
+        "title": "Win Rate",
+        "source_url": "",
+        "word_count": 135,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Win Rate\n\n**Category:** Risk & Performance Metrics  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nThe percentage of winning trades out of the total number of trades executed.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Win Rate} = \\frac{\\text{Winning Trades}}{\\text{Total Trades}} \\times 100$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nHigh win rate is psychologically satisfying, but profitability also depends on Risk-Reward Ratio.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_WorldQuant_101_Alphas_Complete_Guide",
+      "metadata": {
+        "filename": "WorldQuant_101_Alphas_Complete_Guide.md",
+        "category": "research_insights",
+        "title": "WorldQuant 101 Alphas - Complete Implementation Guide",
+        "source_url": "https://docs.dolphindb.com/en/Tutorials/wq101alpha.html",
+        "word_count": 1098,
+        "has_formulas": false,
+        "has_code": true,
+        "key_concepts": [
+          "Overview",
+          "Key Performance Metrics",
+          "Data Requirements",
+          "Core Market Data",
+          "Additional Data (for specific alphas)",
+          "Alpha Categories",
+          "1. Alphas Without Industry Information (82 alphas)",
+          "Single Input Alphas",
+          "Price-Volume Combinations",
+          "VWAP-Based Alphas"
+        ]
+      },
+      "content": "# WorldQuant 101 Alphas - Complete Implementation Guide\n\n**Source:** https://docs.dolphindb.com/en/Tutorials/wq101alpha.html  \n**Paper Reference:** [101 Formulaic Alphas](https://arxiv.org/pdf/1601.00991.pdf)  \n**Authors:** Zura Kakushadze, Willie Yu  \n**Publication:** 2016\n\n## Overview\n\nIn 2015, WorldQuant presented 101 quantitative trading alphas in their seminal paper \"101 Formulaic Alphas\". These alphas are mathematical models that seek to predict future price movements of financial instruments using various market data inputs.\n\n## Key Performance Metrics\n\n- **Holding Period:** 0.6 - 6.4 days\n- **Testing Period:** January 4, 2010 - December 31, 2013 (1006 observations)\n- **Performance:** Returns strongly correlated with volatility, no significant dependence on turnover\n- **Implementation Advantage:** DolphinDB outperforms Python by median 15.5x, with 27.5% of alphas running 100x faster\n\n## Data Requirements\n\n### Core Market Data\n- **tradetime:** Trading hours\n- **securityid:** Security code  \n- **open:** Open price\n- **close:** Close price\n- **high:** High price\n- **low:** Low price\n- **vol:** Trading volume\n- **vwap:** Volume-weighted average price\n\n### Additional Data (for specific alphas)\n- **cap:** Market capitalization\n- **indclass:** Industry classification\n\n## Alpha Categories\n\n### 1. Alphas Without Industry Information (82 alphas)\n\n#### Single Input Alphas\n- **Alpha 1, 9, 10, 19, 24, 29, 34, 46, 49, 51:** `close` only\n- **Alpha 4:** `low` only\n\n#### Price-Volume Combinations\n- **Alpha 2, 14:** `vol, open, close`\n- **Alpha 3, 6:** `vol, open`\n- **Alpha 7, 12, 13, 17, 21, 30, 39, 43, 45:** `vol, close`\n- **Alpha 8, 18, 33, 37, 38:** `open, close`\n\n#### VWAP-Based Alphas\n- **Alpha 5:** `vwap, open, close`\n- **Alpha 11, 96:** `vwap, vol, close`\n- **Alpha 25, 47, 74:** `vwap, vol, close, high`\n- **Alpha 27, 50, 61, 81:** `vwap, vol`\n- **Alpha 32, 42, 57, 84:** `vwap, close`\n\n#### Multi-Factor Alphas\n- **Alpha 20, 54, 101:** `open, close, high, low`\n- **Alpha 62, 64:** `vwap, vol, open, high, low`\n- **Alpha 71:** `vwap, vol, open, close, low`\n- **Alpha 88, 92, 94:** `vol, open, close, high, low`\n\n### 2. Alphas With Industry Information (19 alphas)\n\n#### Industry-Neutral Alphas\n- **Alpha 48:** `close, indclass`\n- **Alpha 56:** `close, cap`\n- **Alpha 58, 59:** `vwap, vol, indclass`\n- **Alpha 63, 79:** `vwap, vol, open, close, indclass`\n- **Alpha 69, 70, 87, 91, 93:** `vwap, vol, close, indclass`\n\n#### Complex Industry Alphas\n- **Alpha 67:** `vwap, vol, high, indclass`\n- **Alpha 76, 89:** `vwap, vol, low, indclass`\n- **Alpha 80:** `vol, open, high, indclass`\n- **Alpha 82:** `vol, open, indclass`\n- **Alpha 90:** `vol, close, indclass`\n- **Alpha 97:** `vwap, vol, low, indclass`\n- **Alpha 100:** `vol, close, high, low, indclass`\n\n## Implementation Examples\n\n### Alpha 1: Simple Close Price Momentum\n```python\n# Alpha 1: rank(Ts_ArgMax(SignedPower(((returns < 0) ? stddev(returns, 20) : close), 2.), 5)) - 0.5\ndef WQAlpha1(close):\n    return rank(ts_argmax(signed_power(((returns < 0) ? stddev(returns, 20) : close), 2.), 5)) - 0.5\n```\n\n### Alpha 2: Volume-Price Relationship\n```python\n# Alpha 2: (-1 * correlation(rank(delta(log(volume), 2)), rank(((close - open) / open)), 6))\ndef WQAlpha2(vol, close, open):\n    return -1 * correlation(rank(delta(log(vol), 2)), rank((close - open) / open), 6)\n```\n\n### Alpha 101: Multi-Factor Signal\n```python\n# Alpha 101: ((close - open) / ((high - low) + .001))\ndef WQAlpha101(close, open, high, low):\n    return (close - open) / ((high - low) + 0.001)\n```\n\n## Mathematical Operations Used\n\n### Time Series Operations\n- **ts_rank:** Time series ranking\n- **ts_min/ts_max:** Rolling minimum/maximum\n- **ts_argmin/ts_argmax:** Position of minimum/maximum\n- **delay:** Lag operator\n- **delta:** Difference operator\n- **decay_linear:** Linear decay weighting\n\n### Cross-Sectional Operations\n- **rank:** Cross-sectional ranking\n- **scale:** Normalization to unit sum\n- **correlation:** Rolling correlation\n- **covariance:** Rolling covariance\n- **stddev:** Standard deviation\n\n### Mathematical Functions\n- **log:** Natural logarithm\n- **abs:** Absolute value\n- **sign:** Sign function\n- **power:** Exponentiation\n- **sqrt:** Square root\n\n## Performance Characteristics\n\n### Computational Efficiency\n- **DolphinDB vs Python Pandas:** 15.5x median speedup\n- **DolphinDB vs NumPy:** Significant performance advantage\n- **Memory Efficiency:** Optimized for large-scale data processing\n\n### Statistical Properties\n- **Correlation with Volatility:** Strong positive correlation\n- **Turnover Independence:** No significant dependence on portfolio turnover\n- **Robustness:** Tested across multiple market regimes\n\n## Stream Processing Implementation\n\n### Real-Time Alpha Calculation\n```python\n# Example: Real-time Alpha 1 calculation\ninputSchemaT = table(1:0, [\"SecurityID\",\"TradeTime\",\"close\"], [SYMBOL,TIMESTAMP,DOUBLE])\nresultStream = table(10000:0, [\"SecurityID\",\"TradeTime\", \"factor\"], [SYMBOL,TIMESTAMP, DOUBLE])\n\nmetrics = <[WQAlpha1(close)]>\nstreamEngine = streamEngineParser(\n    name=\"WQAlpha1Parser\", \n    metrics=metrics, \n    dummyTable=inputSchemaT, \n    outputTable=resultStream, \n    keyColumn=\"SecurityID\", \n    timeColumn=`tradetime, \n    triggeringPattern='perBatch', \n    triggeringInterval=4000\n)\n```\n\n## Industry Neutralization\n\nFor industry-related factors, the original paper uses multiple classification levels:\n- **IndClass.subindustry:** Detailed industry classification\n- **IndClass.industry:** Broad industry groups  \n- **IndClass.sector:** Sector-level classification\n\nThe implementation standardizes on a single `IndClass` field for simplicity.\n\n## Validation and Testing\n\n### Backtesting Framework\n- **In-Sample Period:** Training data for alpha development\n- **Out-of-Sample Period:** Testing data for validation\n- **Walk-Forward Analysis:** Rolling window testing methodology\n\n### Performance Metrics\n- **Sharpe Ratio:** Risk-adjusted returns\n- **Information Ratio:** Active return per unit of tracking error\n- **Maximum Drawdown:** Largest peak-to-trough decline\n- **Turnover:** Portfolio rebalancing frequency\n\n## Practical Applications\n\n### Portfolio Construction\n- **Long-Short Equity:** Market-neutral strategies\n- **Factor Investing:** Multi-factor model construction\n- **Risk Management:** Diversification and hedging\n\n### Signal Processing\n- **Alpha Combination:** Ensemble methods for multiple alphas\n- **Risk Adjustment:** Volatility and beta neutralization\n- **Regime Detection:** Adaptive alpha selection\n\n## Research Extensions\n\n### Alpha Enhancement\n- **Machine Learning Integration:** Neural networks and ensemble methods\n- **Alternative Data:** Satellite imagery, social media, news sentiment\n- **High-Frequency Adaptations:** Intraday and tick-level implementations\n\n### Risk Management\n- **Dynamic Hedging:** Real-time risk factor exposure management\n- **Stress Testing:** Scenario analysis and tail risk assessment\n- **Correlation Monitoring:** Cross-alpha correlation tracking\n\n## Implementation Best Practices\n\n### Data Quality\n- **Missing Value Handling:** Forward-fill, interpolation, or exclusion\n- **Outlier Detection:** Statistical filters and winsorization\n- **Corporate Actions:** Dividend and split adjustments\n\n### Performance Optimization\n- **Vectorization:** Batch processing for efficiency\n- **Memory Management:** Streaming computation for large datasets\n- **Parallel Processing:** Multi-threading and distributed computing\n\n### Model Validation\n- **Cross-Validation:** Time series split validation\n- **Robustness Testing:** Parameter sensitivity analysis\n- **Regime Analysis:** Performance across different market conditions\n\n## Conclusion\n\nThe WorldQuant 101 Alphas represent a comprehensive framework for quantitative alpha research. These formulas provide:\n\n1. **Systematic Approach:** Structured methodology for alpha development\n2. **Empirical Validation:** Proven performance across multiple years\n3. **Implementation Efficiency:** Optimized computational frameworks\n4. **Research Foundation:** Base for further alpha research and development\n\nThe alphas demonstrate that simple mathematical transformations of market data can generate significant predictive signals when properly implemented and combined in a systematic framework.\n\n## References\n\n1. Kakushadze, Z., & Yu, W. (2016). 101 Formulaic Alphas. arXiv preprint arXiv:1601.00991.\n2. DolphinDB Documentation: WorldQuant 101 Alphas Implementation Guide\n3. WorldQuant Research: Quantitative Trading Strategies and Alpha Development\n4. Financial Data Science: Time Series Analysis and Cross-Sectional Modeling"
+    },
+    {
+      "id": "research_insights_ZigZag_Indicator",
+      "metadata": {
+        "filename": "ZigZag_Indicator.md",
+        "category": "research_insights",
+        "title": "ZigZag Indicator",
+        "source_url": "",
+        "word_count": 147,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# ZigZag Indicator\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA technical tool that filters out noise by plotting points only when price moves by a percentage greater than a threshold.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Points} = P_t \\text{ if } |P_t - P_{last}| / P_{last} \\ge \\text{Threshold}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nFilters price noise. In WQ Brain: used to identify historical swing highs and lows.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_ZigZag_Indicator_1",
+      "metadata": {
+        "filename": "ZigZag_Indicator_1.md",
+        "category": "research_insights",
+        "title": "ZigZag Indicator",
+        "source_url": "",
+        "word_count": 147,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# ZigZag Indicator\n\n**Category:** Technical Indicators  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA technical tool that filters out noise by plotting points only when price moves by a percentage greater than a threshold.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$\\text{Points} = P_t \\text{ if } |P_t - P_{last}| / P_{last} \\ge \\text{Threshold}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nFilters price noise. In WQ Brain: used to identify historical swing highs and lows.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Z_Score",
+      "metadata": {
+        "filename": "Z_Score.md",
+        "category": "research_insights",
+        "title": "Z Score",
+        "source_url": "",
+        "word_count": 138,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Z Score\n\n**Category:** Quantitative & Statistical Analysis  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA numerical measurement that describes a value's relationship to the mean of a group of values, measured in standard deviations.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$Z = \\frac{X - \\mu}{\\sigma}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nWQ Brain operators: `zscore(x)` (cross-sectional) and `ts_zscore(x, n)` (time-series). Prevents scale bias.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "research_insights_Z_Score_1",
+      "metadata": {
+        "filename": "Z_Score_1.md",
+        "category": "research_insights",
+        "title": "Z Score",
+        "source_url": "",
+        "word_count": 138,
+        "has_formulas": true,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "🔢 Mathematical Formula",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Z Score\n\n**Category:** Quantitative & Statistical Analysis  \n**Source:** Investopedia / Quantitative Finance Reference\n\n---\n\n## 📝 Definition\n\nA numerical measurement that describes a value's relationship to the mean of a group of values, measured in standard deviations.\n\n---\n\n## 🔢 Mathematical Formula\n\n$$Z = \\frac{X - \\mu}{\\sigma}$$\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nWQ Brain operators: `zscore(x)` (cross-sectional) and `ts_zscore(x, n)` (time-series). Prevents scale bias.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "technical_indicators_Wyckoff_Method",
+      "metadata": {
+        "filename": "Wyckoff_Method.md",
+        "category": "technical_indicators",
+        "title": "Wyckoff Method",
+        "source_url": "",
+        "word_count": 513,
+        "has_formulas": false,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "Three Laws of the Wyckoff Method",
+          "Wyckoff Market Cycle",
+          "🔢 Wyckoff Spread & Volume Analysis",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Wyckoff Method\n\n**Category:** Classic Trading Theories  \n**Source:** Investopedia / Technical Analysis Reference\n\n---\n\n## 📝 Definition\n\nThe **Wyckoff Method** is a technical analysis approach to trading and investing developed by Richard Wyckoff in the early 20th century. It is based on studying supply and demand, price action, volume, and the phases of market cycles. Wyckoff proposed that big market players (the \"Composite Man\") accumulate or distribute shares before major trends begin.\n\n### Three Laws of the Wyckoff Method\n1. **The Law of Supply and Demand:** \n   - When demand is greater than supply, prices rise.\n   - When supply is greater than demand, prices fall.\n   - Volume represents the force behind demand and supply.\n2. **The Law of Cause and Effect:**\n   - The size of a price move (effect) is directly proportional to the amount of preparation or consolidation (cause) that preceded it.\n   - Accumulation or distribution ranges represent the \"cause\" of subsequent markup or markdown trends.\n3. **The Law of Effort vs. Result:**\n   - Divergence between price action (result) and volume (effort) indicates a change in trend.\n   - High volume (effort) without a significant price move (result) suggests that the dominant force is changing (e.g., buying effort met with massive distribution supply).\n\n### Wyckoff Market Cycle\n1. **Accumulation:** Composite Man buys shares quietly within a trading range. Characters include: Selling Climax (SC), Automatic Rally (AR), Secondary Test (ST), and Spring (shakeout below support).\n2. **Markup (Bull Trend):** Price breaks out of the accumulation range and starts trending up.\n3. **Distribution:** Composite Man sells shares to the late-coming public. Characters include: Buying Climax (BC), Automatic Reaction (AR), and Upthrust (UTAD - fake breakout above resistance).\n4. **Markdown (Bear Trend):** Price breaks down and trends down.\n\n---\n\n## 🔢 Wyckoff Spread & Volume Analysis\n\nWyckoff relies on analyzing \"spread\" (High minus Low) and volume to identify institutional footprints:\n- **High volume + wide spread + close near high:** Strong buying effort and results (Bullish).\n- **High volume + narrow spread + close near middle/low:** Buying effort met with selling resistance (Bearish absorption).\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nWyckoff principles can be captured by checking volatility compression (cause) and volume-spread relationships (effort vs result):\n\n1. **Effort vs Result Alpha (Volume-Spread Divergence):**\n   Detect cases where price moves are small despite high volume (reversal setups):\n   ```python\n   spread = high - low;\n   normalized_spread = spread / ts_mean(spread, 20);\n   normalized_volume = volume / ts_mean(volume, 20);\n   // High volume relative to spread suggests hidden resistance (distribution/accumulation)\n   effort_vs_result = normalized_volume - normalized_spread;\n   // Reversion signal: sell if price is at a local peak with high effort-vs-result\n   signal = -rank(close) * effort_vs_result;\n   rank(signal)\n   ```\n\n2. **Spring / Shakeout Detector:**\n   Identify cases where price briefly breaks a multi-day low on high volume, then quickly recovers:\n   ```python\n   lookback = 20;\n   local_min = ts_min(low, lookback);\n   is_breakout = low < ts_delay(local_min, 1);\n   is_recovery = close > ts_delay(local_min, 1);\n   shakeout = is_breakout && is_recovery && (volume > ts_mean(volume, lookback));\n   // Buy signal on confirmed shakeouts\n   signal = if_else(shakeout, 1.0, 0.0);\n   rank(signal)\n   ```\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "technical_indicators_Wyckoff_Method_1",
+      "metadata": {
+        "filename": "Wyckoff_Method_1.md",
+        "category": "technical_indicators",
+        "title": "Wyckoff Method",
+        "source_url": "",
+        "word_count": 513,
+        "has_formulas": false,
+        "has_code": true,
+        "key_concepts": [
+          "📝 Definition",
+          "Three Laws of the Wyckoff Method",
+          "Wyckoff Market Cycle",
+          "🔢 Wyckoff Spread & Volume Analysis",
+          "💡 Application in Alpha Design (WorldQuant Brain)"
+        ]
+      },
+      "content": "# Wyckoff Method\n\n**Category:** Classic Trading Theories  \n**Source:** Investopedia / Technical Analysis Reference\n\n---\n\n## 📝 Definition\n\nThe **Wyckoff Method** is a technical analysis approach to trading and investing developed by Richard Wyckoff in the early 20th century. It is based on studying supply and demand, price action, volume, and the phases of market cycles. Wyckoff proposed that big market players (the \"Composite Man\") accumulate or distribute shares before major trends begin.\n\n### Three Laws of the Wyckoff Method\n1. **The Law of Supply and Demand:** \n   - When demand is greater than supply, prices rise.\n   - When supply is greater than demand, prices fall.\n   - Volume represents the force behind demand and supply.\n2. **The Law of Cause and Effect:**\n   - The size of a price move (effect) is directly proportional to the amount of preparation or consolidation (cause) that preceded it.\n   - Accumulation or distribution ranges represent the \"cause\" of subsequent markup or markdown trends.\n3. **The Law of Effort vs. Result:**\n   - Divergence between price action (result) and volume (effort) indicates a change in trend.\n   - High volume (effort) without a significant price move (result) suggests that the dominant force is changing (e.g., buying effort met with massive distribution supply).\n\n### Wyckoff Market Cycle\n1. **Accumulation:** Composite Man buys shares quietly within a trading range. Characters include: Selling Climax (SC), Automatic Rally (AR), Secondary Test (ST), and Spring (shakeout below support).\n2. **Markup (Bull Trend):** Price breaks out of the accumulation range and starts trending up.\n3. **Distribution:** Composite Man sells shares to the late-coming public. Characters include: Buying Climax (BC), Automatic Reaction (AR), and Upthrust (UTAD - fake breakout above resistance).\n4. **Markdown (Bear Trend):** Price breaks down and trends down.\n\n---\n\n## 🔢 Wyckoff Spread & Volume Analysis\n\nWyckoff relies on analyzing \"spread\" (High minus Low) and volume to identify institutional footprints:\n- **High volume + wide spread + close near high:** Strong buying effort and results (Bullish).\n- **High volume + narrow spread + close near middle/low:** Buying effort met with selling resistance (Bearish absorption).\n\n---\n\n## 💡 Application in Alpha Design (WorldQuant Brain)\n\nWyckoff principles can be captured by checking volatility compression (cause) and volume-spread relationships (effort vs result):\n\n1. **Effort vs Result Alpha (Volume-Spread Divergence):**\n   Detect cases where price moves are small despite high volume (reversal setups):\n   ```python\n   spread = high - low;\n   normalized_spread = spread / ts_mean(spread, 20);\n   normalized_volume = volume / ts_mean(volume, 20);\n   // High volume relative to spread suggests hidden resistance (distribution/accumulation)\n   effort_vs_result = normalized_volume - normalized_spread;\n   // Reversion signal: sell if price is at a local peak with high effort-vs-result\n   signal = -rank(close) * effort_vs_result;\n   rank(signal)\n   ```\n\n2. **Spring / Shakeout Detector:**\n   Identify cases where price briefly breaks a multi-day low on high volume, then quickly recovers:\n   ```python\n   lookback = 20;\n   local_min = ts_min(low, lookback);\n   is_breakout = low < ts_delay(local_min, 1);\n   is_recovery = close > ts_delay(local_min, 1);\n   shakeout = is_breakout && is_recovery && (volume > ts_mean(volume, lookback));\n   // Buy signal on confirmed shakeouts\n   signal = if_else(shakeout, 1.0, 0.0);\n   rank(signal)\n   ```\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*\n"
+    },
+    {
+      "id": "core_concepts_Quantitative_Analysis_1",
+      "metadata": {
+        "filename": "Quantitative_Analysis_1.md",
+        "category": "core_concepts",
+        "title": "Quantitative Analysis",
+        "source_url": "",
+        "word_count": 243,
+        "has_formulas": false,
+        "has_code": false,
+        "key_concepts": [
+          "Core Concepts",
+          "Applications",
+          "Common Methods"
+        ]
+      },
+      "content": "# Quantitative Analysis\n\n**Source:** Investopedia / Quantitative Finance Reference\n\nQuantitative analysis is a methodology that uses mathematical and statistical modeling, measurement, and research to understand behavior, predict outcomes, and identify trends. By focusing on hard, numerical data, it aims to provide objective insights that minimize the subjectivity often found in intuition-based decision-making.\n\n### Core Concepts\n* **Definition:** It is the process of collecting and evaluating measurable and verifiable data to understand patterns or assess the performance and value of systems, assets, or events.\n* **Quantitative Analysts (\"Quants\"):** Professionals who specialize in this field—often in finance—are frequently called \"quants.\" They use complex models, algorithms, and computer programming to evaluate investments, manage risk, and develop trading tools.\n* **Quantitative vs. Qualitative:** While quantitative analysis explains *what* happened through numerical values, qualitative analysis typically explains *why* events occur through descriptive information, observations, and interviews.\n\n### Applications\nQuantitative analysis is applied across many fields, including:\n* **Finance & Investing:** Used to evaluate financial instruments, predict market trends, manage portfolios, and mitigate risks.\n* **Business Operations:** Helps in resource allocation, project management, and predicting business performance.\n* **Marketing:** Assists in optimizing campaign budgets, measuring ROI, and managing inventory.\n\n### Common Methods\nQuantitative analysis relies on various statistical techniques, including:\n* **Descriptive Statistics:** Summarizing data using measures like mean, median, mode, and standard deviation.\n* **Inferential Statistics:** Making predictions about a wider population based on a sample, using tools such as regression analysis, correlation, and hypothesis testing (e.g., t-tests).\n"
+    },
+    {
+      "id": "platform_guides_test-period_1",
+      "metadata": {
+        "filename": "test-period_1.md",
+        "category": "platform_guides",
+        "title": "Test Period",
+        "source_url": "https://platform.worldquantbrain.com/learn/documentation/create-alphas/test-period",
+        "word_count": 415,
+        "has_formulas": false,
+        "has_code": false,
+        "key_concepts": [
+          "Test Period"
+        ]
+      },
+      "content": "# Test Period\n\n**Source:** https://platform.worldquantbrain.com/learn/documentation/create-alphas/test-period\n\n[Documentation](/learn/documentation)  [Next: How to choose the Simulation Settings](/learn/documentation/create-alphas/simulation-settings)\n\n## Test Period\n\nThe Test Period is a feature designed to enhance your Alpha and SuperAlpha testing process. This tool allows you to set a separate test period from your IS period, providing a more flexible approach to testing your research ideas.\n\nUsing the Feature:\n\nThe Test Period feature is designed to help you avoid overfitting. It allows you to divide your In-Sample (IS) period into a Train and Test period. The Train period can be utilized to develop your Alphas and SuperAlphas, while the Test period is ideal for validating them. An Alpha or SuperAlpha that is developed based on the simulation results of Training Period and performs well in both periods is likely a strong candidate for submission and may have avoided overfitting.\n\nWhile choosing a Test period does not directly affect the simulation, it influences the statistics and the visualization. The submission tests will run on the entire 5-year period, with the simulation running on the entire 5-year IS. However, if a testing period is chosen, the simulation stats will be divided into two sections: one covering the training period and another for the test period.\n\nNavigating the Feature:\n\n1. Selecting the Test Period: In Simulation Settings, you can define a test period corresponding to the final 0-5 years of the IS period. By default, no test period is set (0 years).\n2. Visualizing the Test Period: The Stats Summary defaults to the training period. You can view the stats for the test period by clicking on the “Show test period” button.\n3. Identifying the Test Period on Graphs: The lines representing the test period on the graphs are colored orange.\n4. Choosing the Stats Summary: You can select between the Stats Summary for the test period or the entire IS period by choosing the “TEST” or “IS” in the Summary section, respectively.\n5. Hiding the Test Period: A button “Hide test period” allows you to hide the test period, if desired. Note that an Alpha or SuperAlpha can only be submitted when the Test Period is revealed by clicking on the “Show test period” button.\n6. Understanding the Stats: The yearly IS stats are divided between Train and Test periods, represented by blue and orange indicators respectively.\n\nA. Orange - test period PnL, Blue - Train period PnL. B. View IS summary by selecting different periods\n\n[Prev: Simulate your first Alpha](/learn/documentation/create-alphas/running-your-first-alpha)  [Next: How to choose the Simulation Settings](/learn/documentation/create-alphas/simulation-settings)"
+    },
+    {
+      "id": "platform_guides_vector-datafields",
+      "metadata": {
+        "filename": "vector-datafields.md",
+        "category": "platform_guides",
+        "title": "Vector Datafields",
+        "source_url": "https://platform.worldquantbrain.com/learn/documentation/understanding-data/vector-datafields",
+        "word_count": 683,
+        "has_formulas": false,
+        "has_code": false,
+        "key_concepts": [
+          "Vector Data Fields 🥉"
+        ]
+      },
+      "content": "# Vector Datafields\n\n**Source:** https://platform.worldquantbrain.com/learn/documentation/understanding-data/vector-datafields\n\n[Documentation](/learn/documentation)  [Next: Model77 dataset](/learn/documentation/understanding-data/getting-started-model77)\n\n## Vector Data Fields 🥉\n\nVector Data are a distinct type of data fields that do not have a fixed size. In such type of data fields, the number of events recorded per day per instrument varies, so they are typically stored in a vector. This is unlike regular matrix data that you work with, which has one value per day per instrument. For example: If a dataset covers news data, it could be a vector because for each instrument there can be different number of news/events happening hence, covering such information in a matrix data tends to result in missing useful information. For example, a vector field reporting multiple news events for a single instrument in a day.\n\nNow, whenever you write an Alpha expression, the end result is a matrix of Alpha values which is the position that is taken in the market. And all the operators on platform are made for matrix input, hence use the matrix operator only after using the vec_ operators to convert the vector data field to matrix field. This is done by aggregating vector for each day and instrument into a single value like a matrix has. The same is depicted in figure below:\n\nFollowing are the different operators to convert vector data field into a matrix each differing in the way vector for a particular date and instrument is aggregated to a single value:\n\nOperator\n\nDescription\n\nvec_avg(x)\n\nTaking mean of the vector field x\n\nvec_choose(x,nth=k)\n\nChoosing kth item(indexed at 0) from each vector field x\n\nvec_count(x)\n\nNumber of elements in vector field x\n\nvec_ir(x)\n\nInformation Ratio (Mean / Standard Deviation) of vector field x\n\nvec_kurtosis(x)\n\nKurtosis of vector field x\n\nvec_max(x)\n\nMaximum value form vector field x\n\nvec_min(x)\n\nMinimum value form vector field x\n\nvec_norm(x)\n\nSum of all absolute values of vector field x\n\nvec_percentage(x,percentage=0.5)\n\nPercentile of vector field x\n\nvec_powersum(x,constant=2)\n\nSum of power of vector field x\n\nvec_range(x)\n\nDifference between maximum and minimum element in vector field x\n\nvec_skewness(x)\n\nSkewness of vector field x\n\nvec_stddev(x)\n\nStandard Deviation of vector field x\n\nvec_sum(x)\n\nSum of vector field x\n\n**Some examples:**\n\n1. nws12_afterhsz_1_minute is a field which gives the percentage change in price within first minute of news release. There can be many news items per day for different instruments. Hence, the count of news can be different for different instruments. Suppose we want to apply a reversion/momentum predictor idea i.e. a general observation that when a stock has high intensity, it follows momentum and when a stock has low news intensity, it follows reversion, we require news count data. For this, we need to use vec_count functions on nws12_afterhsz_1_minute (or rather any similar field like nws12_afterhsz_10_min or nws12_afterhsz_120_min) field. This will convert vector of percentage changes to count of such occurrences. You can use vec_count(nws12_afterhsz_120_min) for getting news count. Below are the plots for average value and turnover of vec_count. You can see the raw turnover is very high and sometimes touching 200%. It tends to be necessary to reduce its turnover using decay operators before combining it with base data or other fields to make Alphas.\n2. ONLY FOR CONSULTANTS WITH ACCESS TO CONSULTANT DATASETS: scl15_d1_sentiment is a field which gives sentiment score of various events in a day. Since we can take only one position for each instrument, as an input as well, we just need one value of sentiment. For AAPL for certain date, if there are 5 sentiment scores and we have to use just one, generally mean of all those scores can be reasonable representative of sentiment in that entire day. So, to convert this sentiment vector to a matrix field, we will use vec_avg(scl15_d1_sentiment). If you think a median could be a better representative, you can use vec_median(scl15_d1_sentiment) instead. Below are again the average value and turnover plots for the vec_avg field. Average value hovers densely  around 15,000 and turnover around 130%. Here as well, you need to reduce turnover by using ts_rank or ts_decay in your Alpha expression.\n\n[Prev: How to use the Data Explorer](/learn/documentation/understanding-data/how-use-data-explorer)  [Next: Model77 dataset](/learn/documentation/understanding-data/getting-started-model77)"
+    },
+    {
+      "id": "platform_guides_vector-datafields_1",
+      "metadata": {
+        "filename": "vector-datafields_1.md",
+        "category": "platform_guides",
+        "title": "Vector Datafields",
+        "source_url": "https://platform.worldquantbrain.com/learn/documentation/understanding-data/vector-datafields",
+        "word_count": 683,
+        "has_formulas": false,
+        "has_code": false,
+        "key_concepts": [
+          "Vector Data Fields 🥉"
+        ]
+      },
+      "content": "# Vector Datafields\n\n**Source:** https://platform.worldquantbrain.com/learn/documentation/understanding-data/vector-datafields\n\n[Documentation](/learn/documentation)  [Next: Model77 dataset](/learn/documentation/understanding-data/getting-started-model77)\n\n## Vector Data Fields 🥉\n\nVector Data are a distinct type of data fields that do not have a fixed size. In such type of data fields, the number of events recorded per day per instrument varies, so they are typically stored in a vector. This is unlike regular matrix data that you work with, which has one value per day per instrument. For example: If a dataset covers news data, it could be a vector because for each instrument there can be different number of news/events happening hence, covering such information in a matrix data tends to result in missing useful information. For example, a vector field reporting multiple news events for a single instrument in a day.\n\nNow, whenever you write an Alpha expression, the end result is a matrix of Alpha values which is the position that is taken in the market. And all the operators on platform are made for matrix input, hence use the matrix operator only after using the vec_ operators to convert the vector data field to matrix field. This is done by aggregating vector for each day and instrument into a single value like a matrix has. The same is depicted in figure below:\n\nFollowing are the different operators to convert vector data field into a matrix each differing in the way vector for a particular date and instrument is aggregated to a single value:\n\nOperator\n\nDescription\n\nvec_avg(x)\n\nTaking mean of the vector field x\n\nvec_choose(x,nth=k)\n\nChoosing kth item(indexed at 0) from each vector field x\n\nvec_count(x)\n\nNumber of elements in vector field x\n\nvec_ir(x)\n\nInformation Ratio (Mean / Standard Deviation) of vector field x\n\nvec_kurtosis(x)\n\nKurtosis of vector field x\n\nvec_max(x)\n\nMaximum value form vector field x\n\nvec_min(x)\n\nMinimum value form vector field x\n\nvec_norm(x)\n\nSum of all absolute values of vector field x\n\nvec_percentage(x,percentage=0.5)\n\nPercentile of vector field x\n\nvec_powersum(x,constant=2)\n\nSum of power of vector field x\n\nvec_range(x)\n\nDifference between maximum and minimum element in vector field x\n\nvec_skewness(x)\n\nSkewness of vector field x\n\nvec_stddev(x)\n\nStandard Deviation of vector field x\n\nvec_sum(x)\n\nSum of vector field x\n\n**Some examples:**\n\n1. nws12_afterhsz_1_minute is a field which gives the percentage change in price within first minute of news release. There can be many news items per day for different instruments. Hence, the count of news can be different for different instruments. Suppose we want to apply a reversion/momentum predictor idea i.e. a general observation that when a stock has high intensity, it follows momentum and when a stock has low news intensity, it follows reversion, we require news count data. For this, we need to use vec_count functions on nws12_afterhsz_1_minute (or rather any similar field like nws12_afterhsz_10_min or nws12_afterhsz_120_min) field. This will convert vector of percentage changes to count of such occurrences. You can use vec_count(nws12_afterhsz_120_min) for getting news count. Below are the plots for average value and turnover of vec_count. You can see the raw turnover is very high and sometimes touching 200%. It tends to be necessary to reduce its turnover using decay operators before combining it with base data or other fields to make Alphas.\n2. ONLY FOR CONSULTANTS WITH ACCESS TO CONSULTANT DATASETS: scl15_d1_sentiment is a field which gives sentiment score of various events in a day. Since we can take only one position for each instrument, as an input as well, we just need one value of sentiment. For AAPL for certain date, if there are 5 sentiment scores and we have to use just one, generally mean of all those scores can be reasonable representative of sentiment in that entire day. So, to convert this sentiment vector to a matrix field, we will use vec_avg(scl15_d1_sentiment). If you think a median could be a better representative, you can use vec_median(scl15_d1_sentiment) instead. Below are again the average value and turnover plots for the vec_avg field. Average value hovers densely  around 15,000 and turnover around 130%. Here as well, you need to reduce turnover by using ts_rank or ts_decay in your Alpha expression.\n\n[Prev: How to use the Data Explorer](/learn/documentation/understanding-data/how-use-data-explorer)  [Next: Model77 dataset](/learn/documentation/understanding-data/getting-started-model77)"
+    },
+    {
+      "id": "platform_guides_WorldQuant_BrainAlpha",
+      "metadata": {
+        "filename": "WorldQuant_BrainAlpha.md",
+        "category": "platform_guides",
+        "title": "WorldQuant Brain中Alpha的核心解析",
+        "source_url": "https://support.worldquantbrain.com/hc/en-us/community/posts/40204453701527-WorldQuant-Brain%E4%B8%ADAlpha%E7%9A%84%E6%A0%B8%E5%BF%83%E8%A7%A3%E6%9E%90",
+        "word_count": 17,
+        "has_formulas": false,
+        "has_code": false,
+        "key_concepts": [
+          "Post Content"
+        ]
+      },
+      "content": "# WorldQuant Brain中Alpha的核心解析\n\n**Source:** https://support.worldquantbrain.com/hc/en-us/community/posts/40204453701527-WorldQuant-Brain%E4%B8%ADAlpha%E7%9A%84%E6%A0%B8%E5%BF%83%E8%A7%A3%E6%9E%90  \n**Metadata:** KONGZHE(ZK49188) 22 days ago\n\n## Post Content\n\n在WorldQuant Brain平台中，alpha是一种用于预测股票或资产在市场中可能走势的公式。它借助价格、成交量、市场趋势等历史数据，生成可进行测试验证的交易信号。\n\n每个alpha都代表一个小型、可测试的交易思路。该平台会对alpha在多种市场场景下的准确性和一致性进行评估，那些表现优异、可靠性强的alpha，可与其他alpha组合，构建出多元化、数据驱动的交易策略。\n\n构建alpha的过程，能教会你像量化研究员一样思考——分析市场规律、测试假设猜想，并为现实世界的金融模型贡献力量。"
+    }
+  ]
+}

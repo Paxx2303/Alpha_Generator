@@ -1,0 +1,418 @@
+{
+  "category": "platform_guides",
+  "file_count": 36,
+  "files": [
+    {
+      "filename": "10-steps-start-brain-platform.md",
+      "title": "10 Steps Start Brain Platform",
+      "word_count": 172,
+      "key_concepts": [
+        "10 Steps to Start on BRAIN"
+      ]
+    },
+    {
+      "filename": "10-steps-start-brain-platform_1.md",
+      "title": "10 Steps Start Brain Platform",
+      "word_count": 172,
+      "key_concepts": [
+        "10 Steps to Start on BRAIN"
+      ]
+    },
+    {
+      "filename": "19-alpha-examples.md",
+      "title": "19 Alpha Examples",
+      "word_count": 623,
+      "key_concepts": [
+        "⭐ Alpha Examples for Beginners",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "Alpha_creation.md",
+      "title": "Alpha creation",
+      "word_count": 13,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "ATOM2024_GLB_Theme_multiplier.md",
+      "title": "ATOM2024 GLB Theme multiplier",
+      "word_count": 1161,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by AG20578 1 year ago",
+        "Comment by QG16026 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by TT55495 1 year ago",
+        "Comment by TN48752 1 year ago",
+        "Comment by SK72105 1 year ago",
+        "Comment by CC40930 1 year ago",
+        "Comment by CT68712 1 year ago"
+      ]
+    },
+    {
+      "filename": "Comparing_Stocks_to_Peers.md",
+      "title": "Comparing Stocks to Peers",
+      "word_count": 753,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by AG20578 2 years ago",
+        "Comment by QG16026 1 year ago",
+        "Comment by LN78195 1 year ago",
+        "Comment by deleted user 1 year ago",
+        "Comment by DP11917 1 year ago",
+        "Comment by LK29993 1 year ago",
+        "Comment by LK29993 1 year ago",
+        "Comment by LK29993 1 year ago"
+      ]
+    },
+    {
+      "filename": "data.md",
+      "title": "Data",
+      "word_count": 788,
+      "key_concepts": [
+        "Understanding Data in BRAIN: Key Concepts and Tips",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "delays_in_feedback_on_filled_questionnares.md",
+      "title": "delays in feedback on filled questionnares",
+      "word_count": 70,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by MH52691 3 months ago"
+      ]
+    },
+    {
+      "filename": "Demystifying_Simulation_Settings_Pasteurization.md",
+      "title": "[BRAIN TIPS] Demystifying Simulation Settings: Pasteurization",
+      "word_count": 971,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by AT42510 1 year ago",
+        "Comment by AG20578 1 year ago",
+        "Comment by TT55495 1 year ago",
+        "Comment by LH38752 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by HV77283 1 year ago",
+        "Comment by LK29993 1 year ago Edited",
+        "Comment by CC40930 1 year ago"
+      ]
+    },
+    {
+      "filename": "Demystifying_Simulation_Settings_Pasteurization_1.md",
+      "title": "[BRAIN TIPS] Demystifying Simulation Settings: Pasteurization",
+      "word_count": 971,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by AT42510 1 year ago",
+        "Comment by AG20578 1 year ago",
+        "Comment by TT55495 1 year ago",
+        "Comment by LH38752 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by HV77283 1 year ago",
+        "Comment by LK29993 1 year ago Edited",
+        "Comment by CC40930 1 year ago"
+      ]
+    },
+    {
+      "filename": "Finding_Alphas_Options_Data.md",
+      "title": "[BRAIN TIPS] Finding Alphas: Options Data",
+      "word_count": 1173,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by SK90981 1 year ago",
+        "Comment by deleted user 1 year ago",
+        "Comment by DP11917 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by TT55495 1 year ago",
+        "Comment by HV77283 1 year ago",
+        "Comment by CC40930 1 year ago",
+        "Comment by CT68712 1 year ago"
+      ]
+    },
+    {
+      "filename": "Generate_insights_from_a_research_paper_using_GPT.md",
+      "title": "[BRAIN TIPS] Generate insights from a research paper using GPT",
+      "word_count": 949,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by deleted user 1 year ago",
+        "Comment by TD17989 1 year ago",
+        "Comment by QG16026 1 year ago",
+        "Comment by HV77283 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by TT55495 1 year ago",
+        "Comment by CC40930 1 year ago",
+        "Comment by CT68712 1 year ago"
+      ]
+    },
+    {
+      "filename": "Generate_insights_from_a_research_paper_using_GPT_1.md",
+      "title": "[BRAIN TIPS] Generate insights from a research paper using GPT",
+      "word_count": 949,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by deleted user 1 year ago",
+        "Comment by TD17989 1 year ago",
+        "Comment by QG16026 1 year ago",
+        "Comment by HV77283 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by TT55495 1 year ago",
+        "Comment by CC40930 1 year ago",
+        "Comment by CT68712 1 year ago"
+      ]
+    },
+    {
+      "filename": "getting-started-sentiment1-dataset.md",
+      "title": "Getting Started Sentiment1 Dataset",
+      "word_count": 237,
+      "key_concepts": [
+        "Sentiment1 dataset"
+      ]
+    },
+    {
+      "filename": "how-use-data-explorer.md",
+      "title": "How Use Data Explorer",
+      "word_count": 487,
+      "key_concepts": [
+        "How to use the Data Explorer",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "how-use-data-explorer_1.md",
+      "title": "How Use Data Explorer",
+      "word_count": 487,
+      "key_concepts": [
+        "How to use the Data Explorer",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "How_to_record_entry_price_and_exit_trade.md",
+      "title": "How to record entry price and exit trade",
+      "word_count": 1410,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by AG20578 1 year ago",
+        "Comment by SK16172 1 year ago",
+        "Comment by PL15523 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by LK29993 1 year ago",
+        "Comment by ND68030 1 year ago",
+        "Comment by NH84459 1 year ago",
+        "Comment by CC40930 1 year ago"
+      ]
+    },
+    {
+      "filename": "intermediate-pack-part-1.md",
+      "title": "Intermediate Pack Part 1",
+      "word_count": 800,
+      "key_concepts": [
+        "Intermediate Pack - Understand Results [1/2]",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "intermediate-pack-part-1_1.md",
+      "title": "Intermediate Pack Part 1",
+      "word_count": 800,
+      "key_concepts": [
+        "Intermediate Pack - Understand Results [1/2]",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "introduction-brain-expression-language.md",
+      "title": "Introduction Brain Expression Language",
+      "word_count": 389,
+      "key_concepts": [
+        "Introduction to BRAIN Expression Language",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "introduction-brain-expression-language_1.md",
+      "title": "Introduction Brain Expression Language",
+      "word_count": 389,
+      "key_concepts": [
+        "Introduction to BRAIN Expression Language",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "Jual_beli_apa_saja.md",
+      "title": "Jual beli apa saja",
+      "word_count": 27,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Learning_fast_expression_seeing_the_output_of_operators_on_the_data.md",
+      "title": "Learning fast expression, seeing the output of operators on the data",
+      "word_count": 1512,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by TT55495 1 year ago",
+        "Comment by TD17989 1 year ago",
+        "Comment by TN48752 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by HD25387 1 year ago",
+        "Comment by CC40930 1 year ago",
+        "Comment by DP11917 1 year ago",
+        "Comment by AK52014 1 year ago"
+      ]
+    },
+    {
+      "filename": "Learning_fast_expression_seeing_the_output_of_operators_on_the_data_1.md",
+      "title": "Learning fast expression, seeing the output of operators on the data",
+      "word_count": 1512,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by TT55495 1 year ago",
+        "Comment by TD17989 1 year ago",
+        "Comment by TN48752 1 year ago",
+        "Comment by AC63290 1 year ago",
+        "Comment by HD25387 1 year ago",
+        "Comment by CC40930 1 year ago",
+        "Comment by DP11917 1 year ago",
+        "Comment by AK52014 1 year ago"
+      ]
+    },
+    {
+      "filename": "md.md",
+      "title": "อัญชนา ศิริโชค",
+      "word_count": 16,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "mdjony.md",
+      "title": "mdjony",
+      "word_count": 16,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "neut-cons.md",
+      "title": "Neut Cons",
+      "word_count": 963,
+      "key_concepts": [
+        "Neutralization 🥉"
+      ]
+    },
+    {
+      "filename": "Research_Paper_02_Tomorrows_Fish_and_Chip_Paper_Slowly_incorporated_News_and_the_Cross-section_of_S.md",
+      "title": "Research Paper 02: Tomorrow's Fish and Chip Paper? Slowly incorporated News and the Cross-section of Stock Returns",
+      "word_count": 183,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_05_Predictability_of_Industry_Returns_After_MA_Announcements.md",
+      "title": "Research Paper 05: Predictability of Industry Returns After M&A Announcements",
+      "word_count": 193,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_06_Penny_Wise_Dollar_Foolish_Buy-Sell_Imbalances_On_and_Around_Round_Numbers.md",
+      "title": "Research Paper 06: Penny Wise, Dollar Foolish: Buy-Sell Imbalances On and Around Round Numbers",
+      "word_count": 248,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "sample-alpha-concepts.md",
+      "title": "Sample Alpha Concepts",
+      "word_count": 390,
+      "key_concepts": [
+        "⭐ Alpha Examples for Bronze Users 🥉",
+        "Table of Contents"
+      ]
+    },
+    {
+      "filename": "test-period.md",
+      "title": "Test Period",
+      "word_count": 415,
+      "key_concepts": [
+        "Test Period"
+      ]
+    },
+    {
+      "filename": "test-period_1.md",
+      "title": "Test Period",
+      "word_count": 415,
+      "key_concepts": [
+        "Test Period"
+      ]
+    },
+    {
+      "filename": "vector-datafields.md",
+      "title": "Vector Datafields",
+      "word_count": 683,
+      "key_concepts": [
+        "Vector Data Fields 🥉"
+      ]
+    },
+    {
+      "filename": "vector-datafields_1.md",
+      "title": "Vector Datafields",
+      "word_count": 683,
+      "key_concepts": [
+        "Vector Data Fields 🥉"
+      ]
+    },
+    {
+      "filename": "WorldQuant_BrainAlpha.md",
+      "title": "WorldQuant Brain中Alpha的核心解析",
+      "word_count": 17,
+      "key_concepts": [
+        "Post Content"
+      ]
+    }
+  ],
+  "key_topics": [
+    "Comment by LK29993 1 year ago",
+    "Comment by HD25387 1 year ago",
+    "Comment by QG16026 1 year ago",
+    "Comment by CC40930 1 year ago",
+    "Comment by NH84459 1 year ago",
+    "10 Steps to Start on BRAIN",
+    "Comment by CT68712 1 year ago",
+    "Sentiment1 dataset",
+    "Comment by PL15523 1 year ago",
+    "Comment by DP11917 1 year ago",
+    "Comment by TD17989 1 year ago",
+    "Comment by AT42510 1 year ago",
+    "Neutralization 🥉",
+    "Comment by TN48752 1 year ago",
+    "Comment by SK16172 1 year ago",
+    "Comment by LH38752 1 year ago",
+    "Vector Data Fields 🥉",
+    "Comment by AC63290 1 year ago",
+    "Post Content",
+    "Understanding Data in BRAIN: Key Concepts and Tips"
+  ],
+  "total_words": 21037
+}

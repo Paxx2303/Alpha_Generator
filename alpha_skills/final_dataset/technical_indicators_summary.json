@@ -1,0 +1,191 @@
+{
+  "category": "technical_indicators",
+  "file_count": 16,
+  "files": [
+    {
+      "filename": "Alphas_in_WorldQuant_Brain_Predicting_Market_Moves_with_Data.md",
+      "title": "Alphas in WorldQuant Brain: Predicting Market Moves with Data",
+      "word_count": 140,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by MB96681 1 month ago",
+        "Comment by GK78565 1 month ago"
+      ]
+    },
+    {
+      "filename": "Bollinger_Bands.md",
+      "title": "Bollinger Bands",
+      "word_count": 154,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Bollinger_Bands_1.md",
+      "title": "Bollinger Bands",
+      "word_count": 154,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Dow_Theory.md",
+      "title": "Dow Theory",
+      "word_count": 539,
+      "key_concepts": [
+        "📝 Definition",
+        "Six Basic Tenets of Dow Theory",
+        "🔢 Mathematical Concept & Logic",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Dow_Theory_1.md",
+      "title": "Dow Theory",
+      "word_count": 539,
+      "key_concepts": [
+        "📝 Definition",
+        "Six Basic Tenets of Dow Theory",
+        "🔢 Mathematical Concept & Logic",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Elliott_Wave_Theory.md",
+      "title": "Elliott Wave Theory",
+      "word_count": 488,
+      "key_concepts": [
+        "📝 Definition",
+        "Wave Structures",
+        "Three Rules of Elliott Wave Impulse Waves",
+        "🔢 Fibonacci Ratios in Elliott Wave",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Elliott_Wave_Theory_1.md",
+      "title": "Elliott Wave Theory",
+      "word_count": 488,
+      "key_concepts": [
+        "📝 Definition",
+        "Wave Structures",
+        "Three Rules of Elliott Wave Impulse Waves",
+        "🔢 Fibonacci Ratios in Elliott Wave",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Ichimoku_Cloud.md",
+      "title": "Ichimoku Cloud",
+      "word_count": 144,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "MACD.md",
+      "title": "MACD",
+      "word_count": 142,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "On_Good_Volatility_Bad_Volatility_and_Directional_Energy.md",
+      "title": "On “Good Volatility, Bad Volatility” and Directional Energy",
+      "word_count": 115,
+      "key_concepts": [
+        "Post Content",
+        "Comments",
+        "Comment by JM47610 7 days ago",
+        "Comment by AA50461 7 days ago"
+      ]
+    },
+    {
+      "filename": "Research_Paper_01_The_Momentum_of_News.md",
+      "title": "Research Paper 01: The Momentum of News",
+      "word_count": 201,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_07_Relative_Strength_Strategies_for_Investing.md",
+      "title": "Research Paper 07: Relative Strength Strategies for Investing",
+      "word_count": 191,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Volume_of_Trade.md",
+      "title": "Volume of Trade",
+      "word_count": 205,
+      "key_concepts": [
+        "Key Concepts"
+      ]
+    },
+    {
+      "filename": "WorldQuant_Brain_Alpha_Core_Analysis.md",
+      "title": "Core Analysis of Alphas in WorldQuant Brain",
+      "word_count": 127,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Wyckoff_Method.md",
+      "title": "Wyckoff Method",
+      "word_count": 513,
+      "key_concepts": [
+        "📝 Definition",
+        "Three Laws of the Wyckoff Method",
+        "Wyckoff Market Cycle",
+        "🔢 Wyckoff Spread & Volume Analysis",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Wyckoff_Method_1.md",
+      "title": "Wyckoff Method",
+      "word_count": 513,
+      "key_concepts": [
+        "📝 Definition",
+        "Three Laws of the Wyckoff Method",
+        "Wyckoff Market Cycle",
+        "🔢 Wyckoff Spread & Volume Analysis",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    }
+  ],
+  "key_topics": [
+    "🔢 Fibonacci Ratios in Elliott Wave",
+    "Comment by AA50461 7 days ago",
+    "Comment by MB96681 1 month ago",
+    "🔢 Mathematical Formula",
+    "Wave Structures",
+    "Comment by JM47610 7 days ago",
+    "Six Basic Tenets of Dow Theory",
+    "Key Concepts",
+    "Three Laws of the Wyckoff Method",
+    "🔢 Wyckoff Spread & Volume Analysis",
+    "💡 Application in Alpha Design (WorldQuant Brain)",
+    "Three Rules of Elliott Wave Impulse Waves",
+    "Post Content",
+    "Comment by GK78565 1 month ago",
+    "📝 Definition",
+    "Wyckoff Market Cycle",
+    "🔢 Mathematical Concept & Logic",
+    "Comments"
+  ],
+  "total_words": 4653
+}

@@ -1,0 +1,98 @@
+{
+  "category": "core_concepts",
+  "file_count": 6,
+  "files": [
+    {
+      "filename": "Black_Scholes_1973_Option_Pricing.md",
+      "title": "The Pricing of Options and Corporate Liabilities",
+      "word_count": 2562,
+      "key_concepts": [
+        "Abstract",
+        "Historical Context and Motivation",
+        "Pre-Black-Scholes Era",
+        "Key Innovation",
+        "Mathematical Framework",
+        "Fundamental Assumptions",
+        "The Black-Scholes Differential Equation",
+        "Boundary Conditions",
+        "European Call Option:",
+        "European Put Option:"
+      ]
+    },
+    {
+      "filename": "Market_Microstructure.md",
+      "title": "Market Microstructure",
+      "word_count": 439,
+      "key_concepts": [
+        "📝 Definition",
+        "Key Microstructure Concepts",
+        "🔢 Mathematical Formulations",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Market_Microstructure_1.md",
+      "title": "Market Microstructure",
+      "word_count": 439,
+      "key_concepts": [
+        "📝 Definition",
+        "Key Microstructure Concepts",
+        "🔢 Mathematical Formulations",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Paper_Sharpe_1964_CAPM.md",
+      "title": "Capital Asset Prices: A Theory of Market Equilibrium under Conditions of Risk (Sharpe, 1964)",
+      "word_count": 329,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Key Formulas",
+        "💡 Application in WorldQuant Brain"
+      ]
+    },
+    {
+      "filename": "Quantitative_Analysis.md",
+      "title": "Quantitative Analysis",
+      "word_count": 243,
+      "key_concepts": [
+        "Core Concepts",
+        "Applications",
+        "Common Methods"
+      ]
+    },
+    {
+      "filename": "Quantitative_Analysis_1.md",
+      "title": "Quantitative Analysis",
+      "word_count": 243,
+      "key_concepts": [
+        "Core Concepts",
+        "Applications",
+        "Common Methods"
+      ]
+    }
+  ],
+  "key_topics": [
+    "💡 Application in Alpha Design (WorldQuant Brain)",
+    "Core Concepts",
+    "Key Microstructure Concepts",
+    "The Black-Scholes Differential Equation",
+    "Boundary Conditions",
+    "Fundamental Assumptions",
+    "European Put Option:",
+    "🔢 Key Formulas",
+    "Historical Context and Motivation",
+    "Key Innovation",
+    "European Call Option:",
+    "📝 Core Summary",
+    "💡 Application in WorldQuant Brain",
+    "📝 Definition",
+    "Common Methods",
+    "Applications",
+    "Pre-Black-Scholes Era",
+    "Abstract",
+    "Mathematical Framework",
+    "🔢 Mathematical Formulations"
+  ],
+  "total_words": 4255
+}

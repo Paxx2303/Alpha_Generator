@@ -1,0 +1,22 @@
+{
+  "category": "academic_papers",
+  "file_count": 1,
+  "files": [
+    {
+      "filename": "Paper_Fama_1970_EMH.md",
+      "title": "Efficient Capital Markets: A Review of Theory and Empirical Work (Fama, 1970)",
+      "word_count": 300,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Joint Hypothesis Problem",
+        "💡 Application in WorldQuant Brain"
+      ]
+    }
+  ],
+  "key_topics": [
+    "🔢 Joint Hypothesis Problem",
+    "📝 Core Summary",
+    "💡 Application in WorldQuant Brain"
+  ],
+  "total_words": 300
+}
