@@ -1,6 +1,0 @@
-2026-05-19 20:41:48,460 | INFO | root | Queued pipeline FIFO ticket 01779198108459153500_13804_dcd20cc11f9c42f3955b9dd3e85db1ee.ticket for pipeline:momentum.
-2026-05-19 20:43:08,023 | INFO | root | Acquired pipeline FIFO slot for pipeline:momentum.
-2026-05-19 20:43:10,734 | INFO | pipeline.alpha_pipeline | Running alpha pipeline for strategy=momentum count=1 run_id=pipeline-momentum-20260519134310-1fc96fad
-2026-05-19 20:43:25,733 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
-2026-05-19 20:43:46,575 | INFO | api_layer.session_manager | Dry-run mode enabled; skipping WorldQuant login.
-2026-05-19 20:44:36,273 | INFO | root | Released pipeline FIFO slot for pipeline:momentum.

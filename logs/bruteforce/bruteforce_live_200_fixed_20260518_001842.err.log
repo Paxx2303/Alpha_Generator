@@ -1,3 +1,0 @@
-2026-05-18 00:18:57,418 | WARNING | orchestration.deerflow_bridge | DeerFlow falling back to OpenRouter model openrouter/owl-alpha
-2026-05-18 00:19:49,681 | INFO | pipeline.brute_force_workflow | Brute-force progress 1/200 | family=return_persistence | expression=rank(ts_mean(returns, 3))
-2026-05-18 00:19:50,922 | INFO | api_layer.session_manager | Authenticated with WorldQuant API.

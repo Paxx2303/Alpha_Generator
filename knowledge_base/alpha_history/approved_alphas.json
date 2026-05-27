@@ -1,8 +1,0 @@
-[
-  {
-    "expression": "rank(ts_mean(returns, 10))",
-    "theme": "momentum",
-    "note": "Baseline example with stable Sharpe in dry-run testing."
-  }
-]
-

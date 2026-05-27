@@ -1,4 +1,0 @@
-Hermes Agent v0.13.0 (2026.5.7)
-Project: /opt/hermes
-Python: 3.13.5
-OpenAI SDK: 1.69.0
