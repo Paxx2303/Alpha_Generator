@@ -1,83 +1,50 @@
-# Alpha Research Dataset - Final Report
+# Alpha Research Dataset - Final Report (v2.0)
 
 ## Dataset Overview
-- **Total Documents**: 376
-- **Categories**: 5
-- **Processing Date**: 1779871150.477188
+- Total Documents: 214
+- Categories: 6
+- Version: 2.0 (deduplicated, re-categorized)
 
 ## Category Breakdown
 
 ### Academic Papers
-- **Files**: 1
-- **Total Words**: 300
-- **Key Topics**: 🔢 Joint Hypothesis Problem, 📝 Core Summary, 💡 Application in WorldQuant Brain
+- Files: 19
+- Total Words: 4,778
+- Key Topics: Abstract, 💡 Application in WorldQuant Brain, 🔢 Key Formulas, 🔢 Kyle's Lambda Formula, Useful Datafields on BRAIN, 🔢 Joint Hypothesis Problem, Reflection, **Authors:** Utpal Bhattacharya, Craig W. Holden, Stacey E. Jacobsen, Key Ideas & Comments, Post Content
 
 ### Core Concepts
-- **Files**: 6
-- **Total Words**: 4,255
-- **Key Topics**: 💡 Application in Alpha Design (WorldQuant Brain), Core Concepts, Key Microstructure Concepts, The Black-Scholes Differential Equation, Boundary Conditions, Fundamental Assumptions, European Put Option:, 🔢 Key Formulas, Historical Context and Motivation, Key Innovation
+- Files: 66
+- Total Words: 20,471
+- Key Topics: Key Components of Fundamental Analysis, Abstract, Methodology, 3. Risk-Adjusted Returns, 1. Mean-Variance Framework, Market Efficiency and Factor Models, The Goal, Mathematical Framework, Core Principles of Prospect Theory, European Put Option:
 
 ### Platform Guides
-- **Files**: 36
-- **Total Words**: 21,037
-- **Key Topics**: Comment by LK29993 1 year ago, Comment by HD25387 1 year ago, Comment by QG16026 1 year ago, Comment by CC40930 1 year ago, Comment by NH84459 1 year ago, 10 Steps to Start on BRAIN, Comment by CT68712 1 year ago, Sentiment1 dataset, Comment by PL15523 1 year ago, Comment by DP11917 1 year ago
+- Files: 22
+- Total Words: 17,980
+- Key Topics: Neutralization 🥉, 10 Steps to Start on BRAIN, ⭐ How BRAIN works, Test Period, Intermediate Pack - Understand Results [1/2], Simulate your first Alpha, ⭐ Alpha Examples for Beginners, Introduction to BRAIN Expression Language, Sentiment1 dataset, Model77 dataset
+
+### Quantitative Methods
+- Files: 18
+- Total Words: 6,081
+- Key Topics: 2.1 Clustering for Market Regimes, Mathematical Framework, 1.2 Ensemble Methods for Alpha Generation, 2.1 Factor Identification and Construction, 2.2 Hidden Markov Models for Regime Switching, 3. Reinforcement Learning for Portfolio Management, 1.1 Feature Engineering for Financial Data, 📝 Definition, 1. Risk Parity Fundamentals, 🔢 Mathematical Formula
 
 ### Research Insights
-- **Files**: 317
-- **Total Words**: 129,295
-- **Key Topics**: Comment by TP14664 1 year ago, **Example Actions**, 🔢 Mathematical Formula, Factor Construction, Comment by CC40930 1 year ago, Comment by YM72581 2 years ago, 1.2 Bollinger Band Mean Reversion, Neutralization 🥉, 2.1 Factor Identification and Construction, Comment by MB96681 1 month ago
+- Files: 52
+- Total Words: 39,610
+- Key Topics: Comment by KG80074 1 year ago, Comment by PD54914 6 months ago, 3.1 Earnings Yield Alpha, Comment by LI36776 1 year ago, Comment by NH84459 1 year ago, Key Performance Metrics, Comment by PL15523 1 year ago, Comment by SK90981 1 year ago, Comment by VK91272 1 year ago, Comment by YM72581 2 years ago
 
 ### Technical Indicators
-- **Files**: 16
-- **Total Words**: 4,653
-- **Key Topics**: 🔢 Fibonacci Ratios in Elliott Wave, Comment by AA50461 7 days ago, Comment by MB96681 1 month ago, 🔢 Mathematical Formula, Wave Structures, Comment by JM47610 7 days ago, Six Basic Tenets of Dow Theory, Key Concepts, Three Laws of the Wyckoff Method, 🔢 Wyckoff Spread & Volume Analysis
+- Files: 37
+- Total Words: 6,433
+- Key Topics: Wyckoff Market Cycle, Wave Structures, 🔢 Wyckoff Spread & Volume Analysis, 🔢 Mathematical Concept & Logic, Six Basic Tenets of Dow Theory, Three Laws of the Wyckoff Method, 📝 Definition, Three Rules of Elliott Wave Impulse Waves, 💡 Application in Alpha Design (WorldQuant Brain), 🔢 Mathematical Formula
 
 ## Dataset Statistics
-- **Total Word Count**: 159,540
-- **Average Words per Document**: 424
-- **Data Quality**: High (noise filtered, duplicates removed)
+- Total Word Count: 95,353
+- Average Words per Document: 445
+- Data Quality: High (deduplicated, properly categorized)
 
-## File Structure
-```
-final_dataset/
-├── alpha_research_dataset.json          # Complete dataset
-├── category_summaries.json              # Category overviews
-├── train_split.json                     # Training data (70%)
-├── validation_split.json                # Validation data (20%)
-├── test_split.json                      # Test data (10%)
-├── search_index.json                    # Keyword search index
-└── dataset_report.md                    # This report
-```
-
-## Usage Recommendations
-
-### For AI Training
-- Use `train_split.json` for model training
-- Use `validation_split.json` for hyperparameter tuning
-- Use `test_split.json` for final evaluation
-
-### For Research
-- Use `alpha_research_dataset.json` for comprehensive analysis
-- Use `search_index.json` for quick content lookup
-- Use category summaries for topic exploration
-
-### For Applications
-- Financial concept definitions and explanations
-- Alpha research methodology and best practices
-- Technical indicator implementations
-- Risk management strategies
-- Platform-specific guidance
-
-## Data Quality Assurance
-✅ Duplicates removed (6 files)
-✅ Irrelevant content filtered (1 file)
-✅ Consistent formatting applied
-✅ Metadata extracted and validated
-✅ Content categorized by relevance
-✅ Search indexing implemented
-
-## Next Steps
-1. **Model Training**: Use splits for training alpha research AI models
-2. **Knowledge Base**: Deploy as searchable knowledge base
-3. **API Development**: Create REST API for content access
-4. **Continuous Updates**: Establish pipeline for new content integration
+## Data Quality Improvements (v2.0)
+- Removed 153 duplicate files
+- Fixed miscategorization (investopedia files)
+- Added quantitative_methods category
+- Properly separated academic papers
+- No more cross-category duplicates

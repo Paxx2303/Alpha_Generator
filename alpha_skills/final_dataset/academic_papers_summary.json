@@ -1,7 +1,15 @@
 {
   "category": "academic_papers",
-  "file_count": 1,
+  "file_count": 19,
   "files": [
+    {
+      "filename": "How_to_read_a_research_paper_for_BRAIN_alphas.md",
+      "title": "How to read a research paper for BRAIN alphas",
+      "word_count": 189,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
     {
       "filename": "Paper_Fama_1970_EMH.md",
       "title": "Efficient Capital Markets: A Review of Theory and Empirical Work (Fama, 1970)",
@@ -11,12 +19,176 @@
         "🔢 Joint Hypothesis Problem",
         "💡 Application in WorldQuant Brain"
       ]
+    },
+    {
+      "filename": "Paper_Fama_French_1993_Three_Factor_Model.md",
+      "title": "Common Risk Factors in the Returns on Stocks and Bonds (Fama & French, 1993)",
+      "word_count": 342,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Key Formulas",
+        "💡 Application in WorldQuant Brain"
+      ]
+    },
+    {
+      "filename": "Paper_Kahneman_Tversky_1979_Prospect_Theory.md",
+      "title": "Prospect Theory: An Analysis of Decision under Risk (Kahneman & Tversky, 1979)",
+      "word_count": 338,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Value Function",
+        "💡 Application in WorldQuant Brain"
+      ]
+    },
+    {
+      "filename": "Paper_Kyle_1985_Informed_Trading.md",
+      "title": "Continuous Auctions and Informed Traders (Kyle, 1985)",
+      "word_count": 349,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Kyle's Lambda Formula",
+        "💡 Application in WorldQuant Brain"
+      ]
+    },
+    {
+      "filename": "Paper_Markowitz_1952_Portfolio_Selection.md",
+      "title": "Portfolio Selection (Markowitz, 1952)",
+      "word_count": 298,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Key Formulas",
+        "💡 Application in WorldQuant Brain"
+      ]
+    },
+    {
+      "filename": "Paper_Sharpe_1964_CAPM.md",
+      "title": "Capital Asset Prices: A Theory of Market Equilibrium under Conditions of Risk (Sharpe, 1964)",
+      "word_count": 329,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Key Formulas",
+        "💡 Application in WorldQuant Brain"
+      ]
+    },
+    {
+      "filename": "Paper_Sharpe_1966_Sharpe_Ratio.md",
+      "title": "Mutual Fund Performance (Sharpe, 1966)",
+      "word_count": 268,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Key Formulas",
+        "💡 Application in WorldQuant Brain"
+      ]
+    },
+    {
+      "filename": "Paper_Sharpe_1994_Sharpe_Ratio_Update.md",
+      "title": "The Sharpe Ratio (Sharpe, 1994)",
+      "word_count": 325,
+      "key_concepts": [
+        "📝 Core Summary",
+        "🔢 Key Formulas",
+        "💡 Application in WorldQuant Brain"
+      ]
+    },
+    {
+      "filename": "Research_Paper_01_The_Momentum_of_News.md",
+      "title": "Research Paper 01: The Momentum of News",
+      "word_count": 201,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_02_Tomorrows_Fish_and_Chip_Paper_Slowly_incorporated_News_and_the_Cross-section_of_S.md",
+      "title": "Research Paper 02: Tomorrow's Fish and Chip Paper? Slowly incorporated News and the Cross-section of Stock Returns",
+      "word_count": 183,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_03_Cross-Firm_Information_Flows_and_the_Predictability_of_Stock_Returns.md",
+      "title": "Research Paper 03: Cross-Firm Information Flows and the Predictability of Stock Returns",
+      "word_count": 160,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_04_Are_Cash_Flows_Better_Stock_Return_Predictors_than_Profits.md",
+      "title": "Research Paper 04: Are Cash Flows Better Stock Return Predictors than Profits?",
+      "word_count": 183,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_05_Predictability_of_Industry_Returns_After_MA_Announcements.md",
+      "title": "Research Paper 05: Predictability of Industry Returns After M&A Announcements",
+      "word_count": 193,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_06_Penny_Wise_Dollar_Foolish_Buy-Sell_Imbalances_On_and_Around_Round_Numbers.md",
+      "title": "Research Paper 06: Penny Wise, Dollar Foolish: Buy-Sell Imbalances On and Around Round Numbers",
+      "word_count": 248,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_07_Relative_Strength_Strategies_for_Investing.md",
+      "title": "Research Paper 07: Relative Strength Strategies for Investing",
+      "word_count": 191,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_08_Good_Volatility_Bad_Volatility_and_the_Cross-Section_of_Stock_Returns.md",
+      "title": "Research Paper 08: Good Volatility, Bad Volatility and the Cross-Section of Stock Returns",
+      "word_count": 199,
+      "key_concepts": [
+        "Post Content"
+      ]
+    },
+    {
+      "filename": "Research_Paper_08_Penny_Wise_Dollar_Foolish_-_Buy-Sell_Imbalances_On_and_Around_Round_Numbers.md",
+      "title": "Research Paper 08: Penny Wise, Dollar Foolish — Buy-Sell Imbalances On and Around Round Numbers",
+      "word_count": 280,
+      "key_concepts": [
+        "Post Content",
+        "**Authors:** Utpal Bhattacharya, Craig W. Holden, Stacey E. Jacobsen",
+        "Abstract",
+        "Key Ideas & Comments",
+        "Useful Datafields on BRAIN",
+        "Reflection"
+      ]
+    },
+    {
+      "filename": "Research_Paper_09_The_Invisible_Burden.md",
+      "title": "Research Paper 09: The Invisible Burden",
+      "word_count": 202,
+      "key_concepts": [
+        "Post Content"
+      ]
     }
   ],
   "key_topics": [
+    "Abstract",
+    "💡 Application in WorldQuant Brain",
+    "🔢 Key Formulas",
+    "🔢 Kyle's Lambda Formula",
+    "Useful Datafields on BRAIN",
     "🔢 Joint Hypothesis Problem",
-    "📝 Core Summary",
-    "💡 Application in WorldQuant Brain"
+    "Reflection",
+    "**Authors:** Utpal Bhattacharya, Craig W. Holden, Stacey E. Jacobsen",
+    "Key Ideas & Comments",
+    "Post Content",
+    "🔢 Value Function",
+    "📝 Core Summary"
   ],
-  "total_words": 300
+  "total_words": 4778
 }

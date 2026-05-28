@@ -1,17 +1,9 @@
 {
   "category": "platform_guides",
-  "file_count": 36,
+  "file_count": 22,
   "files": [
     {
       "filename": "10-steps-start-brain-platform.md",
-      "title": "10 Steps Start Brain Platform",
-      "word_count": 172,
-      "key_concepts": [
-        "10 Steps to Start on BRAIN"
-      ]
-    },
-    {
-      "filename": "10-steps-start-brain-platform_1.md",
       "title": "10 Steps Start Brain Platform",
       "word_count": 172,
       "key_concepts": [
@@ -28,45 +20,30 @@
       ]
     },
     {
-      "filename": "Alpha_creation.md",
-      "title": "Alpha creation",
-      "word_count": 13,
+      "filename": "about-brain-platform.md",
+      "title": "About Brain Platform",
+      "word_count": 855,
       "key_concepts": [
-        "Post Content"
+        "Introduction to Alphas",
+        "Table of Contents"
       ]
     },
     {
-      "filename": "ATOM2024_GLB_Theme_multiplier.md",
-      "title": "ATOM2024 GLB Theme multiplier",
-      "word_count": 1161,
+      "filename": "alpha-submission.md",
+      "title": "Alpha Submission",
+      "word_count": 2081,
       "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by AG20578 1 year ago",
-        "Comment by QG16026 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by TT55495 1 year ago",
-        "Comment by TN48752 1 year ago",
-        "Comment by SK72105 1 year ago",
-        "Comment by CC40930 1 year ago",
-        "Comment by CT68712 1 year ago"
+        "Clear these tests before submitting an Alpha",
+        "Table of Contents"
       ]
     },
     {
-      "filename": "Comparing_Stocks_to_Peers.md",
-      "title": "Comparing Stocks to Peers",
-      "word_count": 753,
+      "filename": "challenge-help.md",
+      "title": "Challenge Help",
+      "word_count": 403,
       "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by AG20578 2 years ago",
-        "Comment by QG16026 1 year ago",
-        "Comment by LN78195 1 year ago",
-        "Comment by deleted user 1 year ago",
-        "Comment by DP11917 1 year ago",
-        "Comment by LK29993 1 year ago",
-        "Comment by LK29993 1 year ago",
-        "Comment by LK29993 1 year ago"
+        "WorldQuant Challenge",
+        "Table of Contents"
       ]
     },
     {
@@ -79,98 +56,11 @@
       ]
     },
     {
-      "filename": "delays_in_feedback_on_filled_questionnares.md",
-      "title": "delays in feedback on filled questionnares",
-      "word_count": 70,
+      "filename": "getting-started-model77.md",
+      "title": "Getting Started Model77",
+      "word_count": 381,
       "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by MH52691 3 months ago"
-      ]
-    },
-    {
-      "filename": "Demystifying_Simulation_Settings_Pasteurization.md",
-      "title": "[BRAIN TIPS] Demystifying Simulation Settings: Pasteurization",
-      "word_count": 971,
-      "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by AT42510 1 year ago",
-        "Comment by AG20578 1 year ago",
-        "Comment by TT55495 1 year ago",
-        "Comment by LH38752 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by HV77283 1 year ago",
-        "Comment by LK29993 1 year ago Edited",
-        "Comment by CC40930 1 year ago"
-      ]
-    },
-    {
-      "filename": "Demystifying_Simulation_Settings_Pasteurization_1.md",
-      "title": "[BRAIN TIPS] Demystifying Simulation Settings: Pasteurization",
-      "word_count": 971,
-      "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by AT42510 1 year ago",
-        "Comment by AG20578 1 year ago",
-        "Comment by TT55495 1 year ago",
-        "Comment by LH38752 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by HV77283 1 year ago",
-        "Comment by LK29993 1 year ago Edited",
-        "Comment by CC40930 1 year ago"
-      ]
-    },
-    {
-      "filename": "Finding_Alphas_Options_Data.md",
-      "title": "[BRAIN TIPS] Finding Alphas: Options Data",
-      "word_count": 1173,
-      "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by SK90981 1 year ago",
-        "Comment by deleted user 1 year ago",
-        "Comment by DP11917 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by TT55495 1 year ago",
-        "Comment by HV77283 1 year ago",
-        "Comment by CC40930 1 year ago",
-        "Comment by CT68712 1 year ago"
-      ]
-    },
-    {
-      "filename": "Generate_insights_from_a_research_paper_using_GPT.md",
-      "title": "[BRAIN TIPS] Generate insights from a research paper using GPT",
-      "word_count": 949,
-      "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by deleted user 1 year ago",
-        "Comment by TD17989 1 year ago",
-        "Comment by QG16026 1 year ago",
-        "Comment by HV77283 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by TT55495 1 year ago",
-        "Comment by CC40930 1 year ago",
-        "Comment by CT68712 1 year ago"
-      ]
-    },
-    {
-      "filename": "Generate_insights_from_a_research_paper_using_GPT_1.md",
-      "title": "[BRAIN TIPS] Generate insights from a research paper using GPT",
-      "word_count": 949,
-      "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by deleted user 1 year ago",
-        "Comment by TD17989 1 year ago",
-        "Comment by QG16026 1 year ago",
-        "Comment by HV77283 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by TT55495 1 year ago",
-        "Comment by CC40930 1 year ago",
-        "Comment by CT68712 1 year ago"
+        "Model77 dataset"
       ]
     },
     {
@@ -179,6 +69,14 @@
       "word_count": 237,
       "key_concepts": [
         "Sentiment1 dataset"
+      ]
+    },
+    {
+      "filename": "how-brain-platform-works.md",
+      "title": "How Brain Platform Works",
+      "word_count": 1748,
+      "key_concepts": [
+        "⭐ How BRAIN works"
       ]
     },
     {
@@ -191,32 +89,6 @@
       ]
     },
     {
-      "filename": "how-use-data-explorer_1.md",
-      "title": "How Use Data Explorer",
-      "word_count": 487,
-      "key_concepts": [
-        "How to use the Data Explorer",
-        "Table of Contents"
-      ]
-    },
-    {
-      "filename": "How_to_record_entry_price_and_exit_trade.md",
-      "title": "How to record entry price and exit trade",
-      "word_count": 1410,
-      "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by AG20578 1 year ago",
-        "Comment by SK16172 1 year ago",
-        "Comment by PL15523 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by LK29993 1 year ago",
-        "Comment by ND68030 1 year ago",
-        "Comment by NH84459 1 year ago",
-        "Comment by CC40930 1 year ago"
-      ]
-    },
-    {
       "filename": "intermediate-pack-part-1.md",
       "title": "Intermediate Pack Part 1",
       "word_count": 800,
@@ -226,11 +98,11 @@
       ]
     },
     {
-      "filename": "intermediate-pack-part-1_1.md",
-      "title": "Intermediate Pack Part 1",
-      "word_count": 800,
+      "filename": "intermediate-pack-part-2.md",
+      "title": "Intermediate Pack Part 2",
+      "word_count": 713,
       "key_concepts": [
-        "Intermediate Pack - Understand Results [1/2]",
+        "Intermediate Pack - Improve your Alpha [2/2]",
         "Table of Contents"
       ]
     },
@@ -244,70 +116,11 @@
       ]
     },
     {
-      "filename": "introduction-brain-expression-language_1.md",
-      "title": "Introduction Brain Expression Language",
-      "word_count": 389,
+      "filename": "list-must-read-posts-how-improve-your-alphas-are-submitted.md",
+      "title": "List Must Read Posts How Improve Your Alphas Are Submitted",
+      "word_count": 250,
       "key_concepts": [
-        "Introduction to BRAIN Expression Language",
-        "Table of Contents"
-      ]
-    },
-    {
-      "filename": "Jual_beli_apa_saja.md",
-      "title": "Jual beli apa saja",
-      "word_count": 27,
-      "key_concepts": [
-        "Post Content"
-      ]
-    },
-    {
-      "filename": "Learning_fast_expression_seeing_the_output_of_operators_on_the_data.md",
-      "title": "Learning fast expression, seeing the output of operators on the data",
-      "word_count": 1512,
-      "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by TT55495 1 year ago",
-        "Comment by TD17989 1 year ago",
-        "Comment by TN48752 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by HD25387 1 year ago",
-        "Comment by CC40930 1 year ago",
-        "Comment by DP11917 1 year ago",
-        "Comment by AK52014 1 year ago"
-      ]
-    },
-    {
-      "filename": "Learning_fast_expression_seeing_the_output_of_operators_on_the_data_1.md",
-      "title": "Learning fast expression, seeing the output of operators on the data",
-      "word_count": 1512,
-      "key_concepts": [
-        "Post Content",
-        "Comments",
-        "Comment by TT55495 1 year ago",
-        "Comment by TD17989 1 year ago",
-        "Comment by TN48752 1 year ago",
-        "Comment by AC63290 1 year ago",
-        "Comment by HD25387 1 year ago",
-        "Comment by CC40930 1 year ago",
-        "Comment by DP11917 1 year ago",
-        "Comment by AK52014 1 year ago"
-      ]
-    },
-    {
-      "filename": "md.md",
-      "title": "อัญชนา ศิริโชค",
-      "word_count": 16,
-      "key_concepts": [
-        "Post Content"
-      ]
-    },
-    {
-      "filename": "mdjony.md",
-      "title": "mdjony",
-      "word_count": 16,
-      "key_concepts": [
-        "Post Content"
+        "Must-read posts: How to improve your Alphas🥉"
       ]
     },
     {
@@ -319,27 +132,29 @@
       ]
     },
     {
-      "filename": "Research_Paper_02_Tomorrows_Fish_and_Chip_Paper_Slowly_incorporated_News_and_the_Cross-section_of_S.md",
-      "title": "Research Paper 02: Tomorrow's Fish and Chip Paper? Slowly incorporated News and the Cross-section of Stock Returns",
-      "word_count": 183,
+      "filename": "parameters-simulation-results.md",
+      "title": "Parameters Simulation Results",
+      "word_count": 1160,
       "key_concepts": [
-        "Post Content"
+        "Parameters in the Simulation results",
+        "Table of Contents"
       ]
     },
     {
-      "filename": "Research_Paper_05_Predictability_of_Industry_Returns_After_MA_Announcements.md",
-      "title": "Research Paper 05: Predictability of Industry Returns After M&A Announcements",
-      "word_count": 193,
+      "filename": "read-first-starter-pack.md",
+      "title": "Read First Starter Pack",
+      "word_count": 2756,
       "key_concepts": [
-        "Post Content"
+        "*Read this First * - Starter Pack",
+        "Table of Contents"
       ]
     },
     {
-      "filename": "Research_Paper_06_Penny_Wise_Dollar_Foolish_Buy-Sell_Imbalances_On_and_Around_Round_Numbers.md",
-      "title": "Research Paper 06: Penny Wise, Dollar Foolish: Buy-Sell Imbalances On and Around Round Numbers",
-      "word_count": 248,
+      "filename": "running-your-first-alpha.md",
+      "title": "Running Your First Alpha",
+      "word_count": 516,
       "key_concepts": [
-        "Post Content"
+        "Simulate your first Alpha"
       ]
     },
     {
@@ -352,15 +167,16 @@
       ]
     },
     {
-      "filename": "test-period.md",
-      "title": "Test Period",
-      "word_count": 415,
+      "filename": "simulation-settings.md",
+      "title": "Simulation Settings",
+      "word_count": 1170,
       "key_concepts": [
-        "Test Period"
+        "How to choose the Simulation Settings",
+        "Table of Contents"
       ]
     },
     {
-      "filename": "test-period_1.md",
+      "filename": "test-period.md",
       "title": "Test Period",
       "word_count": 415,
       "key_concepts": [
@@ -374,45 +190,29 @@
       "key_concepts": [
         "Vector Data Fields 🥉"
       ]
-    },
-    {
-      "filename": "vector-datafields_1.md",
-      "title": "Vector Datafields",
-      "word_count": 683,
-      "key_concepts": [
-        "Vector Data Fields 🥉"
-      ]
-    },
-    {
-      "filename": "WorldQuant_BrainAlpha.md",
-      "title": "WorldQuant Brain中Alpha的核心解析",
-      "word_count": 17,
-      "key_concepts": [
-        "Post Content"
-      ]
     }
   ],
   "key_topics": [
-    "Comment by LK29993 1 year ago",
-    "Comment by HD25387 1 year ago",
-    "Comment by QG16026 1 year ago",
-    "Comment by CC40930 1 year ago",
-    "Comment by NH84459 1 year ago",
-    "10 Steps to Start on BRAIN",
-    "Comment by CT68712 1 year ago",
-    "Sentiment1 dataset",
-    "Comment by PL15523 1 year ago",
-    "Comment by DP11917 1 year ago",
-    "Comment by TD17989 1 year ago",
-    "Comment by AT42510 1 year ago",
     "Neutralization 🥉",
-    "Comment by TN48752 1 year ago",
-    "Comment by SK16172 1 year ago",
-    "Comment by LH38752 1 year ago",
+    "10 Steps to Start on BRAIN",
+    "⭐ How BRAIN works",
+    "Test Period",
+    "Intermediate Pack - Understand Results [1/2]",
+    "Simulate your first Alpha",
+    "⭐ Alpha Examples for Beginners",
+    "Introduction to BRAIN Expression Language",
+    "Sentiment1 dataset",
+    "Model77 dataset",
+    "Must-read posts: How to improve your Alphas🥉",
+    "How to choose the Simulation Settings",
     "Vector Data Fields 🥉",
-    "Comment by AC63290 1 year ago",
-    "Post Content",
-    "Understanding Data in BRAIN: Key Concepts and Tips"
+    "Clear these tests before submitting an Alpha",
+    "Understanding Data in BRAIN: Key Concepts and Tips",
+    "Intermediate Pack - Improve your Alpha [2/2]",
+    "WorldQuant Challenge",
+    "⭐ Alpha Examples for Bronze Users 🥉",
+    "Introduction to Alphas",
+    "*Read this First * - Starter Pack"
   ],
-  "total_words": 21037
+  "total_words": 17980
 }

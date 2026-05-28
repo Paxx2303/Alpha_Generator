@@ -1,23 +1,34 @@
-# Alpha Research Data Index
+# Alpha Research Data Index (v2.0)
 
 ## Overview
-This directory contains cleaned and organized data for alpha research and market analysis.
-All noise and irrelevant content has been filtered out.
+This directory contains cleaned and organized data for alpha research.
+All duplicates removed and content properly categorized.
 
 ## Processing Statistics
-- **Total files processed**: 211
-- **Files excluded**: 1
-- **Processing date**: 1779872874.617574
+- **Total files processed**: 214
+- **Files excluded**: 0 (empty/invalid)
+- **Duplicates removed**: 153
+- **Date**: v2.0
 
 ## Directory Structure
 
-### research_insights/ (179 files)
+### academic_papers/ (19 files)
+Academic research papers and theoretical foundations
+
+### core_concepts/ (66 files)
+Fundamental financial and statistical concepts
+
+### platform_guides/ (22 files)
+WorldQuant Brain platform guides and documentation
+
+### quantitative_methods/ (18 files)
+Advanced quantitative methods and systematic strategies
+
+### research_insights/ (52 files)
 Practical alpha research insights and community Q&A
 
-### technical_indicators/ (9 files)
+### technical_indicators/ (37 files)
 Technical analysis indicators and trading concepts
-
-### core_concepts/ (4 files)
 Fundamental financial and statistical concepts
 
 ### platform_guides/ (18 files)

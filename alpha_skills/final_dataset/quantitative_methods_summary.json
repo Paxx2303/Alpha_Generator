@@ -1,0 +1,223 @@
+{
+  "category": "quantitative_methods",
+  "file_count": 18,
+  "files": [
+    {
+      "filename": "Algorithmic_Trading.md",
+      "title": "Algorithmic Trading",
+      "word_count": 133,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Breakout_Trading.md",
+      "title": "Breakout Trading",
+      "word_count": 136,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Dollar_Cost_Averaging.md",
+      "title": "Dollar Cost Averaging",
+      "word_count": 134,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Grid_Trading.md",
+      "title": "Grid Trading",
+      "word_count": 137,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "High_Frequency_Trading.md",
+      "title": "High Frequency Trading",
+      "word_count": 143,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Long_Short_Equity.md",
+      "title": "Long Short Equity",
+      "word_count": 148,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Machine_Learning_in_Finance.md",
+      "title": "Machine Learning Applications in Quantitative Finance",
+      "word_count": 1911,
+      "key_concepts": [
+        "Overview",
+        "1. Supervised Learning for Return Prediction",
+        "1.1 Feature Engineering for Financial Data",
+        "1.2 Ensemble Methods for Alpha Generation",
+        "1.3 Deep Learning for Sequential Data",
+        "2. Unsupervised Learning for Market Regime Detection",
+        "2.1 Clustering for Market Regimes",
+        "2.2 Hidden Markov Models for Regime Switching",
+        "3. Reinforcement Learning for Portfolio Management",
+        "3.1 Deep Q-Network for Trading"
+      ]
+    },
+    {
+      "filename": "Market_Neutral.md",
+      "title": "Market Neutral",
+      "word_count": 137,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Momentum_Investing.md",
+      "title": "Momentum Investing",
+      "word_count": 127,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Pairs_Trading.md",
+      "title": "Pairs Trading",
+      "word_count": 141,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Position_Trading.md",
+      "title": "Position Trading",
+      "word_count": 140,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Quantitative_Trading.md",
+      "title": "Quantitative Trading",
+      "word_count": 134,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Risk_Parity_and_Factor_Investing.md",
+      "title": "Risk Parity and Factor Investing Strategies",
+      "word_count": 1970,
+      "key_concepts": [
+        "Overview",
+        "1. Risk Parity Fundamentals",
+        "1.1 Core Principles",
+        "Mathematical Framework",
+        "1.2 Equal Risk Contribution (ERC) Portfolio",
+        "1.3 Risk Parity Extensions",
+        "Hierarchical Risk Parity (HRP)",
+        "2. Factor Investing Framework",
+        "2.1 Factor Identification and Construction",
+        "Factor Model Specification"
+      ]
+    },
+    {
+      "filename": "Scalping.md",
+      "title": "Scalping",
+      "word_count": 132,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Statistical_Arbitrage.md",
+      "title": "Statistical Arbitrage",
+      "word_count": 143,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Swing_Trading.md",
+      "title": "Swing Trading",
+      "word_count": 141,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Systematic_Trading.md",
+      "title": "Systematic Trading",
+      "word_count": 141,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    },
+    {
+      "filename": "Trend_Following.md",
+      "title": "Trend Following",
+      "word_count": 133,
+      "key_concepts": [
+        "📝 Definition",
+        "🔢 Mathematical Formula",
+        "💡 Application in Alpha Design (WorldQuant Brain)"
+      ]
+    }
+  ],
+  "key_topics": [
+    "2.1 Clustering for Market Regimes",
+    "Mathematical Framework",
+    "1.2 Ensemble Methods for Alpha Generation",
+    "2.1 Factor Identification and Construction",
+    "2.2 Hidden Markov Models for Regime Switching",
+    "3. Reinforcement Learning for Portfolio Management",
+    "1.1 Feature Engineering for Financial Data",
+    "📝 Definition",
+    "1. Risk Parity Fundamentals",
+    "🔢 Mathematical Formula",
+    "1.1 Core Principles",
+    "Overview",
+    "Hierarchical Risk Parity (HRP)",
+    "1.2 Equal Risk Contribution (ERC) Portfolio",
+    "2. Unsupervised Learning for Market Regime Detection",
+    "1.3 Deep Learning for Sequential Data",
+    "💡 Application in Alpha Design (WorldQuant Brain)",
+    "1. Supervised Learning for Return Prediction",
+    "1.3 Risk Parity Extensions",
+    "Factor Model Specification"
+  ],
+  "total_words": 6081
+}
