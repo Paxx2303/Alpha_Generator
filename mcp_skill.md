@@ -1,58 +1,72 @@
 ---
 name: wqb-alpha-generator
-description: Tự động hóa việc tạo, gửi và đánh giá các chiến lược giao dịch định lượng (Alphas) trên WorldQuant Brain. Cung cấp bộ khung kiến thức toán học và kỹ thuật tối ưu hóa chỉ số Turnover, Fitness và Sharpe.
+description: Comprehensive skill and knowledge base for creating, optimizing, and submitting WorldQuant Brain alphas. Provides mathematical frameworks and optimization techniques for Turnover, Fitness, and Sharpe.
 ---
 
-# Tên Kỹ năng (Skill): wqb-alpha-generator
+# Skill: wqb-alpha-generator
 
-Kỹ năng này cung cấp một bộ công cụ hoàn chỉnh để tác nhân AI có thể đóng vai trò là một Quant Researcher, tự động tương tác với nền tảng WorldQuant Brain (WQB) thông qua REST API trực tiếp.
+This skill provides a complete toolset and knowledge base for the AI agent to act as an expert Quant Researcher, automatically interacting with WorldQuant Brain (WQB).
 
-## Các tính năng chính (Features)
+## 1. Capabilities (MCP Tools)
+1. **`search_data_fields(query, limit)`**: Search for valid data fields on WQB (e.g. "sales", "options", "sentiment") to use in formulas.
+2. **`search_knowledge_base(query)`**: [NEW] Search the internal knowledge base (papers, templates, economic rationale) to build hypotheses. **ALWAYS** use this before generating new themes.
+3. **`generate_hypothesis()`**: Get a curated trading theme (e.g., Statistical Arbitrage, Mean Reversion) and its base formula.
+4. **`submit_alpha(formula, settings, dry_run)`**: Submit an alpha expression for simulation and get backtest results (Sharpe, Fitness, Turnover).
+5. **`diagnose_alpha(metrics)`**: Analyze a weak alpha and get recommendations on how to fix it.
+6. **`mutate_formula(formula, n)`**: Auto-generate `n` variations of your formula (changing lookbacks, operators, adding group neutralization).
+7. **`get_gold_alphas()`**: Retrieve past successful formulas (Sharpe > 1.25, Fitness > 1.0) for inspiration.
 
-1. **Quản lý Phiên (Session Management):**
-   - Đăng nhập an toàn vào WQB bằng Basic Auth.
-   - Quản lý cookies và headers để vượt qua các giới hạn API.
+## 2. Core Knowledge & Rules
 
-2. **Gửi và Giám sát Alpha (Submission & Monitoring):**
-   - Đóng gói công thức toán học (`formula`) và cấu hình (`settings` như Universe, Decay, Neutralization) vào payload JSON.
-   - Gửi Alpha trực tiếp lên API `/simulations`.
-   - Giám sát ngầm tiến trình chạy (Progress) và trạng thái (COMPLETE, WARNING, ERROR) thông qua việc poll API. Tránh bị chặn do vượt quá `CONCURRENT_SIMULATION_LIMIT_EXCEEDED`.
+**ULTIMATE AI GOAL:**
+NEVER create basic, simple Alphas (e.g., just using `rank(-ts_delta(close, 5))`). You MUST always aim to create **Complex/Composite Alphas** by:
+1. **Cross-sectional & Time-series Blending:** Use `group_rank`, `group_neutralize` with time-series operators.
+2. **Diverse Data Exploration:** Use `search_data_fields` to combine Fundamental (`sales`, `pe`), Sentiment, or Alternative data. Always wrap fundamental fields with `ts_backfill()`.
+3. **Signal Blending:** Add or multiply different signals (e.g., Fundamental + Momentum + Volatility).
+4. **Knowledge Retrieval:** Use `search_knowledge_base` to ground your formulas in academic research.
 
-3. **Trích xuất và Phân tích Chỉ số (Metrics Extraction):**
-   - Tự động bóc tách các chỉ số cốt lõi từ phản hồi API: `Sharpe`, `Fitness`, `Turnover`, `Returns`.
-   - Lưu trữ lịch sử chạy vào thư mục `logs/` định dạng JSON để phục vụ phân tích chéo.
-
-## Kiến thức Lõi và Kỹ thuật Tối ưu (Core Knowledge - `Skill.md`)
-
-AI sử dụng bộ từ điển cấu trúc công thức được định nghĩa trong `Skill.md` để sinh ra các Alpha. 
-
-**Tiêu chuẩn IQC (In-Sample Quality Criteria):**
+**IQC Criteria (In-Sample Quality Criteria):**
 - **Sharpe Ratio:** $\ge 1.25$
 - **Fitness:** $\ge 1.0$
-- **Turnover:** $\le 0.7$
+- **Turnover:** $10\% - 70\%$ (Ideal: $<30\%$)
+- **Fitness Formula:** `Fitness = Sharpe * sqrt(|Returns| / max(Turnover, 0.125))`
 
-**Các kỹ thuật tối ưu hóa chuyên sâu (Advanced Optimization):**
+### Valid Operators
+- **Time Series:** `ts_corr`, `ts_covariance`, `ts_rank`, `ts_scale`, `ts_arg_max`, `ts_arg_min`, `ts_decay_linear`, `ts_mean`, `ts_std_dev`, `ts_delta`, `ts_delay`, `ts_zscore`, `ts_regression`, `ts_sum`, `ts_av_diff`, `ts_backfill`, `trade_when`, `pasteurize`
+- **Cross-Sectional:** `rank`, `normalize`, `zscore`, `winsorize`, `scale`, `quantile`
+- **Group:** `group_neutralize`, `group_rank`, `group_zscore`, `group_vector_neut`
+- **BROKEN Operators (DO NOT USE):**
+  - `ts_log_returns` $\to$ use `log(close / ts_delay(close, d))`
+  - `ts_min` $\to$ use `ts_scale` or `-ts_arg_min`
+  - `ts_max` $\to$ use `ts_scale` or `ts_arg_max`
+  - `delay` $\to$ use `ts_delay`
+  - `stddev` $\to$ use `ts_std_dev`
+  - `correlation` $\to$ use `ts_corr`
+  - `delta` $\to$ use `ts_delta`
 
-1. **Giảm Turnover (Chi phí vòng quay cao):**
-   - *Làm mượt (Smoothing):* Sử dụng hàm `ts_decay_linear(signal, days)` để giảm sự biến động liên tục của tín hiệu.
-   - *Cập nhật lười biếng (Lazy Updating):* Kết hợp `trade_when` và `ts_delay` để chỉ đổi vị thế khi giá thay đổi vượt ngưỡng (ví dụ: `trade_when(abs(returns) > 0.02, signal, ts_delay(signal, 1))`).
-   - Tăng thiết lập biến môi trường `Decay` lên 3, 5, hoặc 10.
+### Advanced Optimization Techniques
 
-2. **Tăng Returns & Fitness:**
-   - *Trộn tín hiệu (Signal Blending):* Cộng gộp nhiều tín hiệu yếu thành một tín hiệu mạnh (ví dụ: Price Momentum + Volume Reversion).
-   - *Cắt gọt chặt chẽ (Stricter Truncation):* Giảm Truncation xuống `0.01` để chỉ giao dịch top 1% cổ phiếu có niềm tin cao nhất.
-   - *Trung hòa Nhóm (Group Neutralization):* Sử dụng `Neutralization = Subindustry` để loại bỏ rủi ro hệ thống, chỉ lấy Alpha thuần túy từ nội bộ ngành.
+| Problem | Diagnosis | Fix |
+|---------|-----------|-----|
+| **Sharpe > 4.0** | Look-Ahead Bias | Verify `Delay=1` and no `ts_delay(x, 0)` is used |
+| **Sharpe < 0** | Signal inverted | Add `-` sign to entire formula |
+| **Turnover > 50%** | Too much trading | Apply `ts_decay_linear(signal, 5-10)` or `trade_when` thresholds |
+| **Good Sharpe, bad Fitness** | Turnover too low / Wrong neutralization | Decrease Decay to 0 OR change to Market neutralization |
+| **High drawdown > 15%** | Position concentration | Reduce Truncation to 0.03 or 0.01 |
 
-## Cấu trúc Dự án (Project Structure)
+### Proven Settings (Settings Grid)
 
-- `wqb_automation.py`: Client tương tác API cốt lõi, xử lý HTTP requests và parse kết quả.
-- `run_auto_loop.py`: Kịch bản mẫu để chạy một loạt các công thức liên tiếp.
-- `alpha_agent.py`: Agent chịu trách nhiệm sinh công thức toán học ngẫu nhiên hoặc dựa trên Theme (Momentum, Mean Reversion, v.v.).
-- `alpha_skills/Skill.md`: Bách khoa toàn thư chứa cú pháp, ràng buộc operator của WQB và mẹo tinh chỉnh.
-- `.env`: Chứa thông tin đăng nhập WQB_EMAIL và WQB_PASSWORD.
+| Universe | Neutralization | Decay | Truncation | Expected Sharpe | Use Case |
+|----------|----------------|-------|------------|-----------------|----------|
+| TOP3000  | Market         | 0     | 0.05       | Baseline        | Price/Volume, Mean Reversion |
+| TOP500   | Subindustry    | 0     | 0.10       | High Sharpe     | Fundamental, Idiosyncratic risk |
+| TOP1000  | Subindustry    | 10    | 0.10       | High Fitness    | Slow signals, Sentiment |
 
-## Khi nào nên sử dụng kỹ năng này?
+**Key Insight:** Price-volume alphas should use **Market** neutralization, NOT Subindustry. Neutralizing price reversion by Market reduces Sharpe slightly but GREATLY increases Fitness.
 
-- Khi người dùng muốn mô phỏng (simulate) một ý tưởng định lượng thành công thức thực tế trên WQB.
-- Khi người dùng cung cấp một Alpha bị lỗi (Turnover cao, Fitness thấp) và yêu cầu AI tự động chuẩn đoán, sửa lỗi và nộp lại cho đến khi pass tiêu chuẩn IQC.
-- Khi cần tạo nhanh hàng loạt biến thể của một công thức (thay đổi lookback days, operators) để brute-force tìm ra thông số tối ưu nhất.
+## 3. Project Structure
+- `mcp_skill.md`: The single source of truth for alpha generation knowledge.
+- `mcp_server.py`: Exposes WQB tools to the AI agent.
+- `wqb_automation.py`: Core REST API client for WQB.
+- `alpha_agent.py`: Autonomous agent generating formulas based on knowledge base search.
+- `alpha_skills/knowledge_retriever.py`: RAG module to search academic papers and references.

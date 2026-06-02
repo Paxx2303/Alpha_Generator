@@ -15,15 +15,16 @@ This file is optimized for AI agents reading the codebase.
 | `wqb_automation/browser.py` | Browser lifecycle management | `BrowserManager` class | Playwright |
 | `wqb_automation/login_handler.py` | Login flow & ALTCHA handling | `LoginHandler.login()` | Playwright |
 | `wqb_automation/simulate_handler.py` | Alpha submission & result parsing | `SimulateHandler.submit()` | Playwright |
-| `wqb_automation/knowledge_base.py` | Skill reading & updating | `KnowledgeBase` class | `alpha_skills/Skill.md` |
-| `alpha_agent.py` | Autonomous research loop with skill evolution | `main()` with `--quick`, `--headless`, `--max-cycles` | `wqb_automation/`, `alpha_skills/Skill.md` |
+| `wqb_automation/knowledge_base.py` | Skill reading & updating | `KnowledgeBase` class | `mcp_skill.md` |
+| `alpha_agent.py` | Autonomous research loop with skill evolution | `main()` with `--quick`, `--headless`, `--max-cycles` | `wqb_automation/`, `mcp_skill.md`, `knowledge_retriever.py` |
 | `run_pipeline.py` | CLI for stock screening pipeline | CLI args: `--universe`, `--top-n`, `--start`, `--end`, `--tickers`, `--no-cache` | `stock_pipeline/` |
 | `stock_pipeline/__init__.py` | Package exports | — | `stock_pipeline/*.py` |
 | `stock_pipeline/data_fetcher.py` | `DataFetcher` class | `DataFetcher.__init__()`, `.fetch_batch()` | `yfinance` |
 | `stock_pipeline/alpha_factors.py` | `AlphaFactorEngine` class | `.compute_all()`, `.compute_factor()` | Factor methods |
 | `stock_pipeline/stock_screener.py` | `StockScreener` class | `.rank_stocks()`, `.get_top_stocks()` | Factor data |
 | `stock_pipeline/pipeline.py` | `StockPipeline` orchestration | `.run()` | All stock_pipeline modules |
-| `alpha_skills/Skill.md` | Knowledge base: themes, operators, settings, IQC, automation guide | Read/written by agent | — |
+| `mcp_skill.md` | Single Source of Truth for Knowledge Base | Read/written by agent and MCP | — |
+| `alpha_skills/knowledge_retriever.py` | Semantic search over academic papers | `KnowledgeRetriever.search()` | JSON Datasets |
 | `wqb_config.json` | WQB credentials (gitignored) | Loaded by `WQBConfig.load()` | — |
 
 ---

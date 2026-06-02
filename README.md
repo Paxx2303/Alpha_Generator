@@ -9,13 +9,17 @@ Pipeline Stock (Python)
   └── run_pipeline.py → stock_pipeline/
       DataFetcher, AlphaFactorEngine, StockScreener
 
-WQB Automation (Playwright)
+WQB Automation (REST API)
   └── wqb_automation.py
-      Login WQB → Submit Formula → Đọc kết quả
+      API Login → Submit Formula → Đọc kết quả
 
 Alpha Agent (Autonomous Loop)
   └── alpha_agent.py
       Research → Hypothesis → Submit → Analyze → Improve
+
+MCP Server
+  └── mcp_server.py
+      Cung cấp bộ công cụ MCP cho Claude/Cursor
 ```
 
 ## Quick Start
@@ -24,12 +28,12 @@ Alpha Agent (Autonomous Loop)
 # 1. Chạy stock screening pipeline
 python run_pipeline.py --universe TOP500 --top-n 20
 
-# 2. Test WQB login (sẽ mở browser)
+# 2. Test WQB login
 python wqb_automation.py --formula "-rank(ts_delta(close,5))"
 
 # 3. Chạy autonomous agent
-python alpha_agent.py                 # có browser
-python alpha_agent.py --headless       # ẩn browser
+python alpha_agent.py
+python alpha_agent.py --headless       # Không bắt buộc với API mới
 python alpha_agent.py --quick          # dry-run, không submit
 python alpha_agent.py --max-cycles 10  # tối đa 10 vòng
 ```
@@ -38,7 +42,8 @@ python alpha_agent.py --max-cycles 10  # tối đa 10 vòng
 
 | File | Chức năng |
 |---|---|
-| `wqb_automation.py` | Playwright auto login + submit alpha + đọc kết quả |
+| `mcp_server.py` | MCP Server cung cấp 6 tools nghiên cứu Alpha |
+| `wqb_automation.py` | REST API auto login + submit alpha + đọc kết quả |
 | `alpha_agent.py` | Autonomous agent: loop research → submit → analyze |
 | `run_pipeline.py` | CLI chạy stock screening pipeline |
 | `stock_pipeline/` | Modules: DataFetcher, AlphaFactorEngine, StockScreener |
