@@ -32,6 +32,10 @@ Group: `group_neutralize`, `group_rank`, `group_zscore`
  
 Arithmetic: `abs`, `log`, `sign`, `sqrt`, `power`, `max`, `min`, `if_else`
  
+### Fundamental Data Rule
+Always wrap fundamental fields (like `pe`, `pb`, `roe`, `sales`) with `ts_backfill()` to handle NaN values properly.
+Example: `rank(-ts_backfill(pe))`
+ 
 ### NEVER Use These (confirmed broken)
 `ts_log_returns` → use `log(close / ts_delay(close, d))`
 `ts_min` → broken! use `ts_scale` or `-ts_arg_min`
@@ -51,6 +55,7 @@ To improve Fitness: increase Sharpe OR increase Returns OR decrease Turnover.
  
 | Problem | Diagnosis | Fix |
 |---------|-----------|-----|
+| Sharpe > 4.0 | Look-Ahead Bias | Verify `Delay=1` and no `ts_delay(x, 0)` is used |
 | Sharpe < 0 | Signal inverted | Add `-` sign to entire formula |
 | Fitness < 1.0, Turnover > 30% | Too much trading | Increase Decay to 5-10 |
 | Good Sharpe, bad Fitness | Wrong neutralization | Change to Market neutralization |

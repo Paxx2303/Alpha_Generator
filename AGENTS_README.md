@@ -9,108 +9,118 @@ This file is optimized for AI agents reading the codebase.
 
 | File | Purpose | Entry Points | Dependencies |
 |---|---|---|---|
-| `wqb_automation.py` | Playwright-based WQB browser automation | `WQBAutomation.__init__()`, `.start()`, `.login()`, `.submit_alpha()`, `.stop()` | `playwright`, `wqb_config.json` or env vars |
-| `alpha_agent.py` | Autonomous research loop: research → hypothesis → submit → analyze → improve | `main()` with `--quick`, `--headless`, `--max-cycles` | `wqb_automation.py`, `alpha_skills/Skill.md` |
+| `wqb_automation/__init__.py` | Package exports | `WQBAutomation` | — |
+| `wqb_automation/config.py` | WQB credentials config | `WQBConfig.load()` | `wqb_config.json` or env vars |
+| `wqb_automation/selectors.py` | CSS selectors & locators | `Selectors` class | — |
+| `wqb_automation/browser.py` | Browser lifecycle management | `BrowserManager` class | Playwright |
+| `wqb_automation/login_handler.py` | Login flow & ALTCHA handling | `LoginHandler.login()` | Playwright |
+| `wqb_automation/simulate_handler.py` | Alpha submission & result parsing | `SimulateHandler.submit()` | Playwright |
+| `wqb_automation/knowledge_base.py` | Skill reading & updating | `KnowledgeBase` class | `alpha_skills/Skill.md` |
+| `alpha_agent.py` | Autonomous research loop with skill evolution | `main()` with `--quick`, `--headless`, `--max-cycles` | `wqb_automation/`, `alpha_skills/Skill.md` |
 | `run_pipeline.py` | CLI for stock screening pipeline | CLI args: `--universe`, `--top-n`, `--start`, `--end`, `--tickers`, `--no-cache` | `stock_pipeline/` |
-| `stock_pipeline/__init__.py` | Package exports | `create_pipeline()`, `run_pipeline()` | `stock_pipeline/*.py` |
-| `stock_pipeline/data_fetcher.py` | `DataFetcher` class | `DataFetcher.__init__(use_cache, cache_dir)`, `.fetch_data(tickers, start, end)` | `yfinance` |
-| `stock_pipeline/alpha_factors.py` | `AlphaFactorEngine` class | `AlphaFactorEngine.__init__()`, `.compute_all(df)`, `.get_factor(name)` | 18 factor methods |
-| `stock_pipeline/screener.py` | `StockScreener` class | `StockScreener.__init__(factors, weights)`, `.screen(df, universe_size, top_n)` | `AlphaFactorEngine` |
-| `stock_pipeline/config.py` | Default config variables | `DEFAULT_UNIVERSE`, `DEFAULT_TOP_N`, `FACTOR_WEIGHTS` | — |
-| `alpha_skills/Skill.md` | Knowledge base: themes, operators, settings, IQC, automation guide | Read by AI agent | — |
-| `wqb_config.json` | WQB credentials (gitignored) | Loaded by `load_config()` | — |
+| `stock_pipeline/__init__.py` | Package exports | — | `stock_pipeline/*.py` |
+| `stock_pipeline/data_fetcher.py` | `DataFetcher` class | `DataFetcher.__init__()`, `.fetch_batch()` | `yfinance` |
+| `stock_pipeline/alpha_factors.py` | `AlphaFactorEngine` class | `.compute_all()`, `.compute_factor()` | Factor methods |
+| `stock_pipeline/stock_screener.py` | `StockScreener` class | `.rank_stocks()`, `.get_top_stocks()` | Factor data |
+| `stock_pipeline/pipeline.py` | `StockPipeline` orchestration | `.run()` | All stock_pipeline modules |
+| `alpha_skills/Skill.md` | Knowledge base: themes, operators, settings, IQC, automation guide | Read/written by agent | — |
+| `wqb_config.json` | WQB credentials (gitignored) | Loaded by `WQBConfig.load()` | — |
 
 ---
 
-## 2. WQBAutomation — Variables & Constants
+## 2. Automation Module Structure
 
-### File: `wqb_automation.py`
+### `wqb_automation/config.py`
 
-#### Class: `WQBAutomation`
+```python
+@dataclass
+class WQBConfig:
+    email: str
+    password: str
+    url: str = "https://platform.worldquantbrain.com"
+    headless: bool = False
+    timeout_ms: int = 300000
 
-| Variable | Type | Default | Description |
-|---|---|---|---|
-| `self.config` | dict | from `load_config()` | `email`, `password`, `url`, `headless`, `timeout_ms` |
-| `self.browser` | Browser or None | None | Playwright Chromium instance |
-| `self.context` | BrowserContext or None | None | Browser context with viewport 1920x1080 |
-| `self.page` | Page or None | None | Active page |
-| `self.results_log` | list[dict] | [] | History of all simulation results this session |
+    @classmethod
+    def load() -> WQBConfig  # Env vars override file
+```
 
-#### `load_config()` → dict
+### `wqb_automation/selectors.py`
 
-Read order:
-1. Environment variables: `WQB_EMAIL`, `WQB_PASSWORD`, `WQB_URL`, `WQB_HEADLESS`, `WQB_TIMEOUT`
-2. JSON file: `wqb_config.json` in project root
-3. Falls: `RuntimeError`
+CSS selectors as constants for maintainability:
+- `Selectors.LOGIN_PAGE`, `Selectors.PASSWORD_INPUT`, `Selectors.SIGNIN_FORM`
+- `Selectors.MONACO_EDITOR`, `Selectors.TEXTAREA_EDITOR`
+- `Selectors.SIMULATE_BUTTON`, `Selectors.RESULTS_CHECKBOX`
+- `Selectors.COOKIE_BANNER_ACCEPT/REJECT`, `Selectors.TUTORIAL_CLOSE_BUTTONS`
 
-#### `login()` → bool
+### `wqb_automation/browser.py`
 
-Flow:
-1. Navigate to `{url}/sign-in`
-2. Wait for email/password fields to render
-3. Fill credentials (CSS: `input[name="email"]`, `input[name="password"]`)
-4. Wait 2000ms for ALTCHA auto-verification (`altcha-widget` shadow DOM, triggers automatically)
-5. Submit via `form.requestSubmit()` — this is the **only working method** (prev: button click was intercepted by React disabled state)
-6. Wait up to 20s for URL redirect away from `/sign-in`
-7. Handle tutorial redirect: if redirected to `/simulate/tutorial` or `/simulate/learn/courses`, dismiss intro.js overlay
+```python
+class BrowserManager:
+    browser: Browser
+    context: BrowserContext
+    page: Page
 
-Known issues:
-- ALTCHA is a custom element with shadow DOM, `data-state="verified"` indicates solved
-- Login redirect is inconsistent: can go to `/simulate`, `/simulate/tutorial`, or `/simulate/learn/courses`
-- `form.requestSubmit()` triggers React form handler properly; `btn.click()` does NOT work because React controls button disabled state
+    def start() -> BrowserManager
+    def stop()
+    def navigate(url, wait_until="domcontentloaded")
+    def screenshot(name)
+```
 
-#### `submit_alpha(formula, settings_str)` → dict
+### `wqb_automation/login_handler.py`
 
-Parameters:
-- `formula` (str): WQ Brain formula syntax (e.g. `"-rank(ts_delta(close,5))"`)
-- `settings_str` (str): `"Universe|Neutralization|Decay|Truncation"` (default: `"TOP3000|Market|0|0.05"`)
+```python
+class LoginHandler:
+    def __init__(browser_manager: BrowserManager, config: WQBConfig)
 
-Flow:
-1. Ensure on simulate page (navigate if on `/learn/` sub-path)
-2. Dismiss intro.js overlay (5 attempts, click skip button or JS remove)
-3. Wait for Monaco editor render (up to 20s polling every 1s)
-4. Set formula text via `nativeInputValueSetter` on textarea + dispatch `input` event
-5. Save screenshot + page HTML for debugging
-6. Dismiss cookie consent banner (`cky-btn-accept`)
-7. Click Simulate button via:
-   - **Try 1**: Playwright `click(force=True)` on `button.editor-simulate-button-text`
-   - **Try 2**: JS `dispatchEvent(new MouseEvent('click', ...))` on `button` with text "Simulate"
-   - **Try 3**: Focus `textarea[aria-roledescription="editor"]` → press `Control+Enter`
-8. Click "Results" checkbox (`code-checkbox__label:has-text("Results")`)
-9. Wait up to 10 minutes (120 attempts × 5s) for results
-10. Parse metrics from HTML via regex
-11. Retrigger simulate every 5 attempts (2-9) if no progress detected
-12. Log results to `wqb_logs/alpha_<timestamp>.json`
+    def login() -> bool:
+        # 1. Navigate to /sign-in
+        # 2. Dismiss cookie banner
+        # 3. Fill email/password
+        # 4. Wait for ALTCHA auto-verification (2s)
+        # 5. Submit via form.requestSubmit()
+        # 6. Wait for redirect (20s polling)
+        # 7. Handle tutorial redirect
+```
 
-Return dict keys:
-| Key | Type | Source |
-|---|---|---|
-| `sharpe` | float or None | Regex `Sharpe:\s*(-?[\d.]+)` |
-| `fitness` | float or None | Regex `Fitness:\s*(-?[\d.]+)` |
-| `turnover` | float or None | Regex `Turnover:\s*([\d.]+)%` |
-| `returns` | float or None | Regex `Returns:\s*(-?[\d.]+)%` |
-| `drawdown` | float or None | Regex `Drawdown:\s*([\d.]+)%` |
-| `margin` | float or None | Regex `Margin:\s*(-?[\d.]+)` |
-| `yearly` | list[dict] | Year-by-year table parsed from HTML |
-| `formula` | str | Input formula |
-| `settings` | str | Input settings |
-| `timestamp` | str | ISO datetime |
-| `error` | str | Only on timeout: `"Timeout waiting for simulation"` |
+### `wqb_automation/simulate_handler.py`
 
-#### Known Bug — Simulate Error
+```python
+class SimulateHandler:
+    def __init__(browser_manager: BrowserManager, kb: KnowledgeBase)
 
-Current behavior: Simulate button IS clicked (all 3 methods tried), but page shows "WorldQuant BRAIN is experiencing some difficulties." This error persists and no metrics are returned.
+    def submit(formula: str, settings_str: str) -> dict:
+        # 1. Navigate to /simulate
+        # 2. Dismiss overlays (cookie + intro.js)
+        # 3. Find & type formula in editor
+        # 4. Click Simulate (fallback 3 methods)
+        # 5. Click Results checkbox
+        # 6. Wait & parse metrics (up to 10 min)
+        # 7. Save log
 
-Root cause candidates:
-- Formula might be invalid or rejected
-- ALTCHA may need re-verification per simulation (not just login)
-- Server-side rate limiting on the account
-- Page may be in `/simulate/learn/courses` sub-state and simulate button doesn't trigger proper API call
+    def parse_metrics(html: str) -> dict:
+        # Extract Sharpe, Fitness, Turnover, Returns, Drawdown, Margin, Yearly
 
-Workaround attempts:
-- Retrigger simulate every 5 attempts
-- Tried Playwright force click, JS dispatch, and Ctrl+Enter
-- All produce the same error
+    def run_settings_grid(formula: str, entry: dict) -> list:
+        # Test formula across SETTINGS_GRID
+```
+
+### `wqb_automation/knowledge_base.py`
+
+```python
+class KnowledgeBase:
+    def read() -> dict:
+        # Load themes, patterns, operators from Skill.md
+
+    def update_learning(formula: str, result: dict, diagnosis: dict) -> None:
+        # Append new finding to Skill.md
+
+    def get_gold_alphas() -> list:
+        # Load passed alphas from wqb_logs/gold_alphas.json
+
+    def save_gold(formula: str, settings: dict, result: dict) -> None:
+        # Save passing alpha to gold_alphas.json
+```
 
 ---
 
@@ -118,35 +128,39 @@ Workaround attempts:
 
 ### File: `alpha_agent.py`
 
-#### Main Loop
+#### Main Loop (with Skill Evolution)
 
 ```
-1. RESEARCH:
+1. RESEARCH (before each alpha):
    - Read alpha_skills/Skill.md knowledge base
-   - Check wqb_logs/gold_alphas.json for existing passes
-   - Identify untested themes
+   - Load existing gold_alphas.json for pattern matching
+   - Identify under-tested themes
 
-2. HYPOTHESIS:
-   - Pick a theme (Mean Reversion, Momentum, VWAP, Volatility, etc.)
-   - Generate 3-5 formula variants with economic rationale
-   - Choose best variant based on prior learnings
+2. HYPOTHESIS GENERATION:
+   - Select theme based on learning gaps
+   - Generate formula variants with economic rationale
+   - Weight against known failures
 
-3. SUBMIT:
-   - Call WQBAutomation.submit_alpha(formula, settings)
-   - Wait for simulation results
-   - Save to log
+3. SUBMIT TO WQB:
+   - Login if session expired
+   - Submit formula + settings
+   - Wait for simulation
 
-4. ANALYZE:
-   - If Sharpe >= 1.25 + Fitness >= 1.0 → save to gold_alphas.json, optimize settings
-   - If Sharpe < -0.5 → flip sign, resubmit
-   - If Sharpe 0~0.5 → change field/lookback, resubmit
-   - If Turnover > 70% → add decay, resubmit
-   - If error/timeout → log failure, try next variant
+4. ANALYZE RESULTS:
+   - Parse Sharpe, Fitness, Turnover, Yearly
+   - Diagnose issues (sign, turnover, stability)
+   - If PASS (Sharpe≥1.25 + Fitness≥1.0) → save to gold
+   - If FAIL → generate fix suggestions
 
-5. LOOP:
-   - Max cycles determined by --max-cycles (default 20)
-   - Update Skill.md learnings after each cycle
-   - Report summary to user
+5. UPDATE SKILL KNOWLEDGE BASE:
+   - Write results to Skill.md learnings section
+   - Record successful patterns
+   - Note failed patterns for avoidance
+   - Update theme effectiveness scores
+
+6. LOOP:
+   - Max cycles via --max-cycles (default 20)
+   - Exit early on gold alpha found
 ```
 
 #### CLI Arguments
@@ -165,44 +179,40 @@ Workaround attempts:
 
 ```python
 class DataFetcher:
-    def __init__(self, use_cache=True, cache_dir="stock_data_cache"):
-        # cache_dir: pathlib.Path, stores pickle files per ticker
+    cache_dir: Path
+    use_cache: bool
 
-    def fetch_data(self, tickers: list, start: str, end: str) -> dict:
-        # Returns {ticker: pd.DataFrame} with columns:
-        # open, high, low, close, volume, returns, vwap, adv20, dvol
-        # Uses yfinance.download(tickers, start, end)
+    def fetch_ticker(ticker, start, end) -> Optional[pd.DataFrame]
+    def fetch_batch(tickers, start, end) -> pd.DataFrame  # Parallel via ThreadPoolExecutor
 ```
 
 ### `stock_pipeline/alpha_factors.py`
 
 ```python
 class AlphaFactorEngine:
-    def __init__(self):
-        # Registers 18 factor methods
+    factor_registry: Dict[str, callable]
 
-    def compute_all(self, data: dict) -> pd.DataFrame:
-        # Input: {ticker: DataFrame}
-        # Output: MultiIndex DataFrame (date x ticker) with 18 factor columns
+    def compute_factor(name, df) -> pd.Series
+    def compute_all(df) -> pd.DataFrame
 
-    def get_factor(self, name: str) -> pd.Series:
-        # Returns specific factor Series
+    # Factors: vol_weighted_mr, mean_reversion_5/10, momentum_5/10/20,
+    # volume_price_5, vwap_deviation, vwap_deviation_normalized,
+    # volatility_20, volatility_reversal, high_low_midpoint, high_low_position,
+    # liquidity_volume_ratio, amihud_illiquidity, volume_surge, money_flow, combined_mr_momentum
 ```
 
-18 Factors: `vol_weighted_mr`, `mean_reversion_5`, `mean_reversion_10`, `momentum_5`, `momentum_10`, `momentum_20`, `volume_price_5`, `vwap_deviation`, `vwap_deviation_normalized`, `volatility_20`, `volatility_reversal`, `high_low_midpoint`, `high_low_position`, `liquidity_volume_ratio`, `amihud_illiquidity`, `volume_surge`, `money_flow`, `combined_mr_momentum`.
-
-### `stock_pipeline/screener.py`
+### `stock_pipeline/stock_screener.py`
 
 ```python
 class StockScreener:
-    def __init__(self, factors: AlphaFactorEngine, weights: dict):
-        # weights: {factor_name: weight} (default: factor_config.FACTOR_WEIGHTS)
+    config: StockPipelineConfig
+    factor_weights: dict
 
-    def screen(self, df: pd.DataFrame, universe_size: int = 1000, top_n: int = 10) -> pd.DataFrame:
-        # 1. Filter top universe_size by avg dvol
-        # 2. Score = weighted sum of factor z-scores
-        # 3. Rank by score
-        # Returns DataFrame: date, ticker, rank, score, factor_details
+    def filter_universe(factor_df, date, universe) -> pd.DataFrame
+    def compute_composite_score(factor_df, weights) -> pd.Series
+    def rank_stocks(factor_df, date) -> pd.DataFrame
+    def get_top_stocks(factor_df, date, top_n) -> pd.DataFrame
+    def generate_report(factor_df, dates) -> dict
 ```
 
 ---
@@ -214,11 +224,11 @@ Format: Universe | Neutralization | Decay | Truncation
 Default: TOP3000 | Market | 0 | 0.05
 
 Optimization order:
-1. TOP3000 + Market    + Decay 0  + Truncation 0.05    (baseline)
-2. TOP3000 + Market    + Decay 3  + Truncation 0.05
-3. TOP3000 + Subind.   + Decay 0  + Truncation 0.05
-4. TOP1000 + Subind.   + Decay 10 + Truncation 0.10
-5. TOP500  + Subind.   + Decay 0  + Truncation 0.10    (highest Sharpe)
+1. TOP3000 + Market + Decay 0 + Truncation 0.05  (baseline)
+2. TOP3000 + Market + Decay 5 + Truncation 0.05  (reduce turnover)
+3. TOP3000 + Subind. + Decay 0 + Truncation 0.05 (increase Sharpe)
+4. TOP1000 + Subind. + Decay 10 + Truncation 0.10 (optimize Fitness)
+5. TOP500 + Subind. + Decay 0 + Truncation 0.10 (maximize Sharpe)
 ```
 
 Universe: TOP200 | TOP500 | TOP1000 | TOP3000
@@ -232,62 +242,62 @@ Truncation: 0.01 | 0.03 | 0.05 | 0.10 | 0.20
 
 | Issue | Symptom | Root Cause | Workaround |
 |---|---|---|---|
-| Login hangs after submit | URL stays on `/sign-in` | ALTCHA verification timing | `form.requestSubmit()` + 20s polling loop |
-| Login redirect inconsistency | Goes to `/simulate/tutorial` or `/simulate/learn/courses` | React router state | Auto-dismiss tutorial, force nav to `/simulate` |
-| Simulate button not clickable | "No simulate button found" | Cookie banner overlay | Dismiss `.cky-btn-accept` first |
-| Simulation shows error | "experiencing some difficulties" | Unknown (server-side) | No fix yet — retry with different formulas |
-| Formula not typed | "No text input found" | Monaco editor not rendered | Wait loop up to 20s for `.monaco-editor` |
-| CookieYes banner persistent | Overlays Simulate button | Loaded after React app | Click accept/reject before simulating |
-| Captcha expired | Login success but simulate fails | ALTCHA token TTL | Short session — submit alpha immediately after login |
+| Login hangs after submit | URL stays on `/sign-in` | ALTCHA timing | `form.requestSubmit()` + 20s polling |
+| Login redirect inconsistency | Goes to `/simulate/tutorial` | React router state | Auto-dismiss tutorial, nav to `/simulate` |
+| Simulate button blocked | Button not clickable | Cookie banner overlay | Dismiss `.cky-btn-accept` first |
+| Simulation error | "experiencing some difficulties" | Server-side / ALTCHA | Retry with different formula |
+| Monaco editor not ready | "No text input found" | Editor lazy load | Wait loop up to 20s for `.monaco-editor` |
+| Captcha expired | Login success but simulate fails | ALTCHA token TTL | Submit alpha immediately after login |
 
 ---
 
-## 7. Log Files Directory Structure
+## 7. Log Files Directory
 
 ```
 wqb_logs/
-├── alpha_<timestamp>.json         # Individual alpha results
-├── gold_alphas.json               # Passed alphas (Sharpe >= 1.25 + Fitness >= 1.0)
-├── after_login.png                # Screenshot after successful login
-├── formula_entered.png            # Screenshot after filling formula
-├── simulate_page.png              # Screenshot of simulate page
-├── page_after_formula.html        # Full HTML dump after formula entry
-├── page_debug.html                # Full HTML dump when error occurs
-├── no_button_debug.html           # Full HTML when simulate button not found
-├── wait_start.png                 # Screenshot at start of wait loop
-├── sim_check_<N>.png              # Periodic screenshots during simulation wait
-├── login_page.png                 # Screenshot of login page
-├── login_failed.png               # Screenshot on login failure
-└── tutorial_page.png              # Screenshot of tutorial redirect
+├── alpha_<timestamp>.json            # Individual simulation results
+├── gold_alphas.json                  # Passed alphas (Sharpe≥1.25 + Fitness≥1.0)
+├── knowledge_update_<timestamp>.json # Skill evolution log
+├── after_login.png                   # Login success screenshot
+├── formula_entered.png               # Formula entry screenshot
+├── simulate_page.png                 # Simulate page state
+├── page_debug.html                   # Full HTML on errors
+└── sim_check_<N>.png               # Periodic simulation screenshots
 ```
 
 ---
 
-## 8. Monaco Editor Interaction
+## 8. Result Parsing Patterns
 
-WQB uses Monaco Editor (VS Code's editor). Standard textarea methods don't work because React wraps the editor.
-
-Working approach:
-```javascript
-const textarea = document.querySelector('textarea[aria-roledescription="editor"]');
-const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-    window.HTMLTextAreaElement.prototype, 'value'
-).set;
-nativeInputValueSetter.call(textarea, formula);
-textarea.dispatchEvent(new Event('input', { bubbles: true }));
+```python
+# Extract metrics from simulation results HTML
+patterns = {
+    "sharpe": r'Sharpe[:\\s]*(-?[\\d.]+)',
+    "fitness": r'Fitness[:\\s]*(-?[\\d.]+)',
+    "turnover": r'Turnover[:\\s]*([\\d.]+)%',
+    "returns": r'Returns[:\\s]*(-?[\\d.]+)%',
+    "drawdown": r'Drawdown[:\\s]*([\\d.]+)%',
+    "margin": r'Margin[:\\s]*(-?[\\d.]+)',
+}
 ```
-
-This bypasses React's synthetic event system and triggers Monaco's internal change detection.
 
 ---
 
-## 9. ALTCHA Anti-Bot System
+## 9. Skill Evolution Format
 
-WQB uses ALTCHA widget (similar to reCAPTCHA) on sign-in page.
-- Custom element: `altcha-widget`
-- Challenge URL: `https://api.worldquantbrain.com/captcha`
-- States: `unverified` → `verifying` → `verified`
-- Auto-verifies after page load + email/password interaction
-- Shadow DOM — cannot access via standard Playwright selectors
-- Works automatically: Playwright's real browser environment passes the verification
-- No manual interaction needed — just wait 2s after filling credentials
+Skill.md updated after each alpha with:
+
+```markdown
+## Learnings
+
+### Pattern: <theme>
+- **Best Formula**: <formula string>
+- **Sharpe**: <value>
+- **Notes**: <diagnosis insights>
+
+### Failed Patterns
+- Formula: <formula> → Issue: <diagnosis>
+
+### Settings Optimization
+- Best: <settings> → Sharpe: <value>
+```

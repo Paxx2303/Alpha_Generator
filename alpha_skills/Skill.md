@@ -61,20 +61,24 @@ IQC: goal is MANY diverse alphas, not 1 best alpha.
 
 Personal: optimize for highest Sharpe/Fitness on a single alpha.
 
-### Step 1: Choose Economic Theme
+### Step 1: Explore Data on WQB
 
-| Theme | Core Idea | Reference |
-|---|---|---|
-| Mean Reversion | Overextended prices revert | themes.md#mean-reversion |
-| Momentum | Trend continues short-term | themes.md#momentum |
-| Volume-Price | Volume reveals intent | themes.md#volume-price |
-| Volatility | Abnormal volatility predicts | themes.md#volatility |
-| VWAP Deviation | Price deviates from VWAP | themes.md#vwap |
-| Fundamental | P/E, P/B, ROE — value investing | themes.md#fundamental |
-| Liquidity | Illiquidity premium, volume surge | themes.md#liquidity |
-| Regime-Based | Trade only in suitable conditions | themes.md#regime-based |
+Log into WorldQuant Brain and use the Data Explorer to find interesting datasets.
+Check data coverage, historical availability, and delay parameters.
+Identifying a unique or specific data field (e.g., alternative data or a specific fundamental metric) first often leads to better ideas.
 
-### Step 2: Choose Operators
+### Step 2: Develop Economic Rationale (Hypothesis)
+
+Every good alpha starts with a strong economic theory or behavioral finance hypothesis.
+Do not just blindly test formulas.
+
+To formulate your theory and choose a theme:
+- Read the materials in the `alpha_skills/reference/` folder to understand established economic theories, strategies, and market anomalies.
+- Consult the `alpha_skills/rawdata/` folder to align your theory with available data structures.
+- After studying these materials, form a hypothesis (e.g., "Overreaction to short-term news creates a liquidity vacuum, leading to a mean reversion effect").
+- Match your hypothesis to a Core Theme (Mean Reversion, Momentum, Volume-Price, Volatility, Fundamental, Liquidity).
+
+### Step 3: Choose Operators
 
 **Time Series (ts_*):** compare each stock with its own past
 - `ts_delta(x, d)` — change over d days
@@ -121,7 +125,7 @@ Valid groups: `market`, `sector`, `industry`, `subindustry`
 `ts_delay`, `ts_std_dev`, `ts_corr`, `ts_delta`,
 `log(close / ts_delay(close, d))`.
 
-### Step 3: Build Formula
+### Step 4: Build Formula
 
 **Basic template (1 line):**
 ```
@@ -151,7 +155,33 @@ when     = ts_rank(ts_std_dev(returns, 22), 252) > 0.5;
 trade_when(when, signal, -1)
 ```
 
-### Step 4: Choose Initial Settings
+### Step 4.5: Apply Advanced Filters
+
+Raw formulas often suffer from high turnover and noise, leading to low Fitness scores. Apply filters using `trade_when(condition, signal, 0)` to restrict trades only to high-conviction setups.
+
+**1. Liquidity / Conviction Filter:**
+Only trade when there is an abnormal surge in volume, confirming the price move.
+```python
+condition = volume > ts_mean(volume, 20);
+trade_when(condition, signal, 0)
+```
+
+**2. Volatility / Regime Filter:**
+Only trade (e.g., mean reversion) when market volatility is high (panic selling).
+```python
+volatility = ts_std_dev(returns, 20);
+condition = ts_rank(volatility, 252) > 0.8;
+trade_when(condition, signal, 0)
+```
+
+**3. Combined Filter Example:**
+Combine multiple conditions using `&&` or `||`.
+```python
+condition = (volume > ts_mean(volume, 20)) && (ts_rank(ts_std_dev(returns, 20), 252) > 0.8);
+trade_when(condition, signal, 0)
+```
+
+### Step 5: Choose Initial Settings
 
 ```
 Universe:       TOP3000
@@ -162,7 +192,31 @@ Region:         USA
 Delay:          1
 ```
 
-### Step 5: Run Simulation & Evaluate
+### Step 5.5: Advanced Optimization (Turnover & Returns)
+
+If your alpha has a good Sharpe but fails on Turnover (too high) or Returns/Fitness (too low), apply these techniques:
+
+**1. Techniques to Reduce Turnover:**
+- **Linear Decay:** Smooth out erratic signals.
+  ```python
+  signal = ts_decay_linear(raw_signal, 5);
+  ```
+- **Lazy Updating (Thresholding):** Only update positions if the signal changes significantly.
+  ```python
+  condition = abs(returns) > 0.02;  # E.g., large price movement
+  trade_when(condition, signal, ts_delay(signal, 1))
+  ```
+- **Settings:** Increase `Decay` to 3, 5, or 10.
+
+**2. Techniques to Enhance Returns (and Fitness):**
+- **Signal Blending:** Combine multiple weak signals into a stronger one.
+  ```python
+  signal = rank(ts_delta(close, 5)) + rank(ts_delta(volume, 5));
+  ```
+- **Stricter Truncation:** Decrease `Truncation` from `0.05` to `0.01` to only trade the top 1% strongest convictions.
+- **Subindustry Neutralization:** Use `Neutralization = Subindustry` to remove broad market/sector risks and capture idiosyncratic returns.
+
+### Step 6: Run Simulation & Evaluate
 
 Check results then apply Workflow B or C.
 

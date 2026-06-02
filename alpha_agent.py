@@ -118,6 +118,16 @@ THEMES = {
         "settings": {"universe": "TOP3000", "neutralization": "Subindustry", "decay": 3, "truncation": 0.05},
         "base_formula": None,
     },
+    "fundamental_value": {
+        "name": "Fundamental Value",
+        "rationale": "Value investing principles: buy cheap, high quality companies based on fundamental metrics like P/E, P/B, ROE.",
+        "when": "Longer-term signals, finding mispriced assets",
+        "data_fields": ["pe", "pb", "roe", "sales", "ebitda"],
+        "core_operators": ["ts_backfill", "rank", "ts_delta"],
+        "best_lookback": "Quarterly data, so focus on cross-sectional rank",
+        "settings": {"universe": "TOP500", "neutralization": "Subindustry", "decay": 10, "truncation": 0.10},
+        "base_formula": "rank(-ts_backfill(pe))",
+    },
 }
 
 SETTINGS_GRID = [
@@ -180,7 +190,9 @@ def diagnose(metrics: dict) -> list:
     d = metrics.get("drawdown", 0)
     yearly = metrics.get("yearly", [])
 
-    if s < -0.5:
+    if s > 4.0:
+        fixes.append({"issue": f"LOOK_AHEAD_BIAS (Sharpe {s:.2f})", "fix": "Sharpe > 4.0 is abnormally high. Check for look-ahead bias (e.g. using future data like ts_delay(x, 0)). Ensure settings Delay=1.", "priority": 1})
+    elif s < -0.5:
         fixes.append({"issue": f"WRONG_SIGN (Sharpe {s:.2f})", "fix": "Flip sign: add/remove '-' at front", "priority": 1})
     elif s < 0:
         fixes.append({"issue": f"SLIGHTLY_NEGATIVE (Sharpe {s:.2f})", "fix": "Flip sign: add/remove '-' at front", "priority": 1})
@@ -197,7 +209,7 @@ def diagnose(metrics: dict) -> list:
         fixes.append({"issue": f"LOW_TURNOVER ({t:.1f}%)", "fix": f"Turnover < {PASS_TARGETS['turnover_min']}%. Reduce Decay to 0 or use shorter lookback", "priority": 3})
 
     if d > PASS_TARGETS["drawdown_max"]:
-        fixes.append({"issue": f"HIGH_DRAWDOWN ({d:.1f}%)", "fix": f"Drawdown > {PASS_TARGETS['drawdown_max']}%. Add regime filter or reduce concentration", "priority": 3})
+        fixes.append({"issue": f"HIGH_DRAWDOWN ({d:.1f}%)", "fix": f"Drawdown > {PASS_TARGETS['drawdown_max']}%. Add regime filter or reduce concentration (Truncation to 0.03)", "priority": 3})
 
     if yearly:
         neg_years = [y for y in yearly if y.get("sharpe", 0) < 0]
@@ -292,6 +304,14 @@ def generate_variants(theme_key: str, theme: dict, history: list) -> list:
         variants = [
             {"description": "IQC top 1.3% (copy)", "formula": PROVEN_ALPHAS["iqc_top_1pct"]["formula"]},
             {"description": "Vol + Vol surge regime", "formula": "lookback = 10;\nsignal = 0.6 * (-rank(ts_delta(close, 5) / (ts_std_dev(returns, 20) + 0.001))) + 0.4 * rank(volume / adv20);\nvol_regime = ts_rank(ts_std_dev(returns, 22), 252) > 0.55;\nvol_surge = ts_rank(volume / adv20, 5) > 0.7;\nwhen = vol_regime && vol_surge;\ntrade_when(when, signal, -1)"},
+        ]
+    elif theme_key == "fundamental_value":
+        variants = [
+            {"description": "Value: low P/E", "formula": "rank(-ts_backfill(pe))"},
+            {"description": "Value: low P/B", "formula": "rank(-ts_backfill(pb))"},
+            {"description": "Quality: high ROE", "formula": "rank(ts_backfill(roe))"},
+            {"description": "Combined Value & Quality", "formula": "rank(-ts_backfill(pe)) + rank(ts_backfill(roe))"},
+            {"description": "Sales growth momentum", "formula": "rank(ts_delta(ts_backfill(sales), 252))"},
         ]
 
     if not variants:
