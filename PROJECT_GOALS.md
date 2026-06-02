@@ -1,59 +1,50 @@
-# Project Goals - WorldQuant Brain Alpha Automation System
+# Project Goals - WorldQuant Brain Interactive Alpha Automation
 
 ## Mục tiêu chính
 
-### 1. Tự động hóa quy trình tạo alpha
-- Xây dựng pipeline tự động: nghiên cứu → tạo hypothesis → submit → phân tích → cải thiện
-- Giảm thiểu công việc thủ công cho researcher
-- Tăng tốc độ exploration các alpha patterns
+### 1. Tự động hóa Giao tiếp API qua MCP
+- Xây dựng một MCP Server vững chắc đóng vai trò làm cầu nối giữa AI Assistant (như Claude) và WorldQuant Brain API.
+- Thay vì để một script (như `alpha_agent.py`) chạy ngầm một cách mù quáng, chúng ta trao quyền cho AI Assistant trở thành một **Quant Researcher** thực thụ: tự đọc tài liệu, tự nghĩ ý tưởng và tự gửi API.
 
-### 2. Tối ưu hóa chất lượng alpha
-- Đạt Sharpe >= 1.25 và Fitness >= 1.0
-- Kiểm soát turnover (1-70%) và drawdown (<25%)
-- Xây dựng knowledge base các alpha patterns thành công/thất bại
+### 2. Tối ưu hóa chất lượng alpha bằng Lý thuyết học thuật
+- Đạt Sharpe >= 1.25 và Fitness >= 1.0.
+- Kiểm soát turnover (10%-70%) và drawdown (<15%).
+- Đảm bảo **mọi Alpha** được sinh ra đều có cơ sở từ các bài báo khoa học thông qua công cụ `search_knowledge_base` (RAG). Khắc phục tình trạng "curve fitting" (khớp đường cong) vô căn cứ.
 
-### 3. Học máy & evolution
-- Lưu trữ gold alphas từ các phiên simulation
-- Sinh mutation từ alpha thành công
-- Áp dụng chiến lược trading (momentum, mean reversion, vwap deviation, ...)
+### 3. Hỗ trợ quy trình Interactive Exploration
+- Khám phá các data fields lạ (Alternative Data, Sentiment, Fundamentals) bằng API để làm phong phú dữ liệu đầu vào.
+- Lưu trữ các "Gold Alphas" (thành công) để AI có thể thực hiện Mutation (tiến hóa) lên các dạng công thức phức tạp hơn.
 
-### 4. Hỗ trợ IDE development
-- Chạy được trực tiếp trên VS Code/Rider với debugging
-- Cung cấp logs chi tiết tại `wqb_logs/`
-- Screenshots tự động để diagnose UI issues
+## Workflow Tương tác (Interactive Workflow)
 
-## Workflow tự động
+Khác với quy trình tự động cũ, quy trình hiện tại là sự giao tiếp liên tục giữa User và AI:
 
 ```
-[Research Papers] → [Knowledge Base] → [Hypothesis Generation]
-                                        ↓
-                              [Alpha Formula Creation]
-                                        ↓
-                              [Settings Grid Testing]
-                                        ↓
-                         [Simulation Result Collection]
-                                        ↓
-                              [Metrics Analysis]
-                                        ↓
-                             [Diagnosis & Fixing]
-                                        ↓
-                               [Knowledge Update]
+[User Request] ──────────────────────────┐
+                                         ↓
+[AI Assistant] ──> (search_knowledge) ──> [Knowledge Base (Papers)]
+      │
+      ├──> (search_data_fields) ──────> [WQB API]
+      │
+      └──> (submit_alpha) ────────────> [WQB Simulation]
+                                         │
+[AI Assistant] <── (diagnose_alpha) <────┘
+      │
+      └──> Đề xuất tinh chỉnh, thay đổi Settings, sửa công thức
 ```
 
 ## Các module chính
 
 | Module | Chức năng |
 |--------|----------|
-| `alpha_agent.py` | Agent chính - autonomous loop |
-| `wqb_automation.py` | Browser automation + submission |
-| `stock_pipeline/` | Stock screening + factor computation |
-| `alpha_skills/` | Knowledge base - themes, operators, IQC |
-| `AGENTS_README.md` | Documentation chi tiết |
+| `mcp_server.py` | Cổng giao tiếp MCP (Tool Provider). |
+| `wqb_automation.py` | Module xử lý kỹ thuật (Login, Submit, Parse kết quả). |
+| `alpha_skills/knowledge_retriever.py` | Engine RAG tìm kiếm lý thuyết Quant. |
+| `mcp_skill.md` | Bộ não (Quy tắc, IQC, Themes) hướng dẫn AI hoạt động. |
 
 ## Tiêu chí thành công
 
-- ✅ Login WQB thành công
-- ✅ Submit alpha và nhận kết quả (Sharpe, Fitness, Turnover)
-- ✅ Lưu gold alpha vào `wqb_logs/gold_alphas.json`
-- ✅ Chạy liên tục không crash
-- ✅ Tự động cải thiện dựa trên kết quả
+- ✅ AI tự do tra cứu lý thuyết và đưa ra ý tưởng có căn cứ.
+- ✅ AI gửi lệnh lên WQB qua công cụ MCP thành công.
+- ✅ Lưu trữ được các Gold Alphas vào `wqb_logs/gold_alphas.json`.
+- ✅ Quy trình linh hoạt, User có thể can thiệp ở bất kỳ bước nào (ví dụ: chỉ định Data Field cần dùng).

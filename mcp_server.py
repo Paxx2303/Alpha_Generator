@@ -9,7 +9,6 @@ from alpha_agent import (
     diagnose, 
     _save_gold_alpha, 
     get_next_hypothesis, 
-    run_agent_loop,
     mutate_formula,
     THEMES
 )
@@ -189,32 +188,6 @@ def list_gold_alphas(limit: int = 20, min_sharpe: float = 0.0) -> list:
     except Exception as e:
         logging.error(f"Failed to list gold alphas: {e}")
         return []
-
-@mcp.tool()
-def run_research_cycle(goal: str, max_cycles: int = 10, theme_focus: str = None) -> dict:
-    """
-    Run an autonomous research cycle to find a good alpha.
-    
-    Args:
-        goal: The goal description (used for logging only).
-        max_cycles: Max number of hypotheses to test.
-        theme_focus: If provided, will only focus on this theme.
-    """
-    try:
-        logging.info(f"Starting research cycle for goal: {goal}")
-        config = load_config()
-        config["headless"] = True
-        
-        # We can temporarily patch the agent loop if we want to restrict themes, 
-        # but for now we just run the full agent loop.
-        history, best = run_agent_loop(config, max_cycles=max_cycles, dry_run=False)
-        return {
-            "best_alpha": best,
-            "cycles_run": len(history),
-            "status": "success"
-        }
-    except Exception as e:
-        return {"error": str(e)}
 
 @mcp.tool()
 def mutate_from_gold(base_formula: str = None, n: int = 5) -> list:

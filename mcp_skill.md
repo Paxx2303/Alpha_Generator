@@ -64,7 +64,21 @@ NEVER create basic, simple Alphas (e.g., just using `rank(-ts_delta(close, 5))`)
 
 **Key Insight:** Price-volume alphas should use **Market** neutralization, NOT Subindustry. Neutralizing price reversion by Market reduces Sharpe slightly but GREATLY increases Fitness.
 
-## 3. Project Structure
+## 4. Examples of High-Quality Composite Alphas
+
+**Example 1: Vol-Normalized Mean Reversion + Volume Regime Filter**
+*Rationale*: Instead of naive price mean reversion, we normalize the price drop by the stock's 20-day volatility. We only trade this signal when the trading volume surges (top 30% of the month) compared to its 20-day average.
+*Metrics*: Sharpe 0.91, Fitness 0.34, Turnover 32.59%, Drawdown 7.54% (Failed IQC slightly but has excellent turnover/risk control).
+```python
+lookback = 5;
+vol = ts_std_dev(returns, 20);
+signal = -group_rank(ts_delta(close, lookback) / (vol + 0.001), subindustry);
+regime = ts_rank(volume / adv20, 20) > 0.7;
+trade_when(regime, signal, -1)
+```
+*Settings*: TOP1000 | Subindustry | Decay: 0 | Truncation: 0.05
+
+## 5. Project Structure
 - `mcp_skill.md`: The single source of truth for alpha generation knowledge.
 - `mcp_server.py`: Exposes WQB tools to the AI agent.
 - `wqb_automation.py`: Core REST API client for WQB.
