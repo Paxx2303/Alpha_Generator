@@ -4,6 +4,7 @@ import sys
 import time
 import requests
 import base64
+import sqlite3
 from pathlib import Path
 
 import structlog
@@ -91,9 +92,24 @@ class WQBAutomation:
 
     def save_raw_response(self, sim_id: str, data: dict):
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        filename = LOG_DIR / f"raw_sim_{sim_id}_{timestamp}.json"
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+        try:
+            conn = sqlite3.connect(LOG_DIR / "wqb_data.db")
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS raw_simulations (
+                    sim_id TEXT PRIMARY KEY,
+                    timestamp TEXT,
+                    data JSON
+                )
+            ''')
+            cursor.execute('''
+                INSERT OR IGNORE INTO raw_simulations (sim_id, timestamp, data)
+                VALUES (?, ?, ?)
+            ''', (sim_id, timestamp, json.dumps(data)))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            logger.error("Failed to save raw response to SQLite", error=str(e))
 
     @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(3))
     def submit_alpha(self, formula: str, settings_str: str = None):
@@ -179,6 +195,12 @@ class WQBAutomation:
                                     self.save_raw_response(sim_id, data)
                                     self._save_log(metrics)
                                 
+                                # Auto-submit if it passes IS criteria
+                                if metrics.get("sharpe", 0) >= 1.25 and metrics.get("fitness", 0) >= 0.5 and 0.01 <= metrics.get("turnover", 1.0) <= 0.7:
+                                    logger.info("Alpha meets IS criteria. Attempting to submit...")
+                                    submit_res = self._submit_to_exchange(alpha_id)
+                                    metrics["submit_status"] = submit_res
+
                                 logger.info("Simulation finished", status=status, sharpe=metrics.get("sharpe"))
                                 return metrics
                         
@@ -242,17 +264,92 @@ class WQBAutomation:
             "raw_api_response": alpha_data
         }
 
+    def _submit_to_exchange(self, alpha_id: str) -> dict:
+        try:
+            submit_url = f"{self.base_url}/alphas/{alpha_id}/submit"
+            logger.info("Sending SUBMIT request...", alpha_id=alpha_id)
+            res = self.session.post(submit_url, headers=self.headers)
+            if res.status_code != 201 and res.status_code != 200:
+                logger.warning("Submit POST failed", status=res.status_code, response=res.text)
+                return {"status": "FAIL", "reason": res.text}
+            
+            # Poll for PENDING checks to resolve
+            max_wait = 120
+            start_time = time.time()
+            while time.time() - start_time < max_wait:
+                poll_res = self.session.get(f"{self.base_url}/alphas/{alpha_id}", headers=self.headers)
+                if poll_res.status_code == 200:
+                    data = poll_res.json()
+                    checks = data.get("is", {}).get("checks", [])
+                    
+                    pending = [c for c in checks if c.get("result") == "PENDING"]
+                    if not pending:
+                        # Submission checks completed
+                        failures = [c for c in checks if c.get("result") == "FAIL"]
+                        if not failures:
+                            logger.info("Submission SUCCESS! All tests passed.", alpha_id=alpha_id)
+                            return {"status": "SUCCESS", "checks": checks}
+                        else:
+                            fail_names = [c.get("name") for c in failures]
+                            logger.warning("Submission FAILED checks", alpha_id=alpha_id, failed_checks=fail_names)
+                            return {"status": "FAIL_CHECKS", "checks": checks, "failures": failures}
+                    
+                    time.sleep(2)
+                else:
+                    logger.warning("Failed to poll alpha status during submit", status=poll_res.status_code)
+                    time.sleep(5)
+            
+            logger.warning("Submit polling TIMEOUT")
+            return {"status": "TIMEOUT"}
+            
+        except Exception as e:
+            logger.error("Exception during submit_to_exchange", error=str(e))
+            return {"status": "ERROR", "error": str(e)}
+
     def _save_log(self, data: dict):
         if data.get("fitness", 0.0) < 0.5:
             return
             
-        # Save a clean version without raw_api_response if we want smaller logs
-        clean_data = {k: v for k, v in data.items() if k != 'raw_api_response'}
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        filename = LOG_DIR / f"alpha_result_{timestamp}.json"
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(clean_data, f, indent=2)
-        self.results_log.append(clean_data)
+        try:
+            conn = sqlite3.connect(LOG_DIR / "wqb_data.db")
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS alpha_results (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    formula TEXT,
+                    settings TEXT,
+                    sharpe REAL,
+                    fitness REAL,
+                    turnover REAL,
+                    returns REAL,
+                    margin REAL,
+                    drawdown REAL,
+                    timestamp TEXT,
+                    full_data JSON
+                )
+            ''')
+            cursor.execute('''
+                INSERT INTO alpha_results (formula, settings, sharpe, fitness, turnover, returns, margin, drawdown, timestamp, full_data)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                data.get("formula", ""),
+                data.get("settings", ""),
+                data.get("sharpe", 0.0),
+                data.get("fitness", 0.0),
+                data.get("turnover", 0.0),
+                data.get("returns", 0.0),
+                data.get("margin", 0.0),
+                data.get("drawdown", 0.0),
+                timestamp,
+                json.dumps(data)
+            ))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            logger.error("Failed to save alpha log to SQLite", error=str(e))
+        
+        self.results_log.append({k: v for k, v in data.items() if k != 'raw_api_response'})
 
 if __name__ == "__main__":
     import argparse

@@ -93,11 +93,12 @@ async def mutate_from_gold(base_formula: str = None, n: int = 5) -> list
 
 ### **Phase 2: Skill Enhancement (3-5 ngày)**
 
-**2.1 Evolutionary Intelligence**
-- Tạo module `evolution.py`:
-  - Genetic-style mutation (thay đổi lookback, decay, operators)
-  - Crossover giữa các gold alphas
-  - Theme-based evolution
+**2.1 Evolutionary Intelligence (✅ COMPLETED)**
+- Đã tạo module `evolution` ngay trong `alpha_agent.py`:
+  - Thêm Genetic-style mutation (thay đổi rank, neutralization, toán tử, sign flip).
+  - Thêm Crossover (`mutate_crossover`) giữa các gold alphas.
+  - Thêm Parameter noise (`mutate_parameters`) để tự động tìm thông số tối ưu.
+- Đã expose toàn bộ dưới dạng MCP Tools: `mutate_from_gold`, `mutate_crossover_from_gold`, `mutate_parameters_from_gold`.
 
 **2.2 Stock Pipeline Integration**
 - Tạo tool: `analyze_market_condition()` → gợi ý theme mạnh hiện tại
