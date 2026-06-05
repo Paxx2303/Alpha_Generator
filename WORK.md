@@ -12,7 +12,8 @@ Hệ thống Core đã hoạt động ổn định và cực kỳ mượt mà.
 ### Các thành phần đã hoàn thiện:
 - **`wqb_automation.py`**: Tự động hóa đăng nhập API và gửi/nhận kết quả mô phỏng từ WorldQuant Brain. Đã hỗ trợ xử lý lỗi, retry mechanism, và tự động refresh session.
 - **`alpha_agent.py`**: Chứa logic chẩn đoán lỗi alpha (Diagnose) và bộ máy tiến hóa (Evolutionary Engine - lai ghép, đột biến tham số).
-- **`mcp_server.py`**: Expose đầy đủ các tool quan trọng cho Agent (`generate_hypothesis`, `submit_alpha`, `diagnose_alpha`, `search_knowledge_base`, `search_data_fields`, `mutate_from_gold`...).
+- **`mcp_server.py`**: Expose đầy đủ các tool quan trọng cho Agent (`generate_hypothesis`, `submit_alpha`, ~~`diagnose_alpha`~~, `search_knowledge_base`, `search_data_fields`, `mutate_from_gold`...).
+  - <!-- TODO: diagnose_alpha tool — chưa implement -->
 - Hệ thống đã có khả năng tự động phân loại và lưu trữ các Alpha đạt chuẩn (Sharpe >= 1.25, Fitness >= 1.0) vào file `wqb_logs/gold_alphas.json`.
 
 ### 🏆 Thành tựu nổi bật:

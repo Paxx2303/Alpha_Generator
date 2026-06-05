@@ -412,7 +412,7 @@ class WQBAutomation:
         self.results_log.append({k: v for k, v in data.items() if k != 'raw_api_response'})
 
     def _save_gold_alpha(self, metrics: dict):
-        gold_db = Path("c:/Using/Alpha_Generator/gold_alphas.json")
+        gold_db = Path(__file__).parent / "gold_alphas.json"
         gold_data = []
         if gold_db.exists():
             try:

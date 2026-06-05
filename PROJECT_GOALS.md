@@ -28,9 +28,11 @@ Khác với quy trình tự động cũ, quy trình hiện tại là sự giao t
       │
       └──> (submit_alpha) ────────────> [WQB Simulation]
                                          │
-[AI Assistant] <── (diagnose_alpha) <────┘
+[AI Assistant] <── (analyze_results) <────┘
       │
       └──> Đề xuất tinh chỉnh, thay đổi Settings, sửa công thức
+      
+      <!-- TODO: diagnose_alpha tool — chưa implement -->
 ```
 
 ## Các module chính

@@ -35,6 +35,30 @@ def get_automation() -> WQBAutomation:
     return _auto_instance
 
 @mcp.tool()
+def get_skill_knowledge() -> str:
+    """
+    Get the comprehensive skill knowledge base (mcp_skill.md) containing:
+    - MCP tools documentation and capabilities
+    - Core knowledge and rules for alpha generation
+    - Valid operators and broken operators to avoid
+    - Advanced optimization techniques
+    - Proven settings grid
+    - Examples of high-quality composite alphas
+    
+    IMPORTANT: Call this tool at the start of your session to load domain knowledge!
+    """
+    try:
+        skill_file = Path(__file__).parent / "mcp_skill.md"
+        if skill_file.exists():
+            with open(skill_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            return content
+        else:
+            return "Error: mcp_skill.md not found"
+    except Exception as e:
+        return f"Error reading skill file: {str(e)}"
+
+@mcp.tool()
 def search_data_fields(query: str, limit: int = 20) -> list:
     """
     Search WorldQuant Brain's API for available data fields like fundamentals, sentiment, estimates, etc.
@@ -91,6 +115,10 @@ def submit_alpha(formula: str, settings: dict = None, dry_run: bool = True) -> s
     except Exception as e:
         return json.dumps({"error": str(e)})
 
+# TODO: diagnose_alpha tool — chưa implement
+# Kế hoạch: Thêm hàm để phân tích metrics của alpha và đưa ra khuyến nghị sửa lỗi
+# (VD: "HIGH_TURNOVER -> Increase Decay", "LOW_SHARPE -> Change neutralization")
+
 if __name__ == "__main__":
     import atexit
     
@@ -103,4 +131,5 @@ if __name__ == "__main__":
     atexit.register(cleanup)
     
     logging.info("Starting Alpha Generator MCP Server...")
+    logging.info("IMPORTANT: Agent should call get_skill_knowledge() at startup to load domain knowledge!")
     mcp.run()

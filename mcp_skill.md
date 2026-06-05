@@ -12,7 +12,7 @@ This skill provides a complete toolset and knowledge base for the AI agent to ac
 2. **`search_knowledge_base(query)`**: [NEW] Search the internal knowledge base (papers, templates, economic rationale) to build hypotheses. **ALWAYS** use this before generating new themes.
 3. **`generate_hypothesis()`**: Get a curated trading theme (e.g., Statistical Arbitrage, Mean Reversion) and its base formula.
 4. **`submit_alpha(formula, settings, dry_run)`**: Submit an alpha expression for simulation and get backtest results (Sharpe, Fitness, Turnover).
-5. **`diagnose_alpha(metrics)`**: Analyze a weak alpha and get recommendations on how to fix it.
+<!-- 5. **`diagnose_alpha(metrics)`**: Analyze a weak alpha and get recommendations on how to fix it. (TODO: chưa implement) -->
 6. **`mutate_formula(formula, n)`**: Auto-generate `n` variations of your formula (changing lookbacks, operators, adding group neutralization).
 7. **`get_gold_alphas()`**: Retrieve past successful formulas (Sharpe > 1.25, Fitness > 1.0) for inspiration.
 

@@ -5,6 +5,36 @@ This file is optimized for AI agents reading the codebase.
 
 ---
 
+## ⚠️ STARTUP CHECKLIST (READ THIS FIRST!)
+
+When starting work on this project, **you MUST call these in order:**
+
+1. **Load Skill Knowledge** (Critical!)
+   ```
+   Call MCP tool: get_skill_knowledge()
+   ```
+   This loads the complete knowledge base from `mcp_skill.md` containing:
+   - Valid/broken operators reference for WQB formulas
+   - IQC criteria (Sharpe ≥ 1.25, Fitness ≥ 1.0, Turnover 10-70%)
+   - Advanced optimization techniques (Decay, Truncation, Neutralization)
+   - Proven settings grid for different alpha types
+   - Examples of high-quality composite alphas
+
+2. **Read the Architecture Overview** (sections 1-4 below)
+
+3. **Start the Workflow**
+   - Always `search_knowledge_base()` first (academic rationale)
+   - Then `submit_alpha()` with dry_run=True for testing
+   - Analyze metrics and iterate
+
+### Why This Matters
+- Without the skill knowledge, you'll generate simple alphas that fail IQC
+- You'll use broken operators like `ts_min`, `ts_max`, `delay` instead of correct ones
+- You'll apply wrong neutralization (Market vs Subindustry)
+- You'll miss critical turnover and drawdown optimization rules
+
+---
+
 ## 1. File Map
 
 | File | Purpose | Entry Points | Dependencies |
@@ -15,7 +45,7 @@ This file is optimized for AI agents reading the codebase.
 | `wqb_automation/browser.py` | Browser lifecycle management | `BrowserManager` class | Playwright |
 | `wqb_automation/login_handler.py` | Login flow & ALTCHA handling | `LoginHandler.login()` | Playwright |
 | `wqb_automation/simulate_handler.py` | Alpha submission & result parsing | `SimulateHandler.submit()` | Playwright |
-| `mcp_server.py` | MCP Server exposing WQB tools | `search_knowledge_base`, `submit_alpha`, `diagnose_alpha` | `wqb_automation/`, `alpha_skills/` |
+| `mcp_server.py` | MCP Server exposing WQB tools | `get_skill_knowledge`, `search_data_fields`, `search_knowledge_base`, `submit_alpha` | `wqb_automation/`, `alpha_skills/`, `mcp_skill.md` |
 | `submit_single.py` | Utility script to submit an alpha formula directly | `main()` | `wqb_automation` |
 | `run_pipeline.py` | CLI for stock screening pipeline | CLI args: `--universe`, `--top-n`, `--start`, `--end`, `--tickers`, `--no-cache` | `stock_pipeline/` |
 | `stock_pipeline/__init__.py` | Package exports | — | `stock_pipeline/*.py` |
@@ -107,7 +137,8 @@ class SimulateHandler:
 1. **Ideation**: AI reads `mcp_skill.md` for guidelines and calls `search_knowledge_base` to retrieve academic rationale from `alpha_skills/final_dataset/`.
 2. **Creation**: AI generates a formula based on the rationale.
 3. **Execution**: AI calls the MCP tool `submit_alpha`. The server utilizes `wqb_automation.py` to drive Playwright.
-4. **Analysis**: AI receives the metrics back from `submit_alpha`. If metrics are bad, it can call `diagnose_alpha` to get recommendations.
+4. **Analysis**: AI receives the metrics back from `submit_alpha` and analyzes results.
+   - <!-- AI can call `diagnose_alpha` to get recommendations (TODO: chưa implement) -->
 5. **Evolution**: If an alpha passes IQC, it is saved to `wqb_logs/gold_alphas.json`. AI can call `list_gold_alphas` and `mutate_from_gold` to build upon past successes.
 
 ---

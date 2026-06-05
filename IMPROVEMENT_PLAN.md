@@ -76,8 +76,9 @@ async def generate_hypothesis(theme: str = None, avoid_themes: list = None) -> d
 @mcp.tool()
 async def submit_alpha(formula: str, settings: dict, dry_run: bool = True) -> dict
 
-@mcp.tool()
+<!-- @mcp.tool()
 async def diagnose_alpha(alpha_id: str) -> dict
+# TODO: diagnose_alpha tool — chưa implement -->
 
 @mcp.tool()
 async def list_gold_alphas(limit: int = 20, min_sharpe: float = 0.0) -> list

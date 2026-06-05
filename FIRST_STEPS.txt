@@ -1,0 +1,26 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║  ALPHA GENERATOR - AGENT STARTUP INSTRUCTION                                  ║
+║                                                                                ║
+║  ⚠️  BEFORE YOU DO ANYTHING ELSE:                                              ║
+║                                                                                ║
+║  1. Call MCP Tool: get_skill_knowledge()                                       ║
+║                                                                                ║
+║  2. Save the entire output to your context                                     ║
+║                                                                                ║
+║  3. Read STARTUP_GUIDE.md for detailed instructions                            ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+Why this is critical:
+- The skill knowledge contains ALL domain-specific rules for alpha generation
+- Without it, you'll generate alphas that fail quality criteria
+- It teaches you which operators work on WorldQuant Brain
+- It explains IQC criteria, turnover limits, and optimization techniques
+
+After loading skill knowledge, refer to:
+- STARTUP_GUIDE.md — Complete onboarding guide
+- AGENTS_README.md — System architecture
+- MCP_USAGE.md — Tool usage examples
+
+Questions? Check the documentation first!

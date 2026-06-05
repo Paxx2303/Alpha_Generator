@@ -1,8 +1,24 @@
 import json
 import os
 import re
+import math
 from pathlib import Path
 from typing import List, Dict
+
+def length_penalty(text: str, ideal_tokens: int = 200) -> float:
+    """Penalize quá ngắn hoặc quá dài so với ideal.
+    
+    Returns a penalty factor (0.0 to 1.0) where:
+    - 1.0 is at ideal_tokens
+    - Decreases (Gaussian) as token count deviates from ideal
+    """
+    token_count = len(text.split())
+    if token_count == 0:
+        return 0.0
+    
+    ratio = token_count / ideal_tokens
+    # Gaussian penalty: peak = 1.0 tại ideal_tokens
+    return math.exp(-0.5 * (math.log(ratio) ** 2))
 
 class KnowledgeRetriever:
     def __init__(self, skills_dir: str = None):
@@ -34,17 +50,21 @@ class KnowledgeRetriever:
         # Simple ranking based on occurrences of query terms (case-insensitive)
         query_terms = query.lower().split()
         
-        def score_result(res: Dict) -> int:
+        def score_result(res: Dict) -> float:
             text = (res['title'] + " " + res['content']).lower()
-            score = 0
+            raw_score = 0
             for term in query_terms:
-                score += len(re.findall(re.escape(term), text))
-            return score
+                raw_score += len(re.findall(re.escape(term), text))
+            
+            # Apply length penalty based on content length
+            penalty = length_penalty(res['content'], ideal_tokens=200)
+            adjusted_score = raw_score * penalty
+            return adjusted_score
 
         # Filter out 0 score results
         results = [r for r in results if score_result(r) > 0]
         
-        # Sort by score descending
+        # Sort by adjusted score descending
         results.sort(key=score_result, reverse=True)
         
         top_results = results[:top_k]

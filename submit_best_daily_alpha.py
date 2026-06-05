@@ -6,7 +6,7 @@ from wqb_automation import WQBAutomation, load_config
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-GOLD_ALPHAS_PATH = Path("c:/Using/Alpha_Generator/gold_alphas.json")
+GOLD_ALPHAS_PATH = Path(__file__).parent / "gold_alphas.json"
 
 def main():
     if not GOLD_ALPHAS_PATH.exists():
