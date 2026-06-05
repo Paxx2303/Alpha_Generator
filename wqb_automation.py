@@ -111,12 +111,60 @@ class WQBAutomation:
         except Exception as e:
             logger.error("Failed to save raw response to SQLite", error=str(e))
 
+    def _is_failed_combination(self, formula: str, settings: str) -> bool:
+        failed_db = LOG_DIR / "failed_alphas.json"
+        if not failed_db.exists():
+            return False
+        try:
+            with open(failed_db, 'r') as f:
+                failed_data = json.load(f)
+            for item in failed_data:
+                if item.get("formula", "").strip() == formula.strip() and item.get("settings", "") == settings:
+                    return True
+        except:
+            pass
+        return False
+
+    def _save_failed_combination(self, metrics: dict):
+        failed_db = LOG_DIR / "failed_alphas.json"
+        failed_data = []
+        if failed_db.exists():
+            try:
+                with open(failed_db, 'r') as f:
+                    failed_data = json.load(f)
+            except:
+                pass
+        
+        formula = metrics.get("formula", "").strip()
+        settings = metrics.get("settings", "")
+        for item in failed_data:
+            if item.get("formula", "").strip() == formula and item.get("settings", "") == settings:
+                return
+                
+        failed_data.append({
+            "formula": formula,
+            "settings": settings,
+            "sharpe": metrics.get("sharpe", 0),
+            "fitness": metrics.get("fitness", 0),
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+        try:
+            with open(failed_db, 'w') as f:
+                json.dump(failed_data, f, indent=2)
+        except Exception as e:
+            logger.error("Failed to save failed combinations", error=str(e))
+
     @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(3))
-    def submit_alpha(self, formula: str, settings_str: str = None):
+    def submit_alpha(self, formula: str, settings_str: str = None, auto_submit: bool = False, name: str = None):
         self.refresh_login_if_needed()
-        logger.info("Submitting alpha...")
+        logger.info("Submitting alpha simulation...")
         if not settings_str:
             settings_str = "TOP3000|Market|0|0.05"
+            
+        if self._is_failed_combination(formula, settings_str):
+            logger.warning("Rejected: Known failed combination")
+            return {"error": "Rejected: Known failed combination"}
             
         parts = settings_str.split('|')
         universe = parts[0] if len(parts) > 0 else "TOP3000"
@@ -195,11 +243,23 @@ class WQBAutomation:
                                     self.save_raw_response(sim_id, data)
                                     self._save_log(metrics)
                                 
-                                # Auto-submit if it passes IS criteria
-                                if metrics.get("sharpe", 0) >= 1.25 and metrics.get("fitness", 0) >= 0.5 and 0.01 <= metrics.get("turnover", 1.0) <= 0.7:
-                                    logger.info("Alpha meets IS criteria. Attempting to submit...")
-                                    submit_res = self._submit_to_exchange(alpha_id)
-                                    metrics["submit_status"] = submit_res
+                                # Check if it passes IS criteria
+                                if metrics.get("sharpe", 0) >= 1.25 and metrics.get("fitness", 0) >= 1.0 and 0.01 <= metrics.get("turnover", 1.0) <= 0.7:
+                                    logger.info("Alpha meets IS criteria.")
+                                    metrics["name"] = name or "Untitled Alpha"
+                                    metrics["status"] = "UNSUBMITTED"
+                                    if auto_submit:
+                                        logger.info("Attempting to submit...")
+                                        submit_res = self._submit_to_exchange(alpha_id)
+                                        metrics["submit_status"] = submit_res
+                                        if submit_res.get("status") == "SUCCESS":
+                                            metrics["status"] = "SUBMITTED_SUCCESS"
+                                    
+                                    # Save to gold_alphas.json
+                                    self._save_gold_alpha(metrics)
+                                else:
+                                    # Add to failed combinations if it does not meet gold criteria
+                                    self._save_failed_combination(metrics)
 
                                 logger.info("Simulation finished", status=status, sharpe=metrics.get("sharpe"))
                                 return metrics
@@ -252,6 +312,7 @@ class WQBAutomation:
         is_stats = alpha_data.get("is", {})
         
         return {
+            "id": alpha_data.get("id"),
             "formula": formula,
             "settings": settings,
             "sharpe": is_stats.get("sharpe", 0.0),
@@ -348,14 +409,55 @@ class WQBAutomation:
             conn.close()
         except Exception as e:
             logger.error("Failed to save alpha log to SQLite", error=str(e))
-        
         self.results_log.append({k: v for k, v in data.items() if k != 'raw_api_response'})
+
+    def _save_gold_alpha(self, metrics: dict):
+        gold_db = Path("c:/Using/Alpha_Generator/gold_alphas.json")
+        gold_data = []
+        if gold_db.exists():
+            try:
+                with open(gold_db, 'r', encoding='utf-8') as f:
+                    gold_data = json.load(f)
+            except:
+                pass
+                
+        # Check if already exists
+        for item in gold_data:
+            if item.get("id") == metrics.get("id"):
+                return
+                
+        # Prepare clean dict
+        clean_metrics = {
+            "id": metrics.get("id"),
+            "name": metrics.get("name", "Untitled Alpha"),
+            "formula": metrics.get("formula"),
+            "settings": metrics.get("settings"),
+            "sharpe": metrics.get("sharpe"),
+            "fitness": metrics.get("fitness"),
+            "turnover": metrics.get("turnover"),
+            "returns": metrics.get("returns"),
+            "drawdown": metrics.get("drawdown"),
+            "margin": metrics.get("margin"),
+            "status": metrics.get("status", "UNSUBMITTED")
+        }
+        
+        gold_data.append(clean_metrics)
+        try:
+            with open(gold_db, 'w', encoding='utf-8') as f:
+                json.dump(gold_data, f, indent=2, ensure_ascii=False)
+            logger.info("Saved to gold_alphas.json")
+        except Exception as e:
+            logger.error("Failed to save to gold_alphas.json", error=str(e))
+
+    def submit_saved_alpha(self, alpha_id: str) -> dict:
+        self.refresh_login_if_needed()
+        return self._submit_to_exchange(alpha_id)
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="WQB API Automation")
     parser.add_argument("--formula", type=str, help="Formula to test")
-    parser.add_argument("--settings", type=str, default="TOP3000|Market|0|0.05", help="Settings string")
+    parser.add_argument("--auto-submit", action="store_true", help="Auto submit if IS passes")
     args = parser.parse_args()
 
     config = load_config()
@@ -363,7 +465,7 @@ if __name__ == "__main__":
     auto.start()
     if auto.login():
         if args.formula:
-            res = auto.submit_alpha(args.formula, args.settings)
+            res = auto.submit_alpha(args.formula, args.settings, auto_submit=args.auto_submit)
             print(json.dumps(res, indent=2))
         else:
             print("Login successful. Run with --formula to test an alpha.")

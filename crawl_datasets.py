@@ -63,7 +63,7 @@ def crawl_datasets_and_fields(delay=1, instrument_type="EQUITY", region="USA", u
         
         fields = []
         f_offset = 0
-        f_limit = 100
+        f_limit = 20
         
         while True:
             f_url = f"https://api.worldquantbrain.com/data-fields?dataset.id={ds_id}&delay={delay}&instrumentType={instrument_type}&region={region}&universe={universe}&limit={f_limit}&offset={f_offset}"
