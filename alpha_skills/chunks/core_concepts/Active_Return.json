@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## 💡 Application in Alpha Design (WorldQuant Brain)\n\nRepresents raw outperformance before risk adjustment.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*",
+    "metadata": {
+      "source": "core_concepts\\Active_Return.md",
+      "chunk_index": "3",
+      "word_count": 83,
+      "chunk_type": "section"
+    }
+  }
+]

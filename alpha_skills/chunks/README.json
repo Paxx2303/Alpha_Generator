@@ -1,0 +1,29 @@
+[
+  {
+    "content": "## Directory Structure\n\n### academic_papers/ (19 files)\nAcademic research papers and theoretical foundations\n\n### core_concepts/ (66 files)\nFundamental financial and statistical concepts\n\n### platform_guides/ (22 files)\nWorldQuant Brain platform guides and documentation\n\n### quantitative_methods/ (18 files)\nAdvanced quantitative methods and systematic strategies\n\n### research_insights/ (52 files)\nPractical alpha research insights and community Q&A\n\n### technical_indicators/ (37 files)\nTechnical analysis indicators and trading concepts\nFundamental financial and statistical concepts\n\n### platform_guides/ (18 files)\nWorldQuant Brain platform specific guides and documentation\n\n### academic_papers/ (1 files)\nAcademic research papers and theoretical foundations\n\n### quantitative_methods/ (0 files)\nAdvanced quantitative methods and systematic strategies",
+    "metadata": {
+      "source": "README.md",
+      "chunk_index": "3",
+      "word_count": 99,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Data Quality Standards\n- ✅ Contains relevant alpha research, market analysis, or trading concepts\n- ✅ Provides actionable insights for quantitative research\n- ✅ Includes technical indicators, risk metrics, or statistical methods\n- ✅ Platform-specific guides and documentation\n- ❌ Personal questions unrelated to finance\n- ❌ Duplicate content\n- ❌ Noise or irrelevant information",
+    "metadata": {
+      "source": "README.md",
+      "chunk_index": "4",
+      "word_count": 56,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Usage Guidelines\nThis processed data is optimized for:\n- Training AI models on alpha research\n- Building knowledge bases for quantitative analysis\n- Creating educational content for algorithmic trading\n- Developing automated research assistants",
+    "metadata": {
+      "source": "README.md",
+      "chunk_index": "5",
+      "word_count": 35,
+      "chunk_type": "section"
+    }
+  }
+]

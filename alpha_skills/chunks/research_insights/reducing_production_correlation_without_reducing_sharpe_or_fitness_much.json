@@ -1,0 +1,20 @@
+[
+  {
+    "content": "## Post Content\n\nHow to reduce production correlation from 0.9 to 0.6 without reducing sharpe or fitness much. If we should use grouping, how to use that...not able to understand",
+    "metadata": {
+      "source": "research_insights\\reducing_production_correlation_without_reducing_sharpe_or_fitness_much.md",
+      "chunk_index": "1",
+      "word_count": 30,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Comments\n\n### Comment by SJ26950 2 years ago Edited\nAlthough this might not answer your question exactly but try combining your alpha with other alphas (but it would affect sharpe) and also try to use those datafields which have high value score so that production correlation is low by default.\n\n---\n\n### Comment by QG16026 1 year ago\nI think it's quite difficult, because the rate of creating an alpha version with a lower corr and a higher sharpe than the previous version is very difficult, because usually someone has submitted a high sharpe before. I think you should change the idea of ​​alpha, from there change the operator and data\n\n---\n\n### Comment by TN74933 1 year ago\nYou can try integrating it with other factors (e.g., risk factor, growth factor, etc.) to reduce production correlation.\n\n---\n\n### Comment by NH84459 1 year ago\nYou can simulate alpha in a lower liquidity universe (usually with higher sharpe) or simulate in markets that are similar to the one you are working in.\n\n---\n\n### Comment by AC63290 1 year ago\nTo reduce production correlation while maintaining Sharpe and fitness, apply grouping by clustering similar Alphas based on features, then select a subset with diverse signals. Use operators like \"neutralization\" or \"scaling\" to balance exposure. Ensure thorough backtesting to validate reduced correlation without compromising performance metrics like Sharpe ratio.\n\n---\n\n### Comment by AM60509 1 year ago\nTo reduce prod correlation,one can alter neutralization settings .Altering decay settings also helps.Use different fields to group the data using group rank , group neutralize operators\n\n---\n\n### Comment by HV77283 1 year ago\nSome tips to reduce correlation for your alphas -\n\n1) Use uncommon operators like vector_neut, vector_proj, regression _neut and regression proj while making your alphas.\n\n2) Use group operators with custom neutralisations using different kinds of data. Eg. Group_coalesce, group_cartesian_product, etc. work extremely well.\n\n---\n\n### Comment by CC40930 1 year ago\nBy following these steps, you can lower the correlation without significantly impacting the Sharpe ratio or fitness of your alpha. Grouping is particularly useful when you have many assets in your universe, and it can help ensure that your alpha is spread across multiple, less correlated groups.\n\n---\n\n### Comment by SP61833 1 year ago\nI also want to know that how to reduce the production correlation, Thank you for the helpful tips.I will try to use these ideas to reduce the production correlation.\n\n---\n\n### Comment by ZH78994 1 year ago\nThank you so much for sharing your incredible work with us! Your writing not only showcases your talent but also offers valuable insights and inspiration. I truly appreciate the time and effort you’ve put into creating something so thoughtful and meaningful. It’s clear that you have a gift for storytelling, and your work has left a lasting impression on me. Please keep sharing your wonderful creations—I’m already looking forward to your next piece! Thank you again for your generosity and dedication.\n\n---\n\n### Comment by ML65849 1 year ago\nTry to use group operators you can see in operator browser. Also try to learn how to use \"densify()\" operator to control sparse group datafields. Please let us know if you have further questions :) thanks!\n\n---",
+    "metadata": {
+      "source": "research_insights\\reducing_production_correlation_without_reducing_sharpe_or_fitness_much.md",
+      "chunk_index": "2",
+      "word_count": 541,
+      "chunk_type": "section"
+    }
+  }
+]

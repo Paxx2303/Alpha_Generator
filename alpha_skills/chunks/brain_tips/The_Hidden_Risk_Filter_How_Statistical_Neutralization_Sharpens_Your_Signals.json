@@ -1,0 +1,20 @@
+[
+  {
+    "content": "## Post Content\n\n**The problem**\nSometimes an alpha looks strong, but it’s really just riding on known market effects—like size, value, or industry trends. That means it isn’t adding much new insight.\n\n**The solution**\nBRAIN’s new **Statistical Risk-Neutralized Alphas** go beyond the usual “fundamental” filters. Instead of just removing obvious risks, they use data techniques like **Principal Component Analysis (PCA)** to spot hidden patterns in stock returns and strip them out.\n\n**Why it matters**\nThis makes your alphas:\n\n- More robust across different markets\n- Less correlated with common factors\n- Focused on true, unique signals\n\n**How to try it**\nWhen running simulations, set `'neutralization': 'STATISTICAL'`. Test it on your past alphas—you may find cleaner, steadier performance.\n\n**Takeaway**\nBy combining statistical and fundamental neutralization, you can design signals that capture real market edges, not just recycled risk factors.",
+    "metadata": {
+      "source": "brain_tips\\The_Hidden_Risk_Filter_How_Statistical_Neutralization_Sharpens_Your_Signals.md",
+      "chunk_index": "1",
+      "word_count": 138,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Comments\n\n### Comment by PD54914 6 months ago\nInteresting approach, statistical neutralization seems like a solid way to make signals more independent and robust.\n\n---\n\n### Comment by EP91868 6 months ago\nBRAIN’s Statistical Risk-Neutralized Alphas detect hidden return patterns using PCA, going beyond typical size, value, or industry filters, ensuring alphas capture genuine, unique signals rather than just riding known market effects.\n\n---\n\n### Comment by CN36144 6 months ago\nStatistical neutralization is a gamechanger it helps reveal an alpha’s true edge by filtering out hidden risk exposures and improving robustness across markets.\n\n---\n\n### Comment by EP91868 6 months ago\nStatistical neutralization is a great advancement — using PCA to remove hidden common factors helps create cleaner, more independent signals. It’s a solid way to boost alpha uniqueness and cross-market robustness.\n\n---\n\n### Comment by FM65684 5 months ago\nwhat about fast factors?\n\n---\n\n### Comment by GZ60647 5 months ago\nExcellent explanation, concise and clear, outlining the significance and role of Statistical Neutralization. Could you also explain other risk-neutralization methods? Looking forward to your new post.\n\n---\n\n### Comment by PK33503 1 month ago\nStatistical neutralization is a gamechanger it helps reveal an alpha’s true edge by filtering out hidden risk exposures and improving robustness across markets.\n\n---",
+    "metadata": {
+      "source": "brain_tips\\The_Hidden_Risk_Filter_How_Statistical_Neutralization_Sharpens_Your_Signals.md",
+      "chunk_index": "2",
+      "word_count": 212,
+      "chunk_type": "section"
+    }
+  }
+]

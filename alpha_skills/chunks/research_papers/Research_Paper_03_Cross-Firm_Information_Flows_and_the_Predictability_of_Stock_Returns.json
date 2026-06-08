@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\n**Abstract :**\n\nWe identify all return leader-follower pairs among individual stocks using Granger\ncausality regressions. Thus-identified leaders can reliably predict their followers' returns\nout of sample, and the return predictability works at the level of individual stocks rather\nthan industries. Our results indicate that, independent of its size, any  rm may emerge\nas a return leader by being at the center of an important news development that has\nrami cations for other  rms. Indeed, stocks undergoing news-generating developments\nsee an increase in the number of stocks whose returns they lead.\n\nKey Ideas :\n\n- Page 1   Para 2\n- Page 3   Para 4\n- Page 15 Para 3\n\nTerm\n\nDatafield\n\nDataset\n\nvalue-weighted portfolio\n\nfnd6_mkvalt\n\n**[Fundamental](https://platform.worldquantbrain.com/data/data-sets/fundamental6)**\n\nvalue\n\nenterprise_value\n\n**[Fundamental](https://platform.worldquantbrain.com/data/data-sets/fundamental6)**\n\nstock return\n\nreturns\n\n**[Price Volume](https://platform.worldquantbrain.com/data/data-sets/pv1)**\n\nAuthor : Anna Scherbina , Bernd Schlusche\n\nYear : 2016\n\nLink : [https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2263033](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2263033)",
+    "metadata": {
+      "source": "research_papers\\Research_Paper_03_Cross-Firm_Information_Flows_and_the_Predictability_of_Stock_Returns.md",
+      "chunk_index": "1",
+      "word_count": 139,
+      "chunk_type": "section"
+    }
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "content": "## 📝 Core Summary\n\nIn this paper, William Sharpe introduced the \"reward-to-variability ratio\" (later named the **Sharpe Ratio**) to evaluate the performance of mutual funds. Sharpe argued that evaluating mutual funds based on raw returns is insufficient; performance must be adjusted for total risk (standard deviation of returns). The Sharpe Ratio measures the excess return per unit of total volatility.\n\nKey concepts introduced:\n- **Reward-to-Variability Ratio:** The excess return of a fund over the risk-free rate, divided by the standard deviation of the fund's returns.\n- **Risk-Adjusted Performance Ranking:** Allows comparing funds with different risk profiles on a fair, standardized scale.\n\n---",
+    "metadata": {
+      "source": "research_papers\\Paper_Sharpe_1966_Sharpe_Ratio.md",
+      "chunk_index": "1",
+      "word_count": 102,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 🔢 Key Formulas\n\n- **Sharpe Ratio:**\n $$\\text{Sharpe Ratio} = \\frac{R_p - R_f}{\\sigma_p}$$\n\nWhere:\n- $R_p$ is the annualized return of the portfolio.\n- $R_f$ is the annualized risk-free rate.\n- $\\sigma_p$ is the annualized standard deviation of the portfolio's excess returns.\n\n---",
+    "metadata": {
+      "source": "research_papers\\Paper_Sharpe_1966_Sharpe_Ratio.md",
+      "chunk_index": "2",
+      "word_count": 43,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 💡 Application in WorldQuant Brain\n\nThe Sharpe Ratio is the primary fitness metric in WorldQuant Brain:\n\n1. **Required Sharpe (>1.25):** \n All submitted alphas must have a simulation Sharpe ratio of at least 1.25.\n2. **Improving Sharpe in Alpha Design:**\n According to the formula, to maximize Sharpe, you must:\n - **Increase $R_p$:** Enhance signal predictability.\n - **Decrease $\\sigma_p$:** Remove volatility spikes. You can achieve this by using the `winsorize(signal, threshold)` or `zscore(signal)` operators to clip outliers, preventing single stocks from creating massive, volatile swings in portfolio returns.\n\n---\n\n*Prepared as part of the Alpha Creator Skill research paper raw data package.*",
+    "metadata": {
+      "source": "research_papers\\Paper_Sharpe_1966_Sharpe_Ratio.md",
+      "chunk_index": "3",
+      "word_count": 101,
+      "chunk_type": "section"
+    }
+  }
+]

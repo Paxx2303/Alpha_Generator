@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\nThe Alpha value is divided by the sum of the absolute values of all Alpha values in the portfolio. This normalization ensures that the sum of all portfolio weights is standardized (or net zero), and that the total investment exposure is balanced appropriately between long positions and short positions to maintain neutrality.",
+    "metadata": {
+      "source": "research_insights\\Alpha_Normalization_and_Neutrality.md",
+      "chunk_index": "1",
+      "word_count": 55,
+      "chunk_type": "section"
+    }
+  }
+]

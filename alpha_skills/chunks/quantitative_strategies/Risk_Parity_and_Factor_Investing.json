@@ -1,0 +1,92 @@
+[
+  {
+    "content": "# Risk Parity and Factor Investing Strategies\n\n**Focus:** Modern portfolio construction techniques beyond traditional mean-variance optimization \n**Applications:** Institutional portfolio management, factor-based investing, risk budgeting \n**Key Concepts:** Risk parity, factor investing, smart beta, alternative risk premia",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "0",
+      "word_count": 35,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Overview\n\nRisk parity and factor investing represent significant advances in portfolio construction methodology, moving beyond traditional market-cap weighted approaches to focus on risk-based allocation and systematic factor exposures. These strategies aim to improve risk-adjusted returns through more efficient diversification and systematic capture of risk premia.",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "1",
+      "word_count": 46,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 1. Risk Parity Fundamentals\n\n### 1.1 Core Principles\n**Equal Risk Contribution:** Each asset contributes equally to portfolio risk\n**Diversification Focus:** Maximize diversification benefits across risk sources\n**Risk-Based Allocation:** Weights determined by risk characteristics, not expected returns\n\n### Mathematical Framework\n**Risk Contribution Formula:**\n```\nRC_i = w_i * (Σw)_i / σ_p\n```\n\nWhere:\n- RC_i = Risk contribution of asset i\n- w_i = Weight of asset i\n- (Σw)_i = i-th element of covariance matrix times weight vector\n- σ_p = Portfolio volatility\n\n### 1.2 Equal Risk Contribution (ERC) Portfolio\n**Objective:** Minimize sum of squared differences in risk contributions\n\n```python\nimport numpy as np\nfrom scipy.optimize import minimize\n\ndef equal_risk_contribution_portfolio(cov_matrix):\n \"\"\"\n Calculate Equal Risk Contribution portfolio weights\n \n Parameters:\n - cov_matrix: Asset covariance matrix\n \n Returns:\n - weights: Optimal portfolio weights\n \"\"\"\n \n n_assets = cov_matrix.shape[0]\n \n def risk_contributions(weights, cov_matrix):\n \"\"\"Calculate risk contributions for each asset\"\"\"\n portfolio_vol = np.sqrt(np.dot(weights, np.dot(cov_matrix, weights)))\n marginal_contrib = np.dot(cov_matrix, weights) / portfolio_vol\n risk_contrib = weights * marginal_contrib\n return risk_contrib\n \n def objective(weights, cov_matrix):\n \"\"\"Minimize sum of squared deviations from equal risk contribution\"\"\"\n risk_contrib = risk_contributions(weights, cov_matrix)\n target_contrib = 1.0 / len(weights)\n return np.sum((risk_contrib - target_contrib) ** 2)\n \n # Constraints and bounds\n constraints = [{'type': 'eq', 'fun': lambda x: np.sum(x) - 1}]\n bounds = [(0.001, 1) for _ in range(n_assets)]\n \n # Initial guess (equal weights)\n x0 = np.ones(n_assets) / n_assets\n \n # Optimization\n result = minimize(objective, x0, args=(cov_matrix,), \n method='SLSQP', bounds=bounds, constraints=constraints)\n \n return result.x\n```\n\n### 1.3 Risk Parity Extensions\n\n#### Hierarchical Risk Parity (HRP)\n**Concept:** Use machine learning clustering to build diversified portfolios\n\n```python\nimport pandas as pd\nfrom sklearn.cluster import AgglomerativeClustering\nfrom scipy.cluster.hierarchy import linkage, dendrogram\n\ndef hierarchical_risk_parity(returns):\n \"\"\"\n Implement Hierarchical Risk Parity (Lopez de Prado)\n \n Parameters:\n - returns: Asset returns DataFrame\n \n Returns:\n - weights: HRP portfolio weights\n \"\"\"\n \n # Step 1: Compute distance matrix\n corr_matrix = returns.corr()\n distance_matrix = np.sqrt(0.5 * (1 - corr_matrix))\n \n # Step 2: Hierarchical clustering\n linkage_matrix = linkage(distance_matrix, method='ward')\n \n # Step 3: Quasi-diagonalization\n def quasi_diag(linkage_matrix):\n \"\"\"Reorganize correlation matrix based on clustering\"\"\"\n # Implementation of quasi-diagonalization algorithm\n pass\n \n # Step 4: Recursive bisection\n def recursive_bisection(cov_matrix, items):\n \"\"\"Recursively allocate weights using bisection\"\"\"\n if len(items) == 1:\n return {items[0]: 1.0}\n \n # Split items into two clusters\n mid = len(items) // 2\n cluster1 = items[:mid]\n cluster2 = items[mid:]\n \n # Calculate cluster variances\n cov1 = cov_matrix.loc[cluster1, cluster1]\n cov2 = cov_matrix.loc[cluster2, cluster2]\n \n # Equal risk allocation between clusters\n var1 = np.trace(cov1) / len(cluster1)\n var2 = np.trace(cov2) / len(cluster2)\n \n alpha = var2 / (var1 + var2)\n \n # Recursive allocation within clusters\n weights1 = recursive_bisection(cov_matrix, cluster1)\n weights2 = recursive_bisection(cov_matrix, cluster2)\n \n # Combine weights\n weights = {}\n for item in cluster1:\n weights[item] = alpha * weights1[item]\n for item in cluster2:\n weights[item] = (1 - alpha) * weights2[item]\n \n return weights\n \n # Apply HRP algorithm\n cov_matrix = returns.cov()\n items = list(returns.columns)\n weights_dict = recursive_bisection(cov_matrix, items)\n \n return pd.Series(weights_dict)\n```",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "2",
+      "word_count": 462,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "### 2.1 Factor Identification and Construction\n**Systematic Factors:** Market, size, value, momentum, quality, low volatility\n**Factor Exposure:** Measure how much each asset loads on systematic factors\n**Factor Timing:** Dynamic allocation based on factor attractiveness",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "3.1",
+      "word_count": 34,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Factor Model Specification\n```\nR_i = α_i + β_i1 * F_1 + β_i2 * F_2 + ... + β_ik * F_k + ε_i\n```\n\nWhere:\n- R_i = Return of asset i\n- F_j = Factor j return\n- β_ij = Loading of asset i on factor j\n- ε_i = Idiosyncratic return",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "3.2",
+      "word_count": 54,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### 2.2 Multi-Factor Portfolio Construction\n\n```python\ndef multi_factor_portfolio_optimization(expected_returns, factor_loadings, \n factor_covariance, idiosyncratic_var,\n factor_views=None, risk_aversion=1.0):\n \"\"\"\n Optimize portfolio using multi-factor model\n \n Parameters:\n - expected_returns: Expected asset returns\n - factor_loadings: Asset loadings on factors (n_assets x n_factors)\n - factor_covariance: Factor covariance matrix\n - idiosyncratic_var: Asset-specific variances\n - factor_views: Optional views on factor returns\n - risk_aversion: Risk aversion parameter\n \n Returns:\n - optimal_weights: Optimal portfolio weights\n \"\"\"\n \n n_assets = len(expected_returns)\n \n # Construct full covariance matrix\n factor_risk = np.dot(factor_loadings, np.dot(factor_covariance, factor_loadings.T))\n idiosyncratic_risk = np.diag(idiosyncratic_var)\n total_covariance = factor_risk + idiosyncratic_risk\n \n # Incorporate factor views if provided\n if factor_views is not None:\n # Black-Litterman style adjustment\n adjusted_returns = expected_returns + np.dot(factor_loadings, factor_views)\n else:\n adjusted_returns = expected_returns\n \n # Mean-variance optimization\n def portfolio_utility(weights):\n portfolio_return = np.dot(weights, adjusted_returns)\n portfolio_variance = np.dot(weights, np.dot(total_covariance, weights))\n return portfolio_return - 0.5 * risk_aversion * portfolio_variance\n \n # Constraints\n constraints = [{'type': 'eq', 'fun': lambda x: np.sum(x) - 1}]\n bounds = [(0, 1) for _ in range(n_assets)]\n \n # Optimization\n result = minimize(lambda x: -portfolio_utility(x), \n x0=np.ones(n_assets) / n_assets,\n method='SLSQP', bounds=bounds, constraints=constraints)\n \n return result.x\n```",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "3.3",
+      "word_count": 166,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### 2.3 Factor Timing Strategies\n\n```python\ndef factor_timing_model(factor_returns, economic_indicators, lookback_window=60):\n \"\"\"\n Implement factor timing based on economic indicators\n \n Parameters:\n - factor_returns: Historical factor returns\n - economic_indicators: Economic variables for prediction\n - lookback_window: Window for model estimation\n \n Returns:\n - factor_forecasts: Predicted factor returns\n \"\"\"\n \n from sklearn.linear_model import LinearRegression\n \n factor_forecasts = {}\n \n for factor in factor_returns.columns:\n # Prepare data\n y = factor_returns[factor].values[lookback_window:]\n X = economic_indicators.values[:-1] # Lag indicators by 1 period\n \n # Rolling regression\n forecasts = []\n for i in range(len(y)):\n if i sell volatility (negative position)\n # Negative premium -> buy volatility (positive position)\n positions = -np.sign(vol_risk_premium) * np.abs(vol_risk_premium)\n \n # Normalize positions\n positions = positions / positions.rolling(252).std()\n \n return positions\n```",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "3.4",
+      "word_count": 109,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### 4.2 Carry Strategies\n**Concept:** Capture return from holding higher-yielding assets\n\n```python\ndef carry_strategy(asset_yields, funding_costs, fx_rates=None):\n \"\"\"\n Implement carry strategy across assets\n \n Parameters:\n - asset_yields: Yields/interest rates for each asset\n - funding_costs: Cost of funding positions\n - fx_rates: Exchange rates (for currency carry)\n \n Returns:\n - carry_positions: Optimal carry positions\n \"\"\"\n \n # Calculate net carry\n net_carry = asset_yields - funding_costs\n \n # Adjust for currency effects if applicable\n if fx_rates is not None:\n fx_returns = fx_rates.pct_change()\n # Adjust carry for expected FX changes (UIP deviation)\n adjusted_carry = net_carry + fx_returns.rolling(252).mean() * 252\n else:\n adjusted_carry = net_carry\n \n # Risk-adjusted carry positions\n carry_volatility = adjusted_carry.rolling(60).std()\n risk_adjusted_positions = adjusted_carry / carry_volatility\n \n # Scale positions\n positions = risk_adjusted_positions / risk_adjusted_positions.rolling(252).std()\n \n return positions\n```",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "3.5",
+      "word_count": 117,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### 4.3 Momentum Risk Premium\n**Concept:** Systematic momentum strategies across asset classes\n\n```python\ndef cross_asset_momentum_strategy(asset_returns, lookback_periods=[1, 3, 6, 12]):\n \"\"\"\n Implement cross-asset momentum strategy\n \n Parameters:\n - asset_returns: Returns for multiple asset classes\n - lookback_periods: Momentum calculation periods (months)\n \n Returns:\n - momentum_positions: Momentum-based positions\n \"\"\"\n \n momentum_signals = pd.DataFrame(index=asset_returns.index, \n columns=asset_returns.columns)\n \n for period in lookback_periods:\n # Calculate momentum for each period\n period_days = period * 21 # Approximate days per month\n momentum = asset_returns.rolling(period_days).apply(\n lambda x: (1 + x).prod() - 1\n )\n \n # Cross-sectional ranking\n momentum_rank = momentum.rank(axis=1, pct=True)\n \n # Add to combined signal\n if momentum_signals.isna().all().all():\n momentum_signals = momentum_rank / len(lookback_periods)\n else:\n momentum_signals += momentum_rank / len(lookback_periods)\n \n # Convert to positions (long top tercile, short bottom tercile)\n positions = pd.DataFrame(index=asset_returns.index, \n columns=asset_returns.columns)\n \n for date in momentum_signals.index:\n if not momentum_signals.loc[date].isna().any():\n signals = momentum_signals.loc[date]\n \n # Long top tercile\n positions.loc[date, signals >= 0.67] = 1\n # Short bottom tercile \n positions.loc[date, signals 0.33) & (signals < 0.67)] = 0\n \n return positions.fillna(0)\n```",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "3.6",
+      "word_count": 154,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "## 5. Risk Budgeting and Allocation\n\n### 5.1 Risk Budgeting Framework\n**Concept:** Allocate risk budget across different sources of return\n\n```python\ndef risk_budgeting_optimization(expected_returns, covariance_matrix, \n risk_budgets, max_weight=0.3):\n \"\"\"\n Optimize portfolio subject to risk budget constraints\n \n Parameters:\n - expected_returns: Expected returns for each asset\n - covariance_matrix: Asset covariance matrix\n - risk_budgets: Target risk contribution for each asset\n - max_weight: Maximum weight constraint\n \n Returns:\n - optimal_weights: Risk budget optimal weights\n \"\"\"\n \n n_assets = len(expected_returns)\n \n def risk_contributions(weights):\n \"\"\"Calculate risk contributions\"\"\"\n portfolio_vol = np.sqrt(np.dot(weights, np.dot(covariance_matrix, weights)))\n marginal_contrib = np.dot(covariance_matrix, weights) / portfolio_vol\n return weights * marginal_contrib\n \n def objective(weights):\n \"\"\"Minimize tracking error to risk budgets\"\"\"\n risk_contrib = risk_contributions(weights)\n target_contrib = np.array(risk_budgets) * np.sum(risk_contrib)\n return np.sum((risk_contrib - target_contrib) ** 2)\n \n # Constraints\n constraints = [\n {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}, # Weights sum to 1\n {'type': 'eq', 'fun': lambda x: np.sum(risk_budgets) - 1} # Risk budgets sum to 1\n ]\n \n bounds = [(0.001, max_weight) for _ in range(n_assets)]\n \n result = minimize(objective, x0=np.array(risk_budgets),\n method='SLSQP', bounds=bounds, constraints=constraints)\n \n return result.x\n```\n\n### 5.2 Dynamic Risk Allocation\n\n```python\ndef dynamic_risk_allocation(returns, economic_indicators, \n base_allocation, rebalance_frequency=21):\n \"\"\"\n Implement dynamic risk allocation based on market conditions\n \n Parameters:\n - returns: Asset returns\n - economic_indicators: Economic state variables\n - base_allocation: Base case allocation\n - rebalance_frequency: Days between rebalancing\n \n Returns:\n - dynamic_weights: Time-varying portfolio weights\n \"\"\"\n \n # Regime identification using economic indicators\n from sklearn.mixture import GaussianMixture\n \n # Fit regime model\n regime_model = GaussianMixture(n_components=3, random_state=42)\n regime_probs = regime_model.fit_predict(economic_indicators)\n \n # Define regime-specific allocations\n regime_allocations = {\n 0: base_allocation * 0.8, # Low risk regime\n 1: base_allocation, # Normal regime \n 2: base_allocation * 1.2 # High risk regime\n }\n \n # Generate dynamic weights\n dynamic_weights = pd.DataFrame(index=returns.index, \n columns=returns.columns)\n \n for i, date in enumerate(returns.index[::rebalance_frequency]):\n if i < len(regime_probs):\n regime = regime_probs[i]\n weights = regime_allocations[regime]\n \n # Apply weights for rebalancing period\n end_date = min(date + pd.Timedelta(days=rebalance_frequency), \n returns.index[-1])\n dynamic_weights.loc[date:end_date] = weights\n \n return dynamic_weights.fillna(method='ffill')\n```",
+    "metadata": {
+      "source": "quantitative_strategies\\Risk_Parity_and_Factor_Investing.md",
+      "chunk_index": "4",
+      "word_count": 302,
+      "chunk_type": "section"
+    }
+  }
+]

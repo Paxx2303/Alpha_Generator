@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\nIn WorldQuant Brain, an **alpha** is a formula designed to predict how a stock or asset might move in the market. It uses historical data such as prices, trading volumes, and market trends to create a signal that can be tested.\n\nEach alpha represents a small, testable idea. The platform evaluates your alpha for accuracy and consistency across multiple market scenarios. Strong and reliable alphas can then be combined with others to create a diversified, data-driven trading strategy.\n\nBuilding alphas teaches you how to think like a quantitative researcher—analyzing patterns, testing hypotheses, and contributing to real-world financial models.",
+    "metadata": {
+      "source": "research_insights\\Alphas_in_WorldQuant_Brain_Predicting_Market_Moves_with_Data.md",
+      "chunk_index": "1",
+      "word_count": 101,
+      "chunk_type": "section"
+    }
+  }
+]

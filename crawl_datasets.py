@@ -1,6 +1,10 @@
 import json
+import sys
 import time
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+from config import RAW_DATA_DIR
 from wqb_automation import WQBAutomation, load_config
 
 def crawl_datasets_and_fields(delay=1, instrument_type="EQUITY", region="USA", universe="TOP3000"):
@@ -11,7 +15,7 @@ def crawl_datasets_and_fields(delay=1, instrument_type="EQUITY", region="USA", u
     config["headless"] = True
     auto = WQBAutomation(config)
     
-    output_dir = Path("alpha_skills/rawdata")
+    output_dir = RAW_DATA_DIR
     output_dir.mkdir(parents=True, exist_ok=True)
     
     auto.start()

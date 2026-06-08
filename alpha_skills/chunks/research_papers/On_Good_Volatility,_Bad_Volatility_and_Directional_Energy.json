@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\nInteresting paper.\n\nOne conceptual nuance: the proposed measure may be closer to a directional energy imbalance than to volatility in the geometric/path-dependent sense.\n\nIt separates signed squared returns, but it does not directly measure path roughness, local fluctuation structure, or movement around a trend.\n\nA possible extension would be to compute the same good-minus-bad energy idea using mean-centered or locally detrended residuals instead of raw returns.\n\nPGE",
+    "metadata": {
+      "source": "research_papers\\On_Good_Volatility,_Bad_Volatility_and_Directional_Energy.md",
+      "chunk_index": "1",
+      "word_count": 70,
+      "chunk_type": "section"
+    }
+  }
+]

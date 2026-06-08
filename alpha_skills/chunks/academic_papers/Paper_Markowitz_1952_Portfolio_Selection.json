@@ -1,0 +1,29 @@
+[
+  {
+    "content": "## 📝 Core Summary\n\nThis foundational paper is the birth of **Modern Portfolio Theory (MPT)**. Markowitz mathematically demonstrated that investors can reduce portfolio risk through diversification by selecting assets that do not move in perfect lockstep (i.e., have low or negative correlation). He established the \"Mean-Variance\" framework, showing that asset allocation should focus on the trade-off between expected return and variance (risk) of the entire portfolio, rather than looking at individual assets in isolation.\n\nKey concepts introduced:\n- **Efficient Frontier:** The set of optimal portfolios that offer the highest expected return for a defined level of risk, or the lowest risk for a given level of expected return.\n- **Diversification Benefit:** Portfolio variance depends not only on individual asset variances but also on the pairwise covariances between assets.\n\n---",
+    "metadata": {
+      "source": "academic_papers\\Paper_Markowitz_1952_Portfolio_Selection.md",
+      "chunk_index": "1",
+      "word_count": 129,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 🔢 Key Formulas\n\n- **Portfolio Expected Return:**\n  $$E(R_p) = \\sum_{i=1}^n w_i E(R_i) = w^T E(R)$$\n\n- **Portfolio Variance:**\n  $$\\sigma_p^2 = \\sum_{i=1}^n \\sum_{j=1}^n w_i w_j \\text{Cov}(R_i, R_j) = w^T \\Sigma w$$\n\nWhere:\n- $w$ is the vector of portfolio weights.\n- $\\Sigma$ is the covariance matrix of asset returns.\n\n---",
+    "metadata": {
+      "source": "academic_papers\\Paper_Markowitz_1952_Portfolio_Selection.md",
+      "chunk_index": "2",
+      "word_count": 50,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 💡 Application in WorldQuant Brain\n\nMarkowitz's variance-reduction principles are embedded in the risk constraints of WorldQuant Brain simulations:\n\n1. **Pasteurization & Truncation:** \n   WQ Brain automatically applies weight truncation (maximum weight for a single stock, e.g., 0.05 or 0.10) to prevent concentration risk, aligning with MPT's push for diversification.\n2. **Neutralization as Covariance Control:**\n   Statistical and sector neutralization (`group_neutralize` or choosing Subindustry/Market neutralization) actively strips out industry-wide systemic covariance, leaving the portfolio exposed only to idiosyncratic, uncorrelated alpha returns, which greatly enhances the Sharpe ratio.\n\n---\n\n*Prepared as part of the Alpha Creator Skill research paper raw data package.*",
+    "metadata": {
+      "source": "academic_papers\\Paper_Markowitz_1952_Portfolio_Selection.md",
+      "chunk_index": "3",
+      "word_count": 99,
+      "chunk_type": "section"
+    }
+  }
+]

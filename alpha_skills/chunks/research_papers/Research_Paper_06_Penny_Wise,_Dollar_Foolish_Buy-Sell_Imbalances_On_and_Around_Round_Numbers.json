@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\n**Abstract:**\n\nThis paper provides evidence that stock traders focus on round numbers as cognitive reference points for value. Using a random sample of more than 100 million stock transactions, we find excess buying (selling) by liquidity demanders at all price points one penny below (above) round numbers. Further, the size of the buy-sell imbalance is monotonic in the roundness of the adjacent round number (i.e., largest adjacent to integers, second-largest adjacent to half-dollars, etc.). Conditioning on the price path, we find much stronger excess buying (selling) by liquidity demanders when the ask falls (bid rises) to reach the integer than when it crosses the integer. We discuss and test three explanations for these results. Finally, 24-hour returns also vary by price point and buy-sell imbalances are a major determinant of that variation across price points. Buying (selling) by liquidity demanders below (above) round numbers yield losses approaching $1 billion per year.\n\nAuthor: Utpal Bhattacharya, Craig W. Holden, Stacey E. Jacobsen\n\nYear: 2011\n\nLink:  [https://ssrn.com/abstract=1569922](https://ssrn.com/abstract=1569922)\n\n**Key ideas and Comments from WorldQuant:**\n\n- Page 3 Paragraph 1\n- Page 3 Paragraph 2\n- Page 5 Paragraph 2\n\n*Classic introduction and research on integer effect in the stock market, suitable to develop D0 alphas across all regions*\n\n**Useful datafields on BRAIN:**\n\n**Term**\n\n**Datafield**\n\n**Dataset**\n\nPrice\n\nmdf_pri\n\n**Model Data**\n\nVolume\n\nvolume\n\n[**Company Fundamental Data for Equity**](https://platform.worldquantbrain.com/data/data-sets/fundamental6)",
+    "metadata": {
+      "source": "research_papers\\Research_Paper_06_Penny_Wise,_Dollar_Foolish_Buy-Sell_Imbalances_On_and_Around_Round_Numbers.md",
+      "chunk_index": "1",
+      "word_count": 225,
+      "chunk_type": "section"
+    }
+  }
+]

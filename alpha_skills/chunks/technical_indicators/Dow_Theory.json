@@ -1,0 +1,29 @@
+[
+  {
+    "content": "## 📝 Definition\n\n**Dow Theory** is a trading framework developed by Charles Dow (co-founder of Dow Jones & Company and editor of The Wall Street Journal). It is the foundational basis for modern technical analysis, suggesting that the market is in a trend if one of its averages (e.g., Industrials) advances above a previous important high and is accompanied or followed by a similar advance in the other average (e.g., Transports).\n\n### Six Basic Tenets of Dow Theory\n1. **The Market Deploys Three Movements:**\n   - **Primary Trend:** The major trend (bull or bear market) lasting from less than a year to several years.\n   - **Secondary Reaction (Corrections):** Corrections to the primary trend, lasting from three weeks to three months, retracing 1/3 to 2/3 of the primary move.\n   - **Minor Fluctuations:** Short-term day-to-day noise lasting from hours to less than three weeks.\n2. **Market Trends Have Three Phases:**\n   - **Accumulation Phase:** Informed investors buy (or sell) assets against general market opinion. Prices change little because supply matches demand.\n   - **Public Participation (Trend-Following) Phase:** The price moves rapidly as the public, trend followers, and institutional investors jump in on technical signals.\n   - **Distribution (Speculative) Phase:** The public goes rampant, buying heavily. Astute investors who accumulated during the first phase begin to liquidate their positions.\n3. **The Market Index/Average Discounts All News:** Prices immediately reflect all past, current, and future information, including emotions and fundamentals.\n4. **Market Averages Must Confirm Each Other:** A trend signal in one index (e.g., Dow Jones Industrial Average) must be confirmed by a signal in another related index (e.g., Dow Jones Transportation Average) to be valid.\n5. **Volume Must Confirm the Trend:**\n   - In an uptrend, volume should increase when prices rise and decrease when prices fall.\n   - In a downtrend, volume should increase when prices fall and decrease when prices rise.\n6. **Trends Exist Until Definitive Signals Prove Otherwise:** A trend remains in effect despite temporary noise or corrections until a reversal signal is confirmed.\n\n---",
+    "metadata": {
+      "source": "technical_indicators\\Dow_Theory.md",
+      "chunk_index": "1",
+      "word_count": 329,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 🔢 Mathematical Concept & Logic\n\nDow Theory relies on identifying relative peaks and troughs:\n- **Uptrend:** Higher Highs ($HH$) and Higher Lows ($HL$).\n- **Downtrend:** Lower Highs ($LH$) and Lower Lows ($LL$).\n\nLet $H_{local}(t, n)$ be the local peak over window $n$, and $L_{local}(t, n)$ be the local trough.\n- Uptrend condition: \n  $$P_t > H_{local}(t-1, n) \\quad \\text{and} \\quad L_{local}(t, n) > L_{local}(t-n, n)$$\n\n---",
+    "metadata": {
+      "source": "technical_indicators\\Dow_Theory.md",
+      "chunk_index": "2",
+      "word_count": 66,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 💡 Application in Alpha Design (WorldQuant Brain)\n\nDow Theory principles translate directly into trend-following filters and volume confirmations:\n\n1. **Volume Confirmation Indicator:**\n   Multiply price momentum by volume change to confirm the trend:\n   ```python\n   // Positive if price goes up on high volume relative to average volume\n   momentum = ts_delta(close, 5);\n   vol_ratio = volume / ts_mean(volume, 20);\n   signal = momentum * vol_ratio;\n   rank(signal)\n   ```\n\n2. **Primary Trend Filter (Using Long Term Moving Average):**\n   Only trade in the direction of the primary trend (e.g. 200 days):\n   ```python\n   primary_trend = close > ts_mean(close, 200);\n   short_term_reversion = -ts_delta(close, 5);\n   // Only take short-term mean reversion trades in the direction of the primary bull market\n   signal = if_else(primary_trend, short_term_reversion, 0);\n   rank(signal)\n   ```\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*",
+    "metadata": {
+      "source": "technical_indicators\\Dow_Theory.md",
+      "chunk_index": "3",
+      "word_count": 130,
+      "chunk_type": "section"
+    }
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\nI often see performance improve or deteriorate significantly depending on how a signal is normalized. I have tried z-score normalization, ranking, and cross-sectional scaling, but I am not sure which method is most appropriate for different types of signals.\n\nI would like to understand how other researchers choose normalization techniques and whether there are best practices to avoid overfitting while maintaining predictive power.",
+    "metadata": {
+      "source": "research_papers\\Best_Signal_Normalization_Methods_in_WorldQuant_Brain.md",
+      "chunk_index": "1",
+      "word_count": 66,
+      "chunk_type": "section"
+    }
+  }
+]

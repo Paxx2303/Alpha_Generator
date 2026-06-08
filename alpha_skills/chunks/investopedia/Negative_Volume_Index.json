@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## 🔢 Mathematical Formula\n\n$$\\text{NVI}_t = \\text{NVI}_{t-1} + \\text{returns}_t \\text{ (if } V_t 70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*",
+    "metadata": {
+      "source": "investopedia\\Negative_Volume_Index.md",
+      "chunk_index": "2",
+      "word_count": 41,
+      "chunk_type": "section"
+    }
+  }
+]

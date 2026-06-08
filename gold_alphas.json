@@ -49,6 +49,58 @@
     "returns": 0.084,
     "drawdown": 0.042,
     "margin": 0.000859,
+    "status": "FAIL_SELF_CORRELATION"
+  },
+  {
+    "id": "9qRKPxx1",
+    "name": "Untitled Alpha",
+    "formula": "// Intraday Open-Close Reversal\n// Hypothesis: strong intraday gains → next-day reversal\nintraday  = (close - open) / (open + 0.001);\nsmooth    = ts_mean(intraday, 3);\nsignal    = group_rank(-smooth, market);\ngroup_neutralize(signal, market)",
+    "settings": "TOP3000|Market|3|0.05",
+    "sharpe": 1.56,
+    "fitness": 1.02,
+    "turnover": 0.5752,
+    "returns": 0.2445,
+    "drawdown": 0.1254,
+    "margin": 0.00085,
+    "status": "UNSUBMITTED"
+  },
+  {
+    "id": "88LO5k8q",
+    "name": "Fundamental Corr [anl4 eps vs fcf]",
+    "formula": "// Correlation: EPS estimates vs FCF estimates\n// Khác rKWvzA3j: dùng anl4_afv4_eps_mean thay est_ptp\neps_bf = ts_backfill(anl4_afv4_eps_mean, 63);\nfcf_bf = ts_backfill(est_fcf, 63);\nsignal = group_rank(-ts_corr(eps_bf, fcf_bf, 20), market);\ngroup_neutralize(signal, market)",
+    "settings": "TOP3000|Market|3|0.08",
+    "sharpe": 1.79,
+    "fitness": 1.73,
+    "turnover": 0.1729,
+    "returns": 0.1618,
+    "drawdown": 0.1245,
+    "margin": 0.001872,
+    "status": "UNSUBMITTED"
+  },
+  {
+    "id": "1YgoEZQW",
+    "name": "EPS-FCF Corr [Industry]",
+    "formula": "eps_bf = ts_backfill(anl4_afv4_eps_mean, 63);\nfcf_bf = ts_backfill(est_fcf, 63);\nsignal = group_rank(-ts_corr(eps_bf, fcf_bf, 20), industry);\ngroup_neutralize(signal, industry)",
+    "settings": "TOP3000|Industry|3|0.08",
+    "sharpe": 1.6,
+    "fitness": 1.1,
+    "turnover": 0.2412,
+    "returns": 0.114,
+    "drawdown": 0.0769,
+    "margin": 0.000945,
+    "status": "UNSUBMITTED"
+  },
+  {
+    "id": "2rKLk255",
+    "name": "Revenue-Cashflow Corr [Market]",
+    "formula": "// Divergence between revenue and operating cashflow estimates\nrev = ts_backfill(revenue, 63);\ncf = ts_backfill(cashflow_op, 63);\nsignal = group_rank(-ts_corr(rev, cf, 20), market);\ngroup_neutralize(signal, market)",
+    "settings": "TOP3000|Market|3|0.08",
+    "sharpe": 1.32,
+    "fitness": 1.47,
+    "turnover": 0.1594,
+    "returns": 0.1973,
+    "drawdown": 0.233,
+    "margin": 0.002476,
     "status": "UNSUBMITTED"
   }
 ]

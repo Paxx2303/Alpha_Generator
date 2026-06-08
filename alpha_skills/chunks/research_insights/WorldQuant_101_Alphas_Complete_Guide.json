@@ -1,0 +1,137 @@
+[
+  {
+    "content": "## Overview\n\nIn 2015, WorldQuant presented 101 quantitative trading alphas in their seminal paper \"101 Formulaic Alphas\". These alphas are mathematical models that seek to predict future price movements of financial instruments using various market data inputs.",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "1",
+      "word_count": 37,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Key Performance Metrics\n\n- **Holding Period:** 0.6 - 6.4 days\n- **Testing Period:** January 4, 2010 - December 31, 2013 (1006 observations)\n- **Performance:** Returns strongly correlated with volatility, no significant dependence on turnover\n- **Implementation Advantage:** DolphinDB outperforms Python by median 15.5x, with 27.5% of alphas running 100x faster",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "2",
+      "word_count": 51,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Data Requirements\n\n### Core Market Data\n- **tradetime:** Trading hours\n- **securityid:** Security code  \n- **open:** Open price\n- **close:** Close price\n- **high:** High price\n- **low:** Low price\n- **vol:** Trading volume\n- **vwap:** Volume-weighted average price\n\n### Additional Data (for specific alphas)\n- **cap:** Market capitalization\n- **indclass:** Industry classification",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "3",
+      "word_count": 54,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Alpha Categories\n\n### 1. Alphas Without Industry Information (82 alphas)\n\n#### Single Input Alphas\n- **Alpha 1, 9, 10, 19, 24, 29, 34, 46, 49, 51:** `close` only\n- **Alpha 4:** `low` only\n\n#### Price-Volume Combinations\n- **Alpha 2, 14:** `vol, open, close`\n- **Alpha 3, 6:** `vol, open`\n- **Alpha 7, 12, 13, 17, 21, 30, 39, 43, 45:** `vol, close`\n- **Alpha 8, 18, 33, 37, 38:** `open, close`\n\n#### VWAP-Based Alphas\n- **Alpha 5:** `vwap, open, close`\n- **Alpha 11, 96:** `vwap, vol, close`\n- **Alpha 25, 47, 74:** `vwap, vol, close, high`\n- **Alpha 27, 50, 61, 81:** `vwap, vol`\n- **Alpha 32, 42, 57, 84:** `vwap, close`\n\n#### Multi-Factor Alphas\n- **Alpha 20, 54, 101:** `open, close, high, low`\n- **Alpha 62, 64:** `vwap, vol, open, high, low`\n- **Alpha 71:** `vwap, vol, open, close, low`\n- **Alpha 88, 92, 94:** `vol, open, close, high, low`\n\n### 2. Alphas With Industry Information (19 alphas)\n\n#### Industry-Neutral Alphas\n- **Alpha 48:** `close, indclass`\n- **Alpha 56:** `close, cap`\n- **Alpha 58, 59:** `vwap, vol, indclass`\n- **Alpha 63, 79:** `vwap, vol, open, close, indclass`\n- **Alpha 69, 70, 87, 91, 93:** `vwap, vol, close, indclass`\n\n#### Complex Industry Alphas\n- **Alpha 67:** `vwap, vol, high, indclass`\n- **Alpha 76, 89:** `vwap, vol, low, indclass`\n- **Alpha 80:** `vol, open, high, indclass`\n- **Alpha 82:** `vol, open, indclass`\n- **Alpha 90:** `vol, close, indclass`\n- **Alpha 97:** `vwap, vol, low, indclass`\n- **Alpha 100:** `vol, close, high, low, indclass`",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "4",
+      "word_count": 253,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Implementation Examples\n\n### Alpha 1: Simple Close Price Momentum\n```python\n# Alpha 1: rank(Ts_ArgMax(SignedPower(((returns < 0) ? stddev(returns, 20) : close), 2.), 5)) - 0.5\ndef WQAlpha1(close):\n    return rank(ts_argmax(signed_power(((returns < 0) ? stddev(returns, 20) : close), 2.), 5)) - 0.5\n```\n\n### Alpha 2: Volume-Price Relationship\n```python\n# Alpha 2: (-1 * correlation(rank(delta(log(volume), 2)), rank(((close - open) / open)), 6))\ndef WQAlpha2(vol, close, open):\n    return -1 * correlation(rank(delta(log(vol), 2)), rank((close - open) / open), 6)\n```\n\n### Alpha 101: Multi-Factor Signal\n```python\n# Alpha 101: ((close - open) / ((high - low) + .001))\ndef WQAlpha101(close, open, high, low):\n    return (close - open) / ((high - low) + 0.001)\n```",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "5",
+      "word_count": 111,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Mathematical Operations Used\n\n### Time Series Operations\n- **ts_rank:** Time series ranking\n- **ts_min/ts_max:** Rolling minimum/maximum\n- **ts_argmin/ts_argmax:** Position of minimum/maximum\n- **delay:** Lag operator\n- **delta:** Difference operator\n- **decay_linear:** Linear decay weighting\n\n### Cross-Sectional Operations\n- **rank:** Cross-sectional ranking\n- **scale:** Normalization to unit sum\n- **correlation:** Rolling correlation\n- **covariance:** Rolling covariance\n- **stddev:** Standard deviation\n\n### Mathematical Functions\n- **log:** Natural logarithm\n- **abs:** Absolute value\n- **sign:** Sign function\n- **power:** Exponentiation\n- **sqrt:** Square root",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "6",
+      "word_count": 82,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Performance Characteristics\n\n### Computational Efficiency\n- **DolphinDB vs Python Pandas:** 15.5x median speedup\n- **DolphinDB vs NumPy:** Significant performance advantage\n- **Memory Efficiency:** Optimized for large-scale data processing\n\n### Statistical Properties\n- **Correlation with Volatility:** Strong positive correlation\n- **Turnover Independence:** No significant dependence on portfolio turnover\n- **Robustness:** Tested across multiple market regimes",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "7",
+      "word_count": 55,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Stream Processing Implementation\n\n### Real-Time Alpha Calculation\n```python\n# Example: Real-time Alpha 1 calculation\ninputSchemaT = table(1:0, [\"SecurityID\",\"TradeTime\",\"close\"], [SYMBOL,TIMESTAMP,DOUBLE])\nresultStream = table(10000:0, [\"SecurityID\",\"TradeTime\", \"factor\"], [SYMBOL,TIMESTAMP, DOUBLE])\n\nmetrics = <[WQAlpha1(close)]>\nstreamEngine = streamEngineParser(\n    name=\"WQAlpha1Parser\", \n    metrics=metrics, \n    dummyTable=inputSchemaT, \n    outputTable=resultStream, \n    keyColumn=\"SecurityID\", \n    timeColumn=`tradetime, \n    triggeringPattern='perBatch', \n    triggeringInterval=4000\n)\n```",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "8",
+      "word_count": 43,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Industry Neutralization\n\nFor industry-related factors, the original paper uses multiple classification levels:\n- **IndClass.subindustry:** Detailed industry classification\n- **IndClass.industry:** Broad industry groups  \n- **IndClass.sector:** Sector-level classification\n\nThe implementation standardizes on a single `IndClass` field for simplicity.",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "9",
+      "word_count": 37,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Validation and Testing\n\n### Backtesting Framework\n- **In-Sample Period:** Training data for alpha development\n- **Out-of-Sample Period:** Testing data for validation\n- **Walk-Forward Analysis:** Rolling window testing methodology\n\n### Performance Metrics\n- **Sharpe Ratio:** Risk-adjusted returns\n- **Information Ratio:** Active return per unit of tracking error\n- **Maximum Drawdown:** Largest peak-to-trough decline\n- **Turnover:** Portfolio rebalancing frequency",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "10",
+      "word_count": 58,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Practical Applications\n\n### Portfolio Construction\n- **Long-Short Equity:** Market-neutral strategies\n- **Factor Investing:** Multi-factor model construction\n- **Risk Management:** Diversification and hedging\n\n### Signal Processing\n- **Alpha Combination:** Ensemble methods for multiple alphas\n- **Risk Adjustment:** Volatility and beta neutralization\n- **Regime Detection:** Adaptive alpha selection",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "11",
+      "word_count": 47,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Research Extensions\n\n### Alpha Enhancement\n- **Machine Learning Integration:** Neural networks and ensemble methods\n- **Alternative Data:** Satellite imagery, social media, news sentiment\n- **High-Frequency Adaptations:** Intraday and tick-level implementations\n\n### Risk Management\n- **Dynamic Hedging:** Real-time risk factor exposure management\n- **Stress Testing:** Scenario analysis and tail risk assessment\n- **Correlation Monitoring:** Cross-alpha correlation tracking",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "12",
+      "word_count": 57,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Implementation Best Practices\n\n### Data Quality\n- **Missing Value Handling:** Forward-fill, interpolation, or exclusion\n- **Outlier Detection:** Statistical filters and winsorization\n- **Corporate Actions:** Dividend and split adjustments\n\n### Performance Optimization\n- **Vectorization:** Batch processing for efficiency\n- **Memory Management:** Streaming computation for large datasets\n- **Parallel Processing:** Multi-threading and distributed computing\n\n### Model Validation\n- **Cross-Validation:** Time series split validation\n- **Robustness Testing:** Parameter sensitivity analysis\n- **Regime Analysis:** Performance across different market conditions",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "13",
+      "word_count": 76,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## Conclusion\n\nThe WorldQuant 101 Alphas represent a comprehensive framework for quantitative alpha research. These formulas provide:\n\n1. **Systematic Approach:** Structured methodology for alpha development\n2. **Empirical Validation:** Proven performance across multiple years\n3. **Implementation Efficiency:** Optimized computational frameworks\n4. **Research Foundation:** Base for further alpha research and development\n\nThe alphas demonstrate that simple mathematical transformations of market data can generate significant predictive signals when properly implemented and combined in a systematic framework.",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "14",
+      "word_count": 73,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## References\n\n1. Kakushadze, Z., & Yu, W. (2016). 101 Formulaic Alphas. arXiv preprint arXiv:1601.00991.\n2. DolphinDB Documentation: WorldQuant 101 Alphas Implementation Guide\n3. WorldQuant Research: Quantitative Trading Strategies and Alpha Development\n4. Financial Data Science: Time Series Analysis and Cross-Sectional Modeling",
+    "metadata": {
+      "source": "research_insights\\WorldQuant_101_Alphas_Complete_Guide.md",
+      "chunk_index": "15",
+      "word_count": 42,
+      "chunk_type": "section"
+    }
+  }
+]

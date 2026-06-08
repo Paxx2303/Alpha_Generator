@@ -1,0 +1,155 @@
+[
+  {
+    "content": "## Post Content\n\nTheme **ATOM2024 GLB Theme** does not match with multiplier of **2.5**.\n\nI keep getting this error on the checks and test for many of alpha's am creating , what are possible solutions or what to do or avoid in order to pass past this test?",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "1",
+      "word_count": 48,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "### Comment by AG20578 1 year ago\nHi!\n\nGLB Theme is for all ATOM 2024 competition eligible Alphas.\n\nSo to pass this test:\n\n- The Alpha must be simulated in the GLB Region.\n- The Alpha must be eligible for the ATOM 2024 competition.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.1",
+      "word_count": 45,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by QG16026 1 year ago\nHi, I would like to ask if Brain will be implementing any theme for alpha soon? It's been a while since I've seen a new theme. Thanks a lot.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.2",
+      "word_count": 37,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by TT55495 1 year ago\nI hope Brain can improve the speed of simulating the alpha GLB, particularly when it comes to neutralizing slow and fast movements in the data. Optimizing this process would significantly enhance the overall efficiency and performance. It would be great if the system could better handle these dynamics, ensuring smoother transitions and faster responses across various market conditions. Thank you for all the hard work, and I look forward to future updates that can address these areas!\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.4",
+      "word_count": 85,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by TN48752 1 year ago\nI hope in the new year Brain will increase payment for value factor indexes from 0.5 and below, add more slots for value factor from 0.5 and above, Currently I see that nicks with vf 0.5 and above are very few\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.5",
+      "word_count": 49,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by SK72105 1 year ago\n[AC63290](/hc/en-us/profiles/13665148618903-AC63290) ,  [TT55495](/hc/en-us/profiles/13132630342807-TT55495)  Slow, and Fast factors work for me - especially when trying to simulate alphas with low number of operators, or low complexity. However, Slow & Fast  Factors does sometimes time out!\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.6",
+      "word_count": 42,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by CC40930 1 year ago\nThe error message \"Theme ATOM2024 GLB Theme does not match with multiplier of 2.5\" suggests that the theme you're using (likely referring to a specific universe or market category) is not compatible with the specific multiplier you've applied in your alpha.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.7",
+      "word_count": 49,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by CT68712 1 year ago\nI totally feel you on the challenges with GLB themes and multipliers! As a fellow quant enthusiast, I've also faced similar errors when testing my alphas. It's crucial to ensure your alpha aligns with the specific market categories set by the theme. Have you tried simulating your alpha in a different GLB region to see if you can bypass that error? Additionally, double-checking your alpha’s eligibility for the ATOM 2024 competition might help, as it can sometimes reveal overlooked details. These little nuances can really make or break our strategies. Let's keep sharing tips; it's all about refining our approaches, right? Good luck!\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.8",
+      "word_count": 111,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by TP14664 1 year ago\nsounds like you're highlighting the need for **optimization** in the alpha simulation process, specifically in terms of **neutralizing slow and fast movements** in the data. This is crucial because **market dynamics** can vary widely, and optimizing the simulation can lead to **faster responses** and **more accurate simulations** across different conditions.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.9",
+      "word_count": 58,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by DP11917 1 year ago\nIf this is a feature request or feedback you're submitting for a platform you're using, it may be useful to directly reach out to the platform's support or development team to share your suggestion. They could review the current system and potentially make adjustments to increase the availability of slots for higher value factor indexes and improve the payment allocation accordingly.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.10",
+      "word_count": 69,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by DK30003 1 year ago\nThe error message \"Theme ATOM2024 GLB Theme does not match with multiplier of 2.5\" suggests that the theme you're using (likely referring to a specific universe or market category) is not compatible with the specific multiplier you've applied in your alpha.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.11",
+      "word_count": 49,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by TL60820 1 year ago\nThe ATOM competition or ATOM alpha refers to the process of creating a predictive model (alpha) using only the fields from a single dataset. This means that when building your alpha, you are restricted to utilizing data exclusively from one dataset, and you are not allowed to combine or merge fields from multiple datasets. To help you adhere to this rule, the platform provides a \"Data\" tab, where you can search and track which fields belong to which dataset. This feature ensures that you are always aware of the dataset association for each data field, helping you stay within the competition's guidelines and prevent the use of unauthorized data. By following these rules, you ensure that your model creation process is compliant and structured.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.12",
+      "word_count": 132,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by VK91272 1 year ago\nThe ATOM competition or ATOM alpha refers to the process of creating a predictive model (alpha) using only the fields from a single dataset. This means that when building your alpha, you are restricted to utilizing data exclusively from one dataset, and you are not allowed to combine or merge fields from multiple datasets. To help you adhere to this rule, the platform provides a \"Data\" tab, where you can search and track which fields belong to which dataset.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.13",
+      "word_count": 87,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by TD17989 1 year ago\nVerify that the theme you are working with (e.g., ATOM2024 GLB) is correctly aligned with the multiplier specified (in this case, 2.5). The theme should be consistent with the time horizon, market context, or dataset you're using. A mismatch can occur if the theme is designed for a different kind of asset or market condition.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.14",
+      "word_count": 63,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by TN48752 1 year ago\n**Solution**: Check the expected multiplier for the ATOM2024 GLB theme and adjust your alpha's multiplier to match. Typically, each theme has a predefined multiplier that you must follow to ensure consistency and pass the checks.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.15",
+      "word_count": 43,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by TD17989 1 year ago\n**Focus on Revenue Growth**: Ensure that your revenue growth is consistent and aligned with your operational goals. You can invest in marketing, product diversification, or entering new markets to boost revenue streams.\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.16",
+      "word_count": 40,
+      "chunk_type": "subsection"
+    }
+  },
+  {
+    "content": "### Comment by NN89351 1 year ago\nI totally get the struggle with GLB themes and multipliers! I’ve run into similar issues when testing my alphas, and it usually comes down to making sure they align with the market categories defined by the theme. Have you tried running your alpha in a different GLB region to see if it circumvents the error? Also, double-checking its eligibility for the ATOM 2024 competition might help—sometimes, the smallest details trip us up. It’s all about refining our strategies and learning from these challenges. Let’s keep sharing insights—good luck tweaking your alpha!\n\n---",
+    "metadata": {
+      "source": "research_insights\\ATOM2024_GLB_Theme_multiplier.md",
+      "chunk_index": "2.17",
+      "word_count": 99,
+      "chunk_type": "subsection"
+    }
+  }
+]

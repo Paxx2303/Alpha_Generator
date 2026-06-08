@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\n**Abstract:**\n\nThe purpose of this paper is to present simple quantitative methods that improve risk-adjusted returns for investing in US equity sectors and global asset class portfolios. A relative strength model is tested on the French-Fama US equity sector data back to the 1920s that results in increased absolute returns with equity-like risk. The relative strength portfolios outperform the buy and hold benchmark in approximately 70% of all years and returns are persistent across time. The addition of a trend-following parameter to dynamically hedge the portfolio decreases both volatility and drawdown. The relative strength model is then tested across a portfolio of global asset classes with supporting results.\n\nAuthor: Meb Faber\n\nYear: 2010\n\nLink:  [https://ssrn.com/abstract=1585517](https://ssrn.com/abstract=1585517)\n\n**Key ideas and Comments from WorldQuant:**\n\n- Page 6 and page 7\n- Page 11 and page 12\n\n*Faber presents that using a simple moving average timing strategy could avoid the large drawdowns in momentum portfolios.*\n\n**Useful datafields on BRAIN:**\n\n**Term**\n\n**Datafield**\n\n**Dataset**\n\nreturns\n\nreturns\n\n[**Price Volume Data for Equity**](https://platform.worldquantbrain.com/data/data-sets/pv1)\n\ndividends\n\ndividend\n\n[**Price Volume Data for Equity**](https://platform.worldquantbrain.com/data/data-sets/pv1)",
+    "metadata": {
+      "source": "academic_papers\\Research_Paper_07_Relative_Strength_Strategies_for_Investing.md",
+      "chunk_index": "1",
+      "word_count": 175,
+      "chunk_type": "section"
+    }
+  }
+]

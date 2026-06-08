@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\nDecay acts as a smoothing mechanism designed to lower an alpha’s Turnover. By averaging current signal values with previous days, it prevents the model from reacting too violently to daily price fluctuations.\nSummary of the Relationship:\n 1.Turnover Reduction: As you increase the Decay value, the daily change in your portfolio positions decreases. This helps your alpha stay within the required turnover limits (typically under 70%).\n 2. While higher Decay improves your Fitness score by lowering transaction costs, it can negatively impact your Sharpe Ratio if the signal is time-sensitive, as the alpha becomes slower to respond to new data.\n 3. Optimization: The goal is to find the minimum Decay necessary to meet turnover requirements without losing the predictive edge of the underlying logic.",
+    "metadata": {
+      "source": "research_papers\\HOW_DECAY_INFLUENCES_TURNOVER.md",
+      "chunk_index": "1",
+      "word_count": 126,
+      "chunk_type": "section"
+    }
+  }
+]

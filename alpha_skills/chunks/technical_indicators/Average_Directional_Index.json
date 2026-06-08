@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## 💡 Application in Alpha Design (WorldQuant Brain)\n\nFilters out range-bound markets. In WQ Brain: can be used as a regime filter: `trade_when(adx > 25, trend_signal, reversion_signal)`.\n\n- **Neutralization Recommendation:** Typically, price-volume expressions under this concept should use **Market** neutralization to eliminate macro biases, while fundamental expressions can use **Subindustry** neutralization.\n- **Tuning Tip:** If the turnover of an alpha built under this concept is too high (e.g. >70%), consider smoothing the final expression with `ts_decay_linear(signal, d)` where `d` is between 3 and 10.\n\n---\n\n*Prepared as part of the Alpha Creator Skill raw data package.*",
+    "metadata": {
+      "source": "technical_indicators\\Average_Directional_Index.md",
+      "chunk_index": "3",
+      "word_count": 96,
+      "chunk_type": "section"
+    }
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "content": "# Quantitative Analysis\n\n**Source:** Investopedia / Quantitative Finance Reference\n\nQuantitative analysis is a methodology that uses mathematical and statistical modeling, measurement, and research to understand behavior, predict outcomes, and identify trends. By focusing on hard, numerical data, it aims to provide objective insights that minimize the subjectivity often found in intuition-based decision-making.\n\n### Core Concepts\n* **Definition:** It is the process of collecting and evaluating measurable and verifiable data to understand patterns or assess the performance and value of systems, assets, or events.\n* **Quantitative Analysts (\"Quants\"):** Professionals who specialize in this field—often in finance—are frequently called \"quants.\" They use complex models, algorithms, and computer programming to evaluate investments, manage risk, and develop trading tools.\n* **Quantitative vs. Qualitative:** While quantitative analysis explains *what* happened through numerical values, qualitative analysis typically explains *why* events occur through descriptive information, observations, and interviews.\n\n### Applications\nQuantitative analysis is applied across many fields, including:\n* **Finance & Investing:** Used to evaluate financial instruments, predict market trends, manage portfolios, and mitigate risks.\n* **Business Operations:** Helps in resource allocation, project management, and predicting business performance.\n* **Marketing:** Assists in optimizing campaign budgets, measuring ROI, and managing inventory.\n\n### Common Methods\nQuantitative analysis relies on various statistical techniques, including:\n* **Descriptive Statistics:** Summarizing data using measures like mean, median, mode, and standard deviation.\n* **Inferential Statistics:** Making predictions about a wider population based on a sample, using tools such as regression analysis, correlation, and hypothesis testing (e.g., t-tests).",
+    "metadata": {
+      "source": "core_concepts\\Quantitative_Analysis.md",
+      "chunk_index": "0",
+      "word_count": 243,
+      "chunk_type": "section"
+    }
+  }
+]

@@ -289,7 +289,8 @@ class WQBAutomation:
         self.refresh_login_if_needed()
         logger.info(f"Searching data fields for '{search_query}'...")
         try:
-            url = f"{self.base_url}/data-fields?instrumentType=EQUITY&region=USA&delay=1&limit={limit}&search={search_query}"
+            # universe is required by the API — without it the endpoint returns 400
+            url = f"{self.base_url}/data-fields?instrumentType=EQUITY&region=USA&universe=TOP3000&delay=1&limit={limit}&search={search_query}"
             res = self.session.get(url, headers=self.headers)
             
             if res.status_code == 200:
@@ -330,39 +331,58 @@ class WQBAutomation:
             submit_url = f"{self.base_url}/alphas/{alpha_id}/submit"
             logger.info("Sending SUBMIT request...", alpha_id=alpha_id)
             res = self.session.post(submit_url, headers=self.headers)
-            if res.status_code != 201 and res.status_code != 200:
-                logger.warning("Submit POST failed", status=res.status_code, response=res.text)
+
+            # ── 201/200: accepted → poll for PENDING checks ────────────────
+            if res.status_code in (200, 201):
+                max_wait  = 120
+                start_time = time.time()
+                while time.time() - start_time < max_wait:
+                    poll_res = self.session.get(f"{self.base_url}/alphas/{alpha_id}", headers=self.headers)
+                    if poll_res.status_code == 200:
+                        data   = poll_res.json()
+                        checks = data.get("is", {}).get("checks", [])
+                        pending = [c for c in checks if c.get("result") == "PENDING"]
+                        if not pending:
+                            failures = [c for c in checks if c.get("result") == "FAIL"]
+                            if not failures:
+                                logger.info("Submission SUCCESS! All tests passed.", alpha_id=alpha_id)
+                                return {"status": "SUCCESS", "checks": checks}
+                            else:
+                                fail_names = [c.get("name") for c in failures]
+                                logger.warning("Submission FAILED checks", alpha_id=alpha_id, failed_checks=fail_names)
+                                return {"status": "FAIL_CHECKS", "checks": checks, "failures": failures}
+                        time.sleep(2)
+                    else:
+                        logger.warning("Failed to poll alpha status during submit", status=poll_res.status_code)
+                        time.sleep(5)
+                logger.warning("Submit polling TIMEOUT")
+                return {"status": "TIMEOUT"}
+
+            # ── 403: WQB returns check results inline in the body ──────────
+            # This happens when a check (e.g. SELF_CORRELATION) fails immediately.
+            if res.status_code == 403:
+                try:
+                    body = res.json()
+                    # Body may itself be a JSON string (double-encoded)
+                    is_data = body.get("is", {})
+                    if not is_data:
+                        # Try parsing the raw text as JSON
+                        inner = json.loads(res.text)
+                        is_data = inner.get("is", {})
+                    checks   = is_data.get("checks", [])
+                    failures = [c for c in checks if c.get("result") == "FAIL"]
+                    logger.warning("Submit rejected (403) — failed checks:", alpha_id=alpha_id,
+                                   failed=[c.get("name") for c in failures])
+                    return {"status": "FAIL_CHECKS", "checks": checks, "failures": failures}
+                except Exception:
+                    pass
+                logger.warning("Submit POST failed (403)", status=res.status_code, response=res.text[:300])
                 return {"status": "FAIL", "reason": res.text}
-            
-            # Poll for PENDING checks to resolve
-            max_wait = 120
-            start_time = time.time()
-            while time.time() - start_time < max_wait:
-                poll_res = self.session.get(f"{self.base_url}/alphas/{alpha_id}", headers=self.headers)
-                if poll_res.status_code == 200:
-                    data = poll_res.json()
-                    checks = data.get("is", {}).get("checks", [])
-                    
-                    pending = [c for c in checks if c.get("result") == "PENDING"]
-                    if not pending:
-                        # Submission checks completed
-                        failures = [c for c in checks if c.get("result") == "FAIL"]
-                        if not failures:
-                            logger.info("Submission SUCCESS! All tests passed.", alpha_id=alpha_id)
-                            return {"status": "SUCCESS", "checks": checks}
-                        else:
-                            fail_names = [c.get("name") for c in failures]
-                            logger.warning("Submission FAILED checks", alpha_id=alpha_id, failed_checks=fail_names)
-                            return {"status": "FAIL_CHECKS", "checks": checks, "failures": failures}
-                    
-                    time.sleep(2)
-                else:
-                    logger.warning("Failed to poll alpha status during submit", status=poll_res.status_code)
-                    time.sleep(5)
-            
-            logger.warning("Submit polling TIMEOUT")
-            return {"status": "TIMEOUT"}
-            
+
+            # ── Other error codes ──────────────────────────────────────────
+            logger.warning("Submit POST failed", status=res.status_code, response=res.text[:300])
+            return {"status": "FAIL", "reason": res.text}
+
         except Exception as e:
             logger.error("Exception during submit_to_exchange", error=str(e))
             return {"status": "ERROR", "error": str(e)}

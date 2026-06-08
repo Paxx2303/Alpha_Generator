@@ -1,0 +1,29 @@
+[
+  {
+    "content": "## 📝 Core Summary\n\nThis seminal paper in **Market Microstructure** models a financial market with three types of participants: a single informed trader, noise traders (liquidity traders who trade randomly), and market makers. Kyle established a model of price formation where informed traders strategically hide their trades among noise traders.\n\nKey concepts introduced:\n- **Kyle's Lambda (Liquidity Measure):** A measure of market depth and illiquidity, representing the price impact of order flow.\n- **Informed Order Flow:** Order flow carries information. Market makers adjust prices upward when they see buy order imbalances, fearing they are trading with an informed buyer (adverse selection).\n\n---",
+    "metadata": {
+      "source": "research_papers\\Paper_Kyle_1985_Informed_Trading.md",
+      "chunk_index": "1",
+      "word_count": 102,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 🔢 Kyle's Lambda Formula\n\nThe pricing rule of the market maker is linear:\n$$P_t = P_0 + \\lambda (y_t)$$\n\nWhere:\n- $y_t = x_t + u_t$ is the total order flow (informed order flow $x_t$ plus noise order flow $u_t$).\n- $\\lambda$ (Kyle's Lambda) represents the price impact of a unit of order flow:\n $$\\lambda = \\frac{\\text{Cov}(v, y)}{\\text{Var}(y)}$$\n ($v$ is the true value of the asset).\n\n---",
+    "metadata": {
+      "source": "research_papers\\Paper_Kyle_1985_Informed_Trading.md",
+      "chunk_index": "2",
+      "word_count": 68,
+      "chunk_type": "section"
+    }
+  },
+  {
+    "content": "## 💡 Application in WorldQuant Brain\n\nKyle's Lambda highlights the relationship between order imbalances and subsequent price moves:\n\n1. **Volume and Price Move Interaction (OFI Proxy):**\n Alphas can predict short-term price moves by measuring volume imbalances:\n ```python\n // Buy stocks experiencing upward order flow pressure (price increase on high volume)\n price_change = ts_delta(close, 1);\n imbalance = price_change * volume;\n // Smooth to create short-term predictive signal\n signal = ts_mean(imbalance, 5);\n rank(signal)\n ```\n2. **Liquidity Provision (Mean Reversion on High Illiquidity):**\n Stocks with high illiquidity (large Kyle's Lambda) experience large price impacts from noise trading. These price impacts represent temporary deviations and tend to revert:\n ```python\n // Amihud Illiquidity proxy: absolute return divided by dollar volume\n illiquidity = ts_mean(abs(returns) / (volume * close + 1), 20);\n // Revert prices that had large moves on high illiquidity\n signal = -rank(returns) * illiquidity;\n rank(signal)\n ```\n\n---\n\n*Prepared as part of the Alpha Creator Skill research paper raw data package.*",
+    "metadata": {
+      "source": "research_papers\\Paper_Kyle_1985_Informed_Trading.md",
+      "chunk_index": "3",
+      "word_count": 156,
+      "chunk_type": "section"
+    }
+  }
+]

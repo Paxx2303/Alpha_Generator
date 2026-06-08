@@ -1,0 +1,11 @@
+[
+  {
+    "content": "## Post Content\n\n**Before Reading :**\n\n- Understand the concept of the operators (time series, non-time series and group operators). This helps to get the sense of the functionality and power of the operators to combine later .\n\n**Read :**\n\n- Read Abstract, Introduction, Conclusion and then Main body\n- The implementation of the paper into an alpha may not be straightforward , but you will still be able to understand ideas and concepts that will help you build better alphas\n\n**Formulate :**\n\n- Formulate the idea in the sense of if-then rules, combine with your knowledge of the operators and data fields\n\n**Example :**\n\n**Research Paper : “The****Rewards to Meeting or Beating Earnings Expectations”**\n\n[https](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=247435)  [://papers.ssrn.com/sol3/papers.cfm?abstract_id=247435](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=247435) \nIdea of paper: type of event alpha related to earning announcement event of stocks\n\nAlpha type: event alpha\n\nData: fundamental + base data\n\nOperator: trade_when\n\n**Alpha Idea:**\n\nCheck if stocks meet or beat the analyst prediction\n\n- If yes, follow a new base signal to trade\n- If no, keep same alpha expression as yesterday",
+    "metadata": {
+      "source": "academic_papers\\How_to_read_a_research_paper_for_BRAIN_alphas.md",
+      "chunk_index": "1",
+      "word_count": 172,
+      "chunk_type": "section"
+    }
+  }
+]

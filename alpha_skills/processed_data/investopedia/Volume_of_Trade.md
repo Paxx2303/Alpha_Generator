@@ -1,0 +1,13 @@
+# Volume of Trade
+
+**Source:** Investopedia / Quantitative Finance Reference
+
+**Volume of trade**, commonly referred to as **trading volume**, is a measure of the total number of shares, contracts, or units of a security that are traded during a specific period of time.
+
+### Key Concepts
+* **Definition:** It represents the total activity or market participation for a security. If 1 million shares of a stock change hands in a single day, the daily trading volume is 1 million.
+* **Liquidity Indicator:** Higher trading volumes generally indicate greater liquidity, which makes it easier for buyers and sellers to execute transactions at stable prices. Low volume can signal a lack of interest or liquidity, potentially leading to wider spreads and greater price slippage.
+* **Market Context:** Traders and analysts often use volume to confirm price trends. A price move accompanied by high volume is typically viewed as more significant or "confirmed" than one occurring on low volume.
+* **Common Patterns:** Trading volume often spikes during the market open and market close, as well as around major news releases or economic data.
+
+While Investopedia is a primary source for this financial definition, the concept is fundamental across all financial markets, including stocks, bonds, options, futures, and commodities.
