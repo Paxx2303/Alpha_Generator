@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Runtime data (never commit these)
+data/
+backups/
+.env
+.env.*
+!.env.example
+
+# Git / CI
+.git/
+.github/
+.claude/
+
+# Node (DeerFlow vendor)
+node_modules/
+.next/
+operation/deerflow/vendor/
+
+# Deploy scripts (not needed inside container)
+deploy/
+
+# Dev scripts
+scripts/
+
+# Docs are excluded except /docs folder
+*.md
+docs/
