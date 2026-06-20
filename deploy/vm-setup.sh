@@ -37,12 +37,40 @@ cp /app/alpha-generator/operation/deerflow/skills/alpha-research/SKILL.md \
 
 # Set up .env (fill in manually after setup)
 cp /app/alpha-generator/operation/deerflow/.env.example /app/deer-flow/.env
+
+# Create log directory
+mkdir -p /app/logs
+
+# Create initial research_status.json so dashboard doesn't show blank
+mkdir -p /app/alpha-generator/data
+cat > /app/alpha-generator/data/research_status.json << 'EOF'
+{
+  "agent_state": "idle",
+  "status": "idle",
+  "current_task": "Waiting for first cycle",
+  "current_cycle": 0,
+  "last_updated": null
+}
+EOF
+
+# Install Python deps for runner.py (requests already in requirements.txt)
+pip3 install requests python-dotenv --quiet
+
+# Add cronjob: run research cycle every 6 hours
+CRON_JOB="0 */6 * * * cd /app/alpha-generator && python3 operation/runner.py >> /app/logs/runner.log 2>&1"
+( crontab -l 2>/dev/null | grep -v "runner.py"; echo "$CRON_JOB" ) | crontab -
+echo "Cronjob set: research cycle every 6 hours"
+
 echo ""
 echo "===================================================="
 echo "  VM setup complete!"
 echo "  Next steps:"
-echo "  1. Edit /app/deer-flow/.env with real credentials"
+echo "  1. Edit /app/deer-flow/.env with real credentials:"
+echo "     WQB_EMAIL, WQB_PASSWORD, GLM_BASE_URL, GLM_API_KEY"
 echo "  2. cd /app/deer-flow && make setup"
 echo "  3. docker compose -f docker-compose.yml \\"
 echo "       -f ../alpha-generator/deploy/docker-compose.override.yml up -d"
+echo "  4. Test runner manually:"
+echo "     cd /app/alpha-generator && python3 operation/runner.py --dry-run"
+echo "  5. Set GitHub var VM_READY=true to enable auto-deploy"
 echo "===================================================="

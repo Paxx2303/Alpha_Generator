@@ -28,14 +28,20 @@ def _conn():
 
 
 def get_gold_alphas() -> pd.DataFrame:
-    if not GOLD_ALPHAS_PATH.exists():
+    conn = _conn()
+    if conn is None:
         return pd.DataFrame()
-    with open(GOLD_ALPHAS_PATH, encoding="utf-8") as f:
-        data = json.load(f)
-    if not data:
-        return pd.DataFrame()
-    df = pd.DataFrame(data)
-    # Normalize settings string → readable columns
+    try:
+        df = pd.read_sql_query(
+            "SELECT * FROM gold_alphas ORDER BY created_at DESC",
+            conn,
+        )
+    except Exception:
+        df = pd.DataFrame()
+    finally:
+        conn.close()
+    if df.empty:
+        return df
     if "settings" in df.columns and df["settings"].dtype == object:
         try:
             parts = df["settings"].str.split("|", expand=True)
@@ -46,7 +52,6 @@ def get_gold_alphas() -> pd.DataFrame:
                 df["truncation"] = parts[3].astype(float)
         except Exception:
             pass
-    # Turnover as percentage
     if "turnover" in df.columns:
         df["turnover_pct"] = (df["turnover"] * 100).round(1)
     return df
