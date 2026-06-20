@@ -14,16 +14,8 @@ st.caption("What DeerFlow knows — semantic knowledge base stats and search")
 
 # ── ChromaDB stats ────────────────────────────────────────────────────────────
 st.subheader("Knowledge Base Size")
-try:
-    from core.knowledge.vector_store import VectorStore
-    vs = VectorStore()
-    stats = vs.stats()
-    c1, c2 = st.columns(2)
-    c1.metric("Alpha Knowledge Chunks", stats.get("alpha_knowledge", 0))
-    c2.metric("WQB Field Facts", stats.get("wqb_fields", 0))
-except Exception as e:
-    st.warning(f"ChromaDB not available: {e}")
-    stats = {}
+st.info("ChromaDB lives on the VM (alpha-vm). Stats are only available when running locally or via VM dashboard.")
+stats = {}
 
 # SQLite doc stats as fallback
 doc_stats = get_document_stats()
@@ -42,24 +34,7 @@ query = st.text_input("Search the knowledge base", placeholder="earnings reversa
 top_k = st.slider("Results", 1, 10, 5)
 
 if query:
-    try:
-        from core.knowledge.vector_store import VectorStore
-        vs = VectorStore()
-        results = vs.search(query, top_k=top_k)
-        if not results:
-            st.info("No results found. The knowledge base may be empty.")
-        for i, r in enumerate(results, 1):
-            meta = r.get("metadata", {})
-            score = r.get("score", 0)
-            with st.expander(
-                f"**[{i}]** score={score:.3f}  "
-                f"*{meta.get('source_type','?')} / {meta.get('category','?')}*"
-            ):
-                st.write(r.get("content", ""))
-                if meta.get("source_id"):
-                    st.caption(f"Source ID: {meta['source_id']}")
-    except Exception as e:
-        st.error(f"Search error: {e}")
+    st.warning("Semantic search requires ChromaDB on the VM. Not available in Cloud Run dashboard.")
 
 st.divider()
 
