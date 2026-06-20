@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.*
+!.env.example
+backups/
+data/
+alpha_skills/
+.git/
+.gitignore
+*.md
+!docs/
+node_modules/

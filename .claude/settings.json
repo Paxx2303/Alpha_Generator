@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python run_alpha_v10.py)",
+      "Bash(python run_alpha_v16b.py)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(python -c ' *)",
+      "Bash(python submit_check_WjgreNdN.py)",
+      "Bash(python run_alpha_v18.py)",
+      "Bash(tee wqb_logs/v18_console.txt)",
+      "Bash(python run_research.py --steps 1,2 --lookback 365)",
+      "Bash(python run_alpha_v19.py)",
+      "Bash(tee wqb_logs/v19_console.txt)",
+      "Bash(python -m py_compile run_research.py analytics/hypothesize.py)",
+      "Bash(python -c \"import ast,sys; ast.parse\\(open\\('analytics/hypothesize.py',encoding='utf-8'\\).read\\(\\)\\); print\\('hypothesize parse OK'\\)\")"
+    ]
+  }
+}

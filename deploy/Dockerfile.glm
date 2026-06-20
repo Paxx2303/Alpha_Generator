@@ -1,0 +1,26 @@
+FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04
+
+RUN apt-get update && apt-get install -y python3-pip git && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    vllm==0.4.3 \
+    huggingface_hub \
+    transformers \
+    accelerate
+
+# Model is downloaded at runtime via HF_TOKEN to avoid baking into image
+ENV MODEL_ID=zai-org/GLM-5.2
+ENV PORT=8000
+ENV MAX_MODEL_LEN=8192
+
+EXPOSE 8000
+
+CMD python3 -m vllm.entrypoints.openai.api_server \
+    --model $MODEL_ID \
+    --host 0.0.0.0 \
+    --port $PORT \
+    --max-model-len $MAX_MODEL_LEN \
+    --gpu-memory-utilization 0.90 \
+    --trust-remote-code

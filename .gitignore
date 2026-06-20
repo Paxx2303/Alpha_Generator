@@ -3,3 +3,32 @@
 wqb_config.json
 wqb_logs/
 stock_data_cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Runtime data (generated)
+data/alpha_store.db
+data/alpha_store.db-wal
+data/alpha_store.db-shm
+data/chroma/
+data/theory_log.json
+data/research_status.json
+
+# Local backups
+backups/
+
+# DeerFlow vendor clone
+operation/deerflow/vendor/
+
+# Env files
+.env
+operation/deerflow/.env
+
+# Node / frontend (DeerFlow)
+node_modules/
+.next/

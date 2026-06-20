@@ -1,0 +1,110 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  # ─── Job 1: Deploy Streamlit dashboard to Cloud Run ───────────────────────
+  deploy-observation:
+    name: Deploy Observation Dashboard
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
+
+      - name: Build and push observation image
+        run: |
+          IMAGE=gcr.io/${{ secrets.GCP_PROJECT_ID }}/alpha-observation
+          docker build \
+            -f deploy/Dockerfile.observation \
+            -t $IMAGE:${{ github.sha }} \
+            -t $IMAGE:latest \
+            .
+          docker push $IMAGE:${{ github.sha }}
+          docker push $IMAGE:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy alpha-observation \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/alpha-observation:${{ github.sha }} \
+            --region us-central1 \
+            --platform managed \
+            --port 8080 \
+            --memory 2Gi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 1 \
+            --allow-unauthenticated \
+            --project ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Print dashboard URL
+        run: |
+          URL=$(gcloud run services describe alpha-observation \
+            --region us-central1 \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --format 'value(status.url)')
+          echo "Dashboard live at: $URL"
+
+  # ─── Job 2: Update DeerFlow on GCE VM ─────────────────────────────────────
+  # Enable this job by setting repository variable VM_READY=true in:
+  # GitHub repo → Settings → Variables → Actions → New repository variable
+  update-vm:
+    name: Update DeerFlow on VM
+    runs-on: ubuntu-latest
+    needs: deploy-observation
+    if: vars.VM_READY == 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Pull latest code + restart containers on VM
+        run: |
+          gcloud compute ssh alpha-vm \
+            --zone us-central1-a \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --tunnel-through-iap \
+            --quiet \
+            --command='
+              set -e
+              cd /app/alpha-generator && git pull
+
+              # Sync DeerFlow configs
+              cp operation/deerflow/config.yaml /app/deer-flow/config.yaml
+              cp operation/deerflow/extensions_config.json /app/deer-flow/extensions_config.json
+              mkdir -p /app/deer-flow/skills/alpha-research
+              cp operation/deerflow/skills/alpha-research/SKILL.md \
+                 /app/deer-flow/skills/alpha-research/SKILL.md
+
+              # Restart observation container with new code
+              cd /app/deer-flow
+              docker compose -f docker-compose.yml \
+                -f ../alpha-generator/deploy/docker-compose.override.yml \
+                up -d --build observation
+              echo "VM update complete"
+            '

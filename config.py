@@ -15,6 +15,25 @@ GOLD_ALPHAS_PATH   = BASE_DIR / "gold_alphas.json"
 SKILL_PATH         = ALPHA_SKILLS_DIR / "wq-alpha.skill"
 MCP_SKILL_PATH     = BASE_DIR / "mcp_skill.md"
 
+# ── v2 Storage Layer ───────────────────────────────────────────────────────────
+DATA_DIR   = BASE_DIR / "data"
+STORE_DB   = DATA_DIR / "alpha_store.db"
+
+# ── v2 Crawl matrix (Ingestion Layer) ─────────────────────────────────────────
+# Mặc định giữ cấu hình v1 để tương thích; mở rộng bằng cách thêm phần tử.
+CRAWL_REGIONS     = ["USA"]
+CRAWL_UNIVERSES   = ["TOP3000"]
+CRAWL_DELAYS      = [1]
+CRAWL_INSTRUMENTS = ["EQUITY"]
+CRAWL_RATE_QPS    = 2.0        # token-bucket: requests/giây cho BaseCrawler
+CRAWL_PAGE_LIMIT  = 20         # offset paging size
+
+# ── v2 Embeddings (Processing Layer) ───────────────────────────────────────────
+# "hashing"  → vector numpy nhẹ, không cần tải model (mặc định, không phụ thuộc)
+# "st:<name>"→ sentence-transformers (vd "st:all-MiniLM-L6-v2") nếu môi trường cho phép
+EMBED_MODEL  = "hashing"
+EMBED_DIM    = 256            # dùng cho hashing embedder
+
 # ── Document quality gates ─────────────────────────────────────────────────────
 MIN_WORDS_PER_DOC  = 50        # Docs shorter than this are rejected
 MAX_WORDS_PER_DOC  = 15000     # Docs longer than this need special chunking
@@ -34,6 +53,15 @@ RAG_SIM_WEIGHT             = 0.60   # Vector similarity weight
 RAG_LENGTH_PENALTY_WEIGHT  = 0.20   # Length-penalty weight
 RAG_QUALITY_WEIGHT         = 0.20   # Quality-score weight
 MIN_QUALITY_FOR_IMPORTANT  = 40     # Docs below this score skipped for high-priority queries
+REFERENCE_QUALITY_SCORE    = 90     # Hand-curated reference files deserve high quality
+RAG_SNIPPET_CHARS          = 1500   # Max chars shown per result in search output
+
+# ── v2 Hybrid retrieval weights (vector + keyword + length + quality) ──────────
+# Khi không có embedding, w_vec tự về 0 và các trọng số còn lại được chuẩn hoá lại.
+HYBRID_VEC_WEIGHT     = 0.45
+HYBRID_KW_WEIGHT      = 0.30
+HYBRID_LENGTH_WEIGHT  = 0.10
+HYBRID_QUALITY_WEIGHT = 0.15
 
 # ── Category definitions (keyword scoring) ────────────────────────────────────
 CATEGORIES = {

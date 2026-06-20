@@ -4,7 +4,6 @@ import sys
 import time
 import requests
 import base64
-import sqlite3
 from pathlib import Path
 
 import structlog
@@ -18,6 +17,16 @@ sys.stdout.reconfigure(line_buffering=True)
 
 CONFIG_PATH = Path("wqb_config.json")
 LOG_DIR = Path("wqb_logs")
+
+# v2: lazy-import Store to avoid circular deps if automation is imported early
+_store = None
+
+def _get_store():
+    global _store
+    if _store is None:
+        from storage.store import Store
+        _store = Store()
+    return _store
 
 def load_config() -> dict:
     if "WQB_EMAIL" in os.environ:
@@ -91,69 +100,36 @@ class WQBAutomation:
             self.login()
 
     def save_raw_response(self, sim_id: str, data: dict):
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
         try:
-            conn = sqlite3.connect(LOG_DIR / "wqb_data.db")
-            cursor = conn.cursor()
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS raw_simulations (
-                    sim_id TEXT PRIMARY KEY,
-                    timestamp TEXT,
-                    data JSON
-                )
-            ''')
-            cursor.execute('''
-                INSERT OR IGNORE INTO raw_simulations (sim_id, timestamp, data)
-                VALUES (?, ?, ?)
-            ''', (sim_id, timestamp, json.dumps(data)))
-            conn.commit()
-            conn.close()
+            formula  = data.get("regular", "")
+            settings = data.get("settings", {})
+            settings_str = (
+                f"{settings.get('universe','TOP3000')}|"
+                f"{settings.get('neutralization','Market')}|"
+                f"{settings.get('decay',0)}|"
+                f"{settings.get('truncation',0.05)}"
+            )
+            _get_store().save_simulation(sim_id, formula, settings_str,
+                                         data.get("status", ""), data)
         except Exception as e:
-            logger.error("Failed to save raw response to SQLite", error=str(e))
+            logger.error("Failed to save simulation to store", error=str(e))
 
     def _is_failed_combination(self, formula: str, settings: str) -> bool:
-        failed_db = LOG_DIR / "failed_alphas.json"
-        if not failed_db.exists():
-            return False
         try:
-            with open(failed_db, 'r') as f:
-                failed_data = json.load(f)
-            for item in failed_data:
-                if item.get("formula", "").strip() == formula.strip() and item.get("settings", "") == settings:
-                    return True
-        except:
-            pass
-        return False
+            return _get_store().is_failed(formula, settings)
+        except Exception:
+            return False
 
     def _save_failed_combination(self, metrics: dict):
-        failed_db = LOG_DIR / "failed_alphas.json"
-        failed_data = []
-        if failed_db.exists():
-            try:
-                with open(failed_db, 'r') as f:
-                    failed_data = json.load(f)
-            except:
-                pass
-        
-        formula = metrics.get("formula", "").strip()
-        settings = metrics.get("settings", "")
-        for item in failed_data:
-            if item.get("formula", "").strip() == formula and item.get("settings", "") == settings:
-                return
-                
-        failed_data.append({
-            "formula": formula,
-            "settings": settings,
-            "sharpe": metrics.get("sharpe", 0),
-            "fitness": metrics.get("fitness", 0),
-            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
-        })
-        
         try:
-            with open(failed_db, 'w') as f:
-                json.dump(failed_data, f, indent=2)
+            _get_store().save_failed(
+                metrics.get("formula", ""),
+                metrics.get("settings", ""),
+                metrics.get("sharpe", 0),
+                metrics.get("fitness", 0),
+            )
         except Exception as e:
-            logger.error("Failed to save failed combinations", error=str(e))
+            logger.error("Failed to save failed combination", error=str(e))
 
     @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(3))
     def submit_alpha(self, formula: str, settings_str: str = None, auto_submit: bool = False, name: str = None):
@@ -217,7 +193,7 @@ class WQBAutomation:
             poll_interval = 2 # Start with 2 seconds, then 5
             
             while time.time() - start_time < max_wait:
-                poll_res = self.session.get(sim_url, headers=self.headers)
+                poll_res = self.session.get(sim_url, headers=self.headers, timeout=30)
                 if poll_res.status_code == 200:
                     data = poll_res.json()
                     status = data.get("status", "")
@@ -233,7 +209,7 @@ class WQBAutomation:
                         # Fetch the actual alpha metrics
                         alpha_id = data.get("alpha")
                         if alpha_id:
-                            alpha_res = self.session.get(f"{self.base_url}/alphas/{alpha_id}", headers=self.headers)
+                            alpha_res = self.session.get(f"{self.base_url}/alphas/{alpha_id}", headers=self.headers, timeout=30)
                             if alpha_res.status_code == 200:
                                 alpha_data = alpha_res.json()
                                 metrics = self._extract_metrics_from_api(alpha_data, formula, settings_str)
@@ -246,17 +222,27 @@ class WQBAutomation:
                                 # Check if it passes IS criteria
                                 if metrics.get("sharpe", 0) >= 1.25 and metrics.get("fitness", 0) >= 1.0 and 0.01 <= metrics.get("turnover", 1.0) <= 0.7:
                                     logger.info("Alpha meets IS criteria.")
-                                    metrics["name"] = name or "Untitled Alpha"
-                                    metrics["status"] = "UNSUBMITTED"
-                                    if auto_submit:
-                                        logger.info("Attempting to submit...")
-                                        submit_res = self._submit_to_exchange(alpha_id)
-                                        metrics["submit_status"] = submit_res
-                                        if submit_res.get("status") == "SUCCESS":
-                                            metrics["status"] = "SUBMITTED_SUCCESS"
-                                    
-                                    # Save to gold_alphas.json
-                                    self._save_gold_alpha(metrics)
+
+                                    # ── Self-correlation check (WQB rule) ──────────────────────
+                                    corr_info = self.check_self_correlation(alpha_id)
+                                    metrics["self_correlation"] = corr_info.get("value")
+                                    if corr_info.get("passes") is False:
+                                        logger.warning("SELF_CORRELATION FAIL — skipping gold save",
+                                                       alpha_id=alpha_id, detail=corr_info["detail"])
+                                        metrics["status"] = "CORRELATED"
+                                        self._save_failed_combination(metrics)
+                                    else:
+                                        metrics["name"] = name or "Untitled Alpha"
+                                        metrics["status"] = "UNSUBMITTED"
+                                        if corr_info.get("value") is not None:
+                                            logger.info("Self-correlation OK", corr=corr_info["value"])
+                                        if auto_submit:
+                                            logger.info("Attempting to submit...")
+                                            submit_res = self._submit_to_exchange(alpha_id)
+                                            metrics["submit_status"] = submit_res
+                                            if submit_res.get("status") == "SUCCESS":
+                                                metrics["status"] = "SUBMITTED_SUCCESS"
+                                        self._save_gold_alpha(metrics)
                                 else:
                                     # Add to failed combinations if it does not meet gold criteria
                                     self._save_failed_combination(metrics)
@@ -284,34 +270,81 @@ class WQBAutomation:
             # Reraise so @retry can catch network exceptions
             raise e
 
+    def search_data_fields(self, search_query: str, limit: int = 20,
+                           force_live: bool = False) -> list:
+        """
+        Search data fields.  By default reads the local store (fast, offline).
+        Falls back to WQB API on cache miss or when force_live=True.
+        """
+        if not force_live:
+            try:
+                store = _get_store()
+                results = store.query_datafields(
+                    region="USA", universe="TOP3000", delay=1,
+                    search=search_query, limit=limit,
+                )
+                if results:
+                    logger.info("search_data_fields.from_store",
+                                query=search_query, count=len(results))
+                    return results
+            except Exception as e:
+                logger.warning("search_data_fields.store_error", error=str(e))
+
+        # Live API fallback
+        return self._search_data_fields_live(search_query, limit)
+
     @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(3))
-    def search_data_fields(self, search_query: str, limit: int = 20) -> list:
+    def _search_data_fields_live(self, search_query: str, limit: int = 20) -> list:
         self.refresh_login_if_needed()
-        logger.info(f"Searching data fields for '{search_query}'...")
+        logger.info("search_data_fields.live", query=search_query)
         try:
-            # universe is required by the API — without it the endpoint returns 400
-            url = f"{self.base_url}/data-fields?instrumentType=EQUITY&region=USA&universe=TOP3000&delay=1&limit={limit}&search={search_query}"
+            url = (f"{self.base_url}/data-fields?instrumentType=EQUITY&region=USA"
+                   f"&universe=TOP3000&delay=1&limit={limit}&search={search_query}")
             res = self.session.get(url, headers=self.headers)
-            
             if res.status_code == 200:
                 data = res.json()
                 results = data.get("results", [])
-                logger.info(f"Found {len(results)} data fields")
+                # Cache results in store for next time
+                try:
+                    for row in results:
+                        row.update({"_region":"USA","_universe":"TOP3000","_delay":1})
+                    _get_store().upsert_datafields(results)
+                except Exception:
+                    pass
                 return results
             elif res.status_code == 429:
-                logger.warning("Rate limit exceeded while searching data fields")
                 raise Exception("Rate limit exceeded")
             else:
-                logger.error("Data fields search FAILED", status_code=res.status_code, response=res.text)
+                logger.error("search_data_fields.live_failed",
+                             status=res.status_code, response=res.text[:200])
                 return [{"error": f"Search failed: {res.text}"}]
-                
         except Exception as e:
-            logger.error("Exception during data fields search", error=str(e))
+            logger.error("search_data_fields.exception", error=str(e))
             raise e
+
+    def list_operators(self, category: str = None) -> list:
+        """Return operators from local store (populated by WQBOperatorCrawler)."""
+        try:
+            store = _get_store()
+            ops = store.list_operators(category=category)
+            if ops:
+                return ops
+        except Exception as e:
+            logger.warning("list_operators.store_error", error=str(e))
+        # If store empty: inform caller to run the crawler
+        return [{"info": "Operators not yet crawled. Run: python run_crawl.py --kind operators"}]
 
     def _extract_metrics_from_api(self, alpha_data: dict, formula: str, settings: str) -> dict:
         is_stats = alpha_data.get("is", {})
-        
+
+        # Extract self-correlation from IS checks (WQB populates after simulation)
+        self_corr = None
+        corr_cutoff = 0.7
+        for check in is_stats.get("checks", []):
+            if check.get("name") == "SELF_CORRELATION":
+                self_corr = check.get("value")
+                break
+
         return {
             "id": alpha_data.get("id"),
             "formula": formula,
@@ -322,9 +355,38 @@ class WQBAutomation:
             "returns": is_stats.get("returns", 0.0),
             "margin": is_stats.get("margin", 0.0),
             "drawdown": is_stats.get("drawdown", 0.0),
-            "yearly_stats": [], # We can extract this if needed, but not strictly required for MVP
+            "self_correlation": self_corr,
+            "yearly_stats": [],
             "raw_api_response": alpha_data
         }
+
+    def check_self_correlation(self, alpha_id: str) -> dict:
+        """Fetch self-correlation for a simulated alpha from WQB API.
+        Returns {"value": float, "passes": bool, "detail": str}
+        """
+        try:
+            res = self.session.get(f"{self.base_url}/alphas/{alpha_id}", headers=self.headers)
+            if res.status_code != 200:
+                return {"value": None, "passes": None, "detail": f"HTTP {res.status_code}"}
+            data = res.json()
+            is_stats = data.get("is", {})
+            sharpe = is_stats.get("sharpe", 0.0)
+            for check in is_stats.get("checks", []):
+                if check.get("name") == "SELF_CORRELATION":
+                    val = check.get("value")
+                    result = check.get("result", "UNKNOWN")
+                    passes = result != "FAIL"
+                    val_str = f"{val:.4f}" if val is not None else "None"
+                    detail = f"self_corr={val_str} result={result}"
+                    if not passes:
+                        detail += f" (cutoff=0.7, need Sharpe {sharpe*1.1:.2f}+)"
+                    logger.info("Self-correlation check", alpha_id=alpha_id,
+                                corr=val, result=result, sharpe=sharpe)
+                    return {"value": val, "passes": passes, "detail": detail}
+            return {"value": None, "passes": True, "detail": "No SELF_CORRELATION check found"}
+        except Exception as e:
+            logger.error("self_correlation check failed", error=str(e))
+            return {"value": None, "passes": None, "detail": str(e)}
 
     def _submit_to_exchange(self, alpha_id: str) -> dict:
         try:
@@ -390,84 +452,18 @@ class WQBAutomation:
     def _save_log(self, data: dict):
         if data.get("fitness", 0.0) < 0.5:
             return
-            
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
         try:
-            conn = sqlite3.connect(LOG_DIR / "wqb_data.db")
-            cursor = conn.cursor()
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS alpha_results (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    formula TEXT,
-                    settings TEXT,
-                    sharpe REAL,
-                    fitness REAL,
-                    turnover REAL,
-                    returns REAL,
-                    margin REAL,
-                    drawdown REAL,
-                    timestamp TEXT,
-                    full_data JSON
-                )
-            ''')
-            cursor.execute('''
-                INSERT INTO alpha_results (formula, settings, sharpe, fitness, turnover, returns, margin, drawdown, timestamp, full_data)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                data.get("formula", ""),
-                data.get("settings", ""),
-                data.get("sharpe", 0.0),
-                data.get("fitness", 0.0),
-                data.get("turnover", 0.0),
-                data.get("returns", 0.0),
-                data.get("margin", 0.0),
-                data.get("drawdown", 0.0),
-                timestamp,
-                json.dumps(data)
-            ))
-            conn.commit()
-            conn.close()
+            _get_store().save_alpha_result(data)
         except Exception as e:
-            logger.error("Failed to save alpha log to SQLite", error=str(e))
+            logger.error("Failed to save alpha result to store", error=str(e))
         self.results_log.append({k: v for k, v in data.items() if k != 'raw_api_response'})
 
     def _save_gold_alpha(self, metrics: dict):
-        gold_db = Path(__file__).parent / "gold_alphas.json"
-        gold_data = []
-        if gold_db.exists():
-            try:
-                with open(gold_db, 'r', encoding='utf-8') as f:
-                    gold_data = json.load(f)
-            except:
-                pass
-                
-        # Check if already exists
-        for item in gold_data:
-            if item.get("id") == metrics.get("id"):
-                return
-                
-        # Prepare clean dict
-        clean_metrics = {
-            "id": metrics.get("id"),
-            "name": metrics.get("name", "Untitled Alpha"),
-            "formula": metrics.get("formula"),
-            "settings": metrics.get("settings"),
-            "sharpe": metrics.get("sharpe"),
-            "fitness": metrics.get("fitness"),
-            "turnover": metrics.get("turnover"),
-            "returns": metrics.get("returns"),
-            "drawdown": metrics.get("drawdown"),
-            "margin": metrics.get("margin"),
-            "status": metrics.get("status", "UNSUBMITTED")
-        }
-        
-        gold_data.append(clean_metrics)
         try:
-            with open(gold_db, 'w', encoding='utf-8') as f:
-                json.dump(gold_data, f, indent=2, ensure_ascii=False)
-            logger.info("Saved to gold_alphas.json")
+            _get_store().upsert_gold_alpha(metrics)
+            logger.info("Saved gold alpha to store", id=metrics.get("id"))
         except Exception as e:
-            logger.error("Failed to save to gold_alphas.json", error=str(e))
+            logger.error("Failed to save gold alpha to store", error=str(e))
 
     def submit_saved_alpha(self, alpha_id: str) -> dict:
         self.refresh_login_if_needed()

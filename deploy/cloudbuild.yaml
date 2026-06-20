@@ -1,0 +1,80 @@
+steps:
+  # 1. Build GLM image (only if Dockerfile.glm changed)
+  - name: gcr.io/cloud-builders/docker
+    id: build-glm
+    args:
+      - build
+      - -t
+      - gcr.io/$PROJECT_ID/alpha-glm:$COMMIT_SHA
+      - -t
+      - gcr.io/$PROJECT_ID/alpha-glm:latest
+      - -f
+      - deploy/Dockerfile.glm
+      - .
+
+  # 2. Push GLM image
+  - name: gcr.io/cloud-builders/docker
+    id: push-glm
+    waitFor: [build-glm]
+    args: [push, gcr.io/$PROJECT_ID/alpha-glm:$COMMIT_SHA]
+
+  # 3. Deploy GLM to Cloud Run GPU
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: deploy-glm
+    waitFor: [push-glm]
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        sed "s/PROJECT_ID/$PROJECT_ID/g; s|alpha-glm:latest|alpha-glm:$COMMIT_SHA|g" \
+          deploy/cloud-run/service-glm.yaml > /tmp/service-glm.yaml
+        gcloud run services replace /tmp/service-glm.yaml \
+          --region=us-central1 --project=$PROJECT_ID
+
+  # 4. Build Observation image
+  - name: gcr.io/cloud-builders/docker
+    id: build-obs
+    args:
+      - build
+      - -t
+      - gcr.io/$PROJECT_ID/alpha-observation:$COMMIT_SHA
+      - -t
+      - gcr.io/$PROJECT_ID/alpha-observation:latest
+      - -f
+      - deploy/Dockerfile.observation
+      - .
+
+  # 5. Push Observation image
+  - name: gcr.io/cloud-builders/docker
+    id: push-obs
+    waitFor: [build-obs]
+    args: [push, gcr.io/$PROJECT_ID/alpha-observation:$COMMIT_SHA]
+
+  # 6. Deploy to GCE VM: git pull + docker compose up
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: deploy-vm
+    waitFor: [push-obs]
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud compute ssh alpha-vm --zone=us-central1-a --command='
+          cd /app/alpha-generator && git pull &&
+          cd /app/deer-flow &&
+          docker compose -f docker-compose.yml -f ../alpha-generator/deploy/docker-compose.override.yml pull &&
+          docker compose -f docker-compose.yml -f ../alpha-generator/deploy/docker-compose.override.yml up -d
+        '
+
+  # 7. Health check
+  - name: gcr.io/cloud-builders/curl
+    id: healthcheck
+    waitFor: [deploy-vm]
+    args: [--fail, --retry, "5", --retry-delay, "10", http://$(gcloud compute instances describe alpha-vm --zone=us-central1-a --format='get(networkInterfaces[0].accessConfigs[0].natIP)')/observe/]
+
+images:
+  - gcr.io/$PROJECT_ID/alpha-glm:$COMMIT_SHA
+  - gcr.io/$PROJECT_ID/alpha-observation:$COMMIT_SHA
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8

@@ -361,3 +361,129 @@ agent/tools/diagnose_alpha.py ← phân tích metrics
 _analyze_sim_history.py    ← phân tích toàn bộ lịch sử
 _find_valid_fields.py      ← tìm field names hợp lệ
 ```
+
+### [2026-06-12] [FIELD]
+`est_sales` (field type MATRIX) — signal NGƯỢC CHIỀU so với kỳ vọng momentum.
+Cả ts_rank(est_sales, 252) lẫn ts_rank(ts_backfill(est_sales,60), 252) đều cho Sharpe âm (-0.50, -0.22).
+→ est_sales đã bị thị trường định giá hết; dùng CONTRARIAN (đảo dấu) hoặc bỏ qua hoàn toàn.
+→ Contrarian: Sharpe 0.57, Fitness 0.32 — vẫn yếu, không đáng tune thêm.
+→ KHAI BÁO DEAD: không dùng est_sales momentum/revision nữa.
+
+### [2026-06-12] [RULE]
+Early-exit rule: Sharpe < 0.8 → SKIP ngay, không phân tích thêm, bảo tồn quota ngày.
+Fitness < 0.5 → signal yếu cơ bản, không tune settings — đổi formula hoàn toàn.
+Fitness 0.85-0.99 → FITNESS CLOSE: thử tune (Decay tăng, TOP1000, truncation 0.08) trước khi bỏ.
+
+### [2026-06-12] [SETTINGS]
+Pattern A (Vol-Adjusted Reversal) với TOP3000|Subindustry|10|0.08: S=1.58, F=1.00, TO=30.3% — PASS.
+Cùng formula với TOP3000|Subindustry|4|0.05: S=1.64, F=0.95, TO=28.2% — chỉ thiếu 0.05 Fitness.
+→ Để boost Fitness 0.95→1.0: tăng truncation 0.05→0.08 VÀ tăng Decay → giảm TO → tăng Ret/TO ratio.
+
+### [2026-06-12] [STRATEGY]
+Simulate-only mặc định, không auto-submit. Sau simulate: user review kết quả trước khi submit thủ công.
+Rule: alpha pass IQC → ghi vào gold_alphas với status=UNSUBMITTED → user quyết định submit.
+
+### [2026-06-12] [SETTINGS LESSON - UNIVERSE SWITCH BACKFIRE]
+Vk8Me1PJ formula (vol-regime reversal): TOP1000 Switch MÀO HIỂM - S giảm từ 1.64 → 1.43, F giảm 0.95 → 0.77.
+Đây là formula được calibrated cho TOP3000 universe — smaller universe = kém diversified = Sharpe thấp hơn.
+→ Rule mới: KHÔNG chuyển universe khi formula đang PASS Sharpe. Chỉ tune Decay hoặc truncation.
+→ Fix đúng cho F=0.95→1.0: tăng Decay (4→10) để giảm TO từ 28% → ~15-18% → tăng Ret/TO ratio.
+→ Công thức: F = S × sqrt(R / max(TO, 0.125)). TO giảm 28%→18%: F = 1.64 × sqrt(0.0945/0.18) = 1.64 × 0.725 = 1.19 → sẽ PASS.
+
+### [2026-06-12] [RESEARCH PIPELINE]
+Quy trình research 4 bước đã được implement tại run_research.py:
+  Step 1 DESCRIBE    → crawl OHLCV thực từ Yahoo Finance (yfinance), stats: vol, return, corr
+  Step 2 EXPLORE     → IC Analysis (IC = Pearson corr giữa signal và forward return) + mine WQB history
+  Step 3 HYPOTHESIZE → translate high-IC signals → WQB formulas, rank by ICIR = IC/IC_std
+  Step 4 ACT         → simulate top candidates on WQB (simulate-only, không auto-submit)
+
+IC Analysis kết quả (53 stocks S&P500, 1 năm 2025-2026):
+  Tốt nhất: price_range_10d (10d price range/close) — ICIR_1d=+0.236, IC_5d=+0.087, Hit=57.5%
+  Thứ hai : 52w_high_proximity — ICIR_1d=+0.148, Hit=57.5%
+  vol_adj_reversal_2d (Pattern A core) — ICIR_1d=+0.034 (nhỏ do basket chỉ 53 stocks)
+  Không có signal nào đạt |ICIR| >= 0.5 trong basket nhỏ này — cần 500+ stocks để IC ổn định hơn.
+
+WQB History mining (130 sims):
+  Best settings: TOP3000|Subindustry|Decay=0 → mean_S=1.71 (14 sims)
+  Top operators: rank(79 wins), ts_delta(55), group_neutralize(33), ts_std_dev(30)
+  Pass rate: 60.8% — cao, do nhiều sims trước test Pattern A variants
+
+Cross-sectional vol thị trường: 1.63%/ngày → điều kiện tốt cho alpha (dispersion cao)
+Mean pairwise correlation: 0.113 → thị trường dễ diversify
+
+### [2026-06-13] [OPERATOR BUG]
+`ts_max` và `ts_min` → "inaccessible or unknown operator" trên account này.
+→ Thay thế: dùng `ts_rank(close, N)` thay cho `close / ts_max(close, N)` (proximity proxy).
+→ 52w high proximity: `group_rank(-ts_rank(close, 252), subindustry)` thay vì `ts_max`.
+
+### [2026-06-13] [STRUCTURAL CAP - TRADE_WHEN]
+Vk8Me1PJ: `trade_when` vol-regime filter CẤP TRẦN Fitness ở ~0.95 không kể settings nào.
+Vật lý: Decay scale S và Returns tỷ lệ thuận → F = S × sqrt(R/TO) ≈ const.
+  Original (Decay=4): S=1.64, F=0.95, TO=28.2%, Ret=9.45%
+  Boost-2 (Decay=10): S=1.41, F=0.95, TO=16.7%, Ret=7.57%
+→ Không thể fix bằng settings. Phải BỎ `trade_when` (= về Alpha-6 formula đã PASS).
+→ Rule: nếu formula có `trade_when` + F < 1.0, đừng tune settings — bỏ `trade_when`.
+
+### [2026-06-13] [SIGNAL STATUS]
+Amihud illiquidity (|returns|/volume/close): S=0.16, F=0.04 → DEAD trên TOP3000 USA.
+5d reversal + vol-regime filter: S=0.93, F=0.47 → tín hiệu yếu, không tune.
+52w high proximity (ts_rank approach chưa test): cần thử trong v5.
+Price-range (10d std) từ IC analysis: ICIR=+0.236 trên real data → cần test trên WQB.
+
+### [2026-06-13] [NEW SIGNAL - INTRADAY REVERSAL]
+`(close - open) / (open + 0.001)` — intraday direction signal — Sharpe=1.84 nhưng TO=78%.
+Formula: `group_rank(-ts_rank(intra, 20), subindustry)` tại TOP3000|Subindustry|5|0.08
+Vấn đề: TO=78% > 70% limit. F=0.71. Cần TO ≤ 38.7% để F=1.0.
+→ Fix 1: Decay=20-25 → giảm TO từ 78% → ~35-40%
+→ Fix 2: Smoothen signal: ts_mean(intra, 3) thay cho ts_rank(intra, 20)
+→ IC không chuyển từ real data: 52w_high (ICIR=0.148) → S=0.32 trên WQB, vol-range → S=0.63.
+→ Rule: IC trên real data không đảm bảo WQB Sharpe. WQB có universe filter, delay, neutralization khác.
+
+### [2026-06-13] [SIGNAL STATUS UPDATE]
+52w_high_proximity via ts_rank(close,252): S=0.32 → DEAD trên WQB.
+vol_range_proxy (ts_std_dev(close,10)/close): S=0.63 → WEAK.
+intraday_reversal: S=1.84, TO=78% → cần tune Decay hoặc smooth formula.
+
+### [2026-06-13] [PATTERN B - VWAP DEVIATION]
+5d VWAP Deviation Reversal — IQC PASS (alpha_id=Gro90oex):
+  Formula: vwap5 = ts_sum(close*volume,5) / (ts_sum(volume,5)+1); dev = (close-vwap5)/(vwap5+0.001)
+  Signal:  group_rank(-rank(dev), subindustry); group_neutralize(signal, subindustry)
+  Settings: TOP3000|Subindustry|5|0.08
+  Result:  S=1.65, F=1.16, TO=21.0% → IQC PASS ✅
+→ VWAP là anchor giá tổ chức. Stocks trading dưới VWAP → lực mua từ institutional → long.
+→ TO=21% thấp nhờ Decay=5 nhỏ + signal có autocorrelation thấp (window 5d đủ mượt).
+→ Variants để thử: 3d VWAP, 10d VWAP, VWAP deviation × volume surge.
+
+### [2026-06-13] [INTRADAY TUNE LESSONS]
+Intraday reversal (close-open)/open — S=1.84 nhưng TO=78% (failed IQC).
+Đã thử fix qua v6-v7:
+  v6-1: Decay=20 → S=1.37, F=0.58, TO=46.6% — F sụp, signal bị làm mờ
+  v6-2: ts_mean(intra,3), Decay=10 → S=1.48, F=0.92, TO=35.4% — GẦN PASS
+  v7-1: ts_mean(intra,3), Decay=13 → S=1.35, F=0.85, TO=31.4% — F giảm theo
+  v7-2: ts_mean(intra,3), Decay=15 → S=1.30, F=0.84, TO=29.5% — F giảm theo
+→ Root cause: tăng Decay làm mờ signal intraday quá mạnh → S giảm nhanh hơn TO giảm.
+→ Formula này có structural ceiling F~0.92 với smoothing.
+→ Đề xuất tiếp: thử kết hợp intraday × volume surge + VWAP để boost Returns.
+
+### [2026-06-13] [IC → WQB TRANSLATION GAP]
+Real market IC tốt KHÔNG đảm bảo WQB Sharpe cao. Gap này có 2 nguyên nhân:
+  1. WQB universe filter (delay=1, specific neutralization) thay đổi dynamics của signal.
+  2. Basket nhỏ (53-70 stocks) cho ICIR không ổn định — cần 200+ stocks.
+Kết quả thực tế:
+  price_range_10d: ICIR_1d=+0.236 → WQB S=0.63 (WEAK)
+  52w_high_proximity: ICIR_1d=+0.148 → WQB S=0.32 (DEAD)
+  intraday_ret (chưa test IC): → WQB S=1.84 (STRONG)
+  vwap_dev_5d (chưa test IC): → WQB S=1.65, F=1.16 (PASS)
+→ Microstructure signals (intraday, VWAP) TRANSFER TỐT hơn technical signals sang WQB.
+→ Rule: ưu tiên test microstructure signals trên WQB, không phụ thuộc IC để lọc.
+
+### [2026-06-13] [RESEARCH PIPELINE UPGRADE]
+analytics/market_data.py: mở rộng 70→~200 tickers (11 sectors, liquid S&P500).
+analytics/explore.py: thêm 6 signal mới:
+  intraday_ret    — proven WQB S=1.84
+  intraday_smooth3 — near-pass F=0.92
+  vwap_dev_5d     — proven WQB PASS (Pattern B)
+  overnight_ret   — gap fade (open vs prev_close)
+  close_location  — (close-low)/(high-low) — closing position trong range
+  vol_price_diverge — high vol + small move = informed accumulation
+analytics/hypothesize.py: thêm PATTERN_B anchor + 6 formula mappings mới.
