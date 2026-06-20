@@ -18,19 +18,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Authenticate to GCP
-        id: auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-          token_format: access_token
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Login to GCR via access token
+      - name: Login to GCR
         run: |
-          echo "${{ steps.auth.outputs.access_token }}" \
+          gcloud auth print-access-token \
             | docker login -u oauth2accesstoken --password-stdin gcr.io
 
       - name: Build and push observation image
