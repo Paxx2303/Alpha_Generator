@@ -52,6 +52,12 @@ jobs:
             --min-instances 0 \
             --max-instances 1 \
             --allow-unauthenticated \
+            --no-traffic \
+            --service-account ${{ secrets.GCP_SERVICE_ACCOUNT }} \
+            --project ${{ secrets.GCP_PROJECT_ID }} && \
+          gcloud run services update-traffic alpha-observation \
+            --to-latest \
+            --region us-central1 \
             --project ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Print dashboard URL
