@@ -1,63 +1,44 @@
-# Alpha Generator — WorldQuant Brain Automation via MCP
+# Alpha Generator — WorldQuant Brain
 
-Hệ thống cung cấp một công cụ MCP (Model Context Protocol) chuyên nghiệp giúp các AI Agent (như Claude, Cursor) đóng vai trò là Interactive Quant Researcher, cho phép AI tự động tra cứu lý thuyết, tạo Alpha, và tương tác trực tiếp với API của WorldQuant Brain.
+Hệ thống nghiên cứu & tạo Alpha (tín hiệu giao dịch định lượng) trên WorldQuant Brain (WQB),
+kết hợp LLM Agent (Claude/Cursor) làm "Quant Researcher" với WQB REST API.
 
-## Kiến trúc Mới (Interactive AI Quant Researcher)
+## Bắt đầu nhanh
 
-Thay vì phó mặc cho một vòng lặp tự động (Autonomous Loop) hoạt động máy móc, dự án này được thiết kế để AI Assistant chủ động:
-1. Đọc và trích xuất lý thuyết từ **Knowledge Base** (các bài báo học thuật).
-2. Viết công thức Alpha sắc bén dựa trên các **Themes** kinh điển.
-3. Gửi công thức đến WQB thông qua **MCP Tools**.
-4. Tự phân tích kết quả (Sharpe, Fitness) và tinh chỉnh qua từng lần thử.
+1. **Credentials:** điền `wqb_config.json` (email/password) — file này gitignored.
+2. **Đọc quy trình:** [WORKFLOW.md](WORKFLOW.md) — 5 bước Explore → Descriptive → Analysis → Predict → Action + luật vận hành.
+3. **Bí kíp tín hiệu:** [mcp_skill.md](mcp_skill.md) — operators, patterns, settings grid (cập nhật liên tục).
+4. **Chạy pipeline:** `python run_research.py` → full 5-step methodology (Explore→Descriptive→Analysis→Predict→Action). Kết quả durable: `data/alpha_store.db` + `RESEARCH_LOG.md`.
+5. **Kiểm tra pool:** `python check_db.py` → liệt kê gold alphas trong `data/alpha_store.db`.
 
-```
-AI Assistant (Claude/Cursor)
-  │
-  ├──> [Knowledge Base] Trích xuất lý thuyết (RAG)
-  │
-  └──> MCP Server (mcp_server.py)
-         └──> WQB Automation (wqb_automation.py)
-                └──> WorldQuant Brain API
-```
+## Kiến trúc
 
-## Quick Start
+- **`wqb_automation.py`** — client REST API (`api.worldquantbrain.com`). Login Basic Auth →
+  `POST /simulations` → poll progress → `GET /alphas/{id}` lấy metrics. KHÔNG dùng Selenium/Playwright.
+- **`config.py` / `wqb_config.json`** — cấu hình credentials.
+- **`mcp_server.py`** — MCP bridge: `search_knowledge_base`, `search_data_fields`, `submit_alpha`…
+- **`run_research.py`** — điểm vào DUY NHẤT; thực thi 5-step methodology end-to-end.
+- **`analytics/hypothesize.py`** — sinh alpha hypothesis với dead-operator guard + fundamental anchors.
+- **`alpha_skills/chunks/`** — knowledge base RAG (brain_tips, academic_papers, platform_guides, core_concepts).
+- **`crawlers/` `pipeline/` `storage/`** — v2 catalog crawl: WQB datasets/datafields/operators → `alpha_store.db`.
+- **`data/alpha_store.db`** — DB thật (bảng `gold_alphas`). `wqb_logs/` chứa log + DB legacy.
 
-```bash
-# 1. Chạy stock screening pipeline (nếu cần dữ liệu local)
-python run_pipeline.py --universe TOP500 --top-n 20
+## IQC (tiêu chí pass)
 
-# 2. Khởi động MCP Server để kết nối với AI Agent
-# Cấu hình file mcp_server.py trong Claude Desktop / Cursor
-```
+`Sharpe ≥ 1.25` & `Fitness ≥ 1.0` & `Turnover ∈ [1%, 70%]`
+trong đó `Fitness = Sharpe × sqrt(Returns / max(Turnover, 0.125))`.
 
-## File Structure
+## Trạng thái pool (cập nhật 2026-06-16)
 
-| File | Chức năng |
-|---|---|
-| `mcp_server.py` | MCP Server cung cấp các công cụ nghiên cứu Alpha cho AI. |
-| `wqb_automation.py` | REST API auto login + submit alpha + parse metrics từ WQB. |
-| `submit_single.py` | Script tiện ích để submit một công thức nhanh qua CLI. |
-| `run_pipeline.py` | CLI chạy stock screening pipeline (sử dụng dữ liệu Yahoo Finance). |
-| `stock_pipeline/` | Modules phân tích nội bộ: DataFetcher, AlphaFactorEngine, StockScreener. |
-| `mcp_skill.md` | Single Source of Truth cho kỹ năng tạo Alpha (Themes, IQC rules). |
-| `alpha_skills/` | Kho lưu trữ các lý thuyết (Knowledge Base JSON) và module `knowledge_retriever.py`. |
+| Alpha | Mô tả | S | F | TO | Status |
+|-------|-------|---|---|----|--------|
+| `WjgreNdN` | VWAP-Open 5d Deviation | 1.87 | 1.36 | 23.3% | SUBMITTED_SUCCESS |
+| `58vYJp15` | VWAP 5d Reversal Decay=2 | 1.75 | 1.02 | 34.7% | UNSUBMITTED |
+| `d5QrbL2g` | VWAP 7d Reversal Decay=5 | 1.65 | 1.17 | 22.0% | UNSUBMITTED |
+| `Gro90oex` | VWAP 5d Reversal Decay=5 | 1.65 | 1.16 | 21.0% | UNSUBMITTED |
+| `1YgWwo8W` | Vol-Adj Price Reversal | 1.58 | 1.00 | 30.3% | UNSUBMITTED |
+| `wpeWEV9d` | VWAP 10d Reversal Decay=5 | 1.47 | 1.07 | 18.3% | UNSUBMITTED |
+| `P01mYX0E` | VWAP-dev + Close Loc | 1.85 | 1.10 | 30.3% | CORRELATED (0.80) |
 
-## Cấu hình Credentials
-
-Set biến môi trường (Environment Variables) hoặc tạo file `wqb_config.json`:
-```json
-{
-    "email": "your_email",
-    "password": "your_password",
-    "headless": false,
-    "timeout_ms": 300000
-}
-```
-
-## Logs & Output
-
-| File | Nội dung |
-|---|---|
-| `wqb_logs/alpha_*.json` | Kết quả của từng alpha được submit (Sharpe, Fitness, Turnover). |
-| `wqb_logs/gold_alphas.json` | Danh sách các Alpha đã Pass (Sharpe ≥ 1.25 + Fitness ≥ 1.0). |
-| `pipeline_output/` | Kết quả trả về từ `stock_pipeline/`. |
+> Họ VWAP-deviation đã bão hoà (tương quan cao lẫn nhau). Hướng tiếp theo: reversal trên
+> input mới (intraday body, overnight gap, z-score) để giữ self-corr < 0.7. Xem [RESEARCH_LOG.md](RESEARCH_LOG.md).

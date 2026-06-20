@@ -8,3 +8,19 @@ structlog>=24.0.0
 rich>=13.0.0
 python-dotenv>=1.0.0
 tenacity>=8.2.0
+pydantic>=2.0.0
+
+# Observation dashboard
+streamlit>=1.35.0
+plotly>=5.20.0
+
+# Knowledge layer
+chromadb>=0.5.0
+sentence-transformers>=3.0.0
+networkx>=3.3
+
+# LLM / DeerFlow integration
+openai>=1.30.0
+
+# Backup / GCS
+google-cloud-storage>=2.16.0

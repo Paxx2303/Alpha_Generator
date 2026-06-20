@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "alpha-wqb": {
+      "enabled": true,
+      "type": "stdio",
+      "command": "python",
+      "args": ["../../core/mcp/server.py"],
+      "env": {
+        "WQB_EMAIL": "$WQB_EMAIL",
+        "WQB_PASSWORD": "$WQB_PASSWORD"
+      },
+      "description": "WorldQuant Brain simulation + knowledge search tools"
+    }
+  }
+}
