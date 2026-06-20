@@ -87,7 +87,7 @@ gcloud iam workload-identity-pools providers describe my-github-provider \
 | Secret | Value |
 |---|---|
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/939562981836/locations/global/workloadIdentityPools/my-global-pool/providers/my-github-provider` |
-| `GCP_SERVICE_ACCOUNT` | `deploy-sa@project-d9243352-39fe-44a5-90d.iam.gserviceaccount.com` |
+| `GCP_SERVICE_ACCOUNT_EMAIL` | `deploy-sa@project-d9243352-39fe-44a5-90d.iam.gserviceaccount.com` |
 | `GCP_PROJECT_ID` | `project-d9243352-39fe-44a5-90d` |
 
 ---
