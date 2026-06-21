@@ -121,7 +121,7 @@ jobs:
                 sudo mkdir -p /app && sudo chown $USER:$USER /app
                 git clone https://github.com/Paxx2303/Alpha_Generator.git /app/alpha-generator
               else
-                cd /app/alpha-generator && git pull
+                cd /app/alpha-generator && git fetch origin && git reset --hard origin/main
               fi
               # vm-setup.sh is idempotent — handles Docker install, deer-flow clone, Ollama, compose
               chmod +x /app/alpha-generator/deploy/vm-setup.sh
