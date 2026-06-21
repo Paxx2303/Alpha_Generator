@@ -103,7 +103,7 @@ jobs:
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --tunnel-through-iap \
             --quiet \
-            --command="mkdir -p /app/deer-flow && echo '${ENV_B64}' | base64 -d > /app/deer-flow/.env"
+            --command="sudo mkdir -p /app/deer-flow && sudo chown \$USER:\$USER /app /app/deer-flow && echo '${ENV_B64}' | base64 -d > /app/deer-flow/.env"
 
       - name: Bootstrap or update VM
         run: |
