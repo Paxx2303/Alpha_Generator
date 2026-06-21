@@ -30,8 +30,9 @@ sudo mkdir -p /app && sudo chown "$USER":"$USER" /app
 mkdir -p /app/logs
 
 # ── Clone / update repos ──────────────────────────────────────────────────────
-if [ ! -d /app/deer-flow ]; then
+if [ ! -d /app/deer-flow/.git ]; then
   echo "Cloning DeerFlow..."
+  rm -rf /app/deer-flow
   git clone https://github.com/bytedance/deer-flow.git /app/deer-flow
 fi
 
@@ -147,8 +148,11 @@ CRON_JOB="0 */6 * * * cd /app/alpha-generator && python3 operation/runner.py >> 
 # ── Start services ────────────────────────────────────────────────────────────
 echo "Starting Docker Compose..."
 cd /app/deer-flow
+# DeerFlow uses docker-compose.yaml (not .yml); fall back if needed
+COMPOSE_BASE="docker-compose.yaml"
+[ -f "docker-compose.yml" ] && COMPOSE_BASE="docker-compose.yml"
 docker compose \
-  -f docker-compose.yml \
+  -f "$COMPOSE_BASE" \
   -f ../alpha-generator/deploy/docker-compose.override.yml \
   up -d --build
 
