@@ -46,7 +46,7 @@ if [ ! -d /app/alpha-generator ]; then
   git clone https://github.com/Paxx2303/Alpha_Generator.git /app/alpha-generator
 else
   echo "Updating Alpha Generator..."
-  cd /app/alpha-generator && git pull
+  cd /app/alpha-generator && git fetch origin && git reset --hard origin/main
 fi
 
 # ── Sync DeerFlow configs ─────────────────────────────────────────────────────
@@ -171,6 +171,6 @@ echo "===================================================="
 echo "  VM deploy complete!"
 echo "  DeerFlow UI:  http://${PUBLIC_IP}/"
 echo "  Dashboard:    http://${PUBLIC_IP}/observe/"
-echo "  Logs:         docker compose -f /app/deer-flow/docker-compose.yml logs -f"
+echo "  Logs:         docker compose -f ${DEER_COMPOSE} logs -f"
 echo "  Runner test:  cd /app/alpha-generator && python3 operation/runner.py --dry-run"
 echo "===================================================="

@@ -3,8 +3,6 @@
 #
 # Usage: docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
 
-version: "3.9"
-
 services:
   observation:
     build:
@@ -16,9 +14,8 @@ services:
       - ../alpha-generator/data:/app/data:ro
     environment:
       - PYTHONPATH=/app
+      - STREAMLIT_SERVER_BASE_URL_PATH=/observe
     restart: unless-stopped
-    networks:
-      - default
 
   # Override DeerFlow's nginx to add /observe/ route
   nginx:
