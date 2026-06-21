@@ -30,11 +30,16 @@ sudo mkdir -p /app && sudo chown "$USER":"$USER" /app
 mkdir -p /app/logs
 
 # ── Clone / update repos ──────────────────────────────────────────────────────
-if [ ! -d /app/deer-flow/.git ]; then
-  echo "Cloning DeerFlow..."
+# Check if deer-flow clone is complete (has a compose file at root)
+DEER_COMPOSE=$(find /app/deer-flow -maxdepth 1 \( -name "compose.yml" -o -name "compose.yaml" -o -name "docker-compose.yml" -o -name "docker-compose.yaml" \) 2>/dev/null | head -1)
+if [ -z "$DEER_COMPOSE" ]; then
+  echo "Cloning DeerFlow (or re-cloning incomplete clone)..."
   rm -rf /app/deer-flow
   git clone https://github.com/bytedance/deer-flow.git /app/deer-flow
+  DEER_COMPOSE=$(find /app/deer-flow -maxdepth 1 \( -name "compose.yml" -o -name "compose.yaml" -o -name "docker-compose.yml" -o -name "docker-compose.yaml" \) 2>/dev/null | head -1)
 fi
+echo "DeerFlow root files: $(ls /app/deer-flow/)"
+echo "Compose file: ${DEER_COMPOSE:-NOT FOUND}"
 
 if [ ! -d /app/alpha-generator ]; then
   echo "Cloning Alpha Generator..."
@@ -148,11 +153,13 @@ CRON_JOB="0 */6 * * * cd /app/alpha-generator && python3 operation/runner.py >> 
 # ── Start services ────────────────────────────────────────────────────────────
 echo "Starting Docker Compose..."
 cd /app/deer-flow
-# DeerFlow uses docker-compose.yaml (not .yml); fall back if needed
-COMPOSE_BASE="docker-compose.yaml"
-[ -f "docker-compose.yml" ] && COMPOSE_BASE="docker-compose.yml"
+if [ -z "$DEER_COMPOSE" ]; then
+  echo "ERROR: No compose file found in /app/deer-flow after clone. Files:"
+  ls -la /app/deer-flow/
+  exit 1
+fi
 docker compose \
-  -f "$COMPOSE_BASE" \
+  -f "$DEER_COMPOSE" \
   -f ../alpha-generator/deploy/docker-compose.override.yml \
   up -d --build
 
