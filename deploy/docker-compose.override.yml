@@ -10,5 +10,5 @@ services:
       - "host.docker.internal:host-gateway"
 
   provisioner:
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    entrypoint: ["sh", "-c", "echo 'Provisioner disabled (LocalSandbox mode)' && exit 0"]
+    restart: "no"
