@@ -79,21 +79,14 @@ for i in $(seq 1 15); do
   sleep 2
 done
 
-# RAM check: qwen2.5:32b needs ~20GB RAM minimum
-TOTAL_RAM_GB=$(awk '/MemTotal/ {printf "%.0f", $2/1024/1024}' /proc/meminfo)
-if [ "$TOTAL_RAM_GB" -lt 28 ]; then
-  echo "WARNING: VM has ${TOTAL_RAM_GB}GB RAM. qwen2.5:32b needs ~20GB."
-  echo "Upgrade VM to e2-highmem-4 (32GB) or switch to qwen2.5:14b in config.yaml."
-fi
-
-# Pull Qwen2.5:32b (non-blocking on first run — model is ~20GB)
+# Pull Qwen2.5:14b (non-blocking on first run — model is ~9GB)
 # Subsequent runs skip if already present.
-if ! ollama list 2>/dev/null | grep -q "qwen2.5:32b"; then
-  echo "Pulling qwen2.5:32b in background (~20GB, takes 15-30 min)..."
-  nohup ollama pull qwen2.5:32b >> /app/logs/ollama-pull.log 2>&1 &
+if ! ollama list 2>/dev/null | grep -q "qwen2.5:14b"; then
+  echo "Pulling qwen2.5:14b in background (~9GB, takes 5-10 min)..."
+  nohup ollama pull qwen2.5:14b >> /app/logs/ollama-pull.log 2>&1 &
   echo "Pull running. Monitor: tail -f /app/logs/ollama-pull.log"
 else
-  echo "qwen2.5:32b already present — skipping pull."
+  echo "qwen2.5:14b already present — skipping pull."
 fi
 
 # ── DeerFlow Python environment ───────────────────────────────────────────────
