@@ -117,8 +117,10 @@ if ! command -v uv &>/dev/null; then
 fi
 cd /app/deer-flow
 if [ ! -d .venv ]; then
-  echo "Running DeerFlow make setup..."
-  make setup
+  echo "Installing DeerFlow dependencies (uv sync)..."
+  # make setup has an interactive wizard that exits in non-TTY environments.
+  # uv sync is all we need — config.yaml and .env are already in place.
+  uv sync
 fi
 
 # ── Initial data files ────────────────────────────────────────────────────────
