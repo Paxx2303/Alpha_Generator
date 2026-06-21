@@ -93,6 +93,7 @@ else
 fi
 
 # ── DeerFlow Python environment ───────────────────────────────────────────────
+command -v make &>/dev/null || sudo apt-get install -y make
 cd /app/deer-flow
 if [ ! -d .venv ]; then
   echo "Running DeerFlow make setup..."
