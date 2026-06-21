@@ -2,16 +2,17 @@
 # Used with: docker compose -f docker/docker-compose.yaml -f /app/alpha-generator/deploy/docker-compose.override.yml
 #
 # Adds host.docker.internal so backend containers can reach Ollama on the host (port 11434).
-# Observation dashboard runs on Cloud Run — no need for a VM container.
-#
-# Service names to verify against actual DeerFlow compose:
-#   grep -E '^  [a-z_-]+:' /app/deer-flow/docker/docker-compose.yaml
+# Observation dashboard runs on Cloud Run — no VM container needed.
 
 services:
   gateway:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  worker:
+  provisioner:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  deer-flow:
     extra_hosts:
       - "host.docker.internal:host-gateway"
