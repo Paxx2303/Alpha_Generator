@@ -90,11 +90,11 @@ for i in $(seq 1 15); do
   sleep 2
 done
 
-if ! ollama list 2>/dev/null | grep -q "qwen2.5:14b"; then
-  echo "Pulling qwen2.5:14b in background (~9GB)..."
-  nohup ollama pull qwen2.5:14b >> /app/logs/ollama-pull.log 2>&1 &
-else
-  echo "qwen2.5:14b already present."
+# Remove local models — using OpenRouter API instead (no RAM needed)
+if ollama list 2>/dev/null | grep -q "qwen2.5"; then
+  echo "Removing qwen2.5 models to free RAM..."
+  ollama rm qwen2.5:14b 2>/dev/null || true
+  ollama rm qwen2.5:7b  2>/dev/null || true
 fi
 
 # ── Initial data files ────────────────────────────────────────────────────────
