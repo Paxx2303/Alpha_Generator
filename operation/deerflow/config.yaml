@@ -19,10 +19,6 @@ models:
     request_timeout: 600.0
     max_retries: 3
 
-tools:
-  web:
-    - deerflow.community.ddg_search.tools:web_search_tool
-
 sandbox:
   use: deerflow.sandbox.local:LocalSandboxProvider
   allow_host_bash: false
