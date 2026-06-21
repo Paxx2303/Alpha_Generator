@@ -105,6 +105,15 @@ pip3 install requests python-dotenv --quiet 2>/dev/null || true
 CRON_JOB="0 */6 * * * cd /app/alpha-generator && python3 operation/runner.py >> /app/logs/runner.log 2>&1"
 ( crontab -l 2>/dev/null | grep -v "runner.py"; echo "$CRON_JOB" ) | crontab -
 
+# ── Ensure DeerFlow sub-env files exist (setup wizard normally does this) ────
+for example in /app/deer-flow/frontend/.env.example /app/deer-flow/backend/.env.example; do
+  target="${example%.example}"
+  if [ -f "$example" ] && [ ! -f "$target" ]; then
+    cp "$example" "$target"
+    echo "Created $target from example"
+  fi
+done
+
 # ── Start DeerFlow via Docker Compose ────────────────────────────────────────
 echo "Starting DeerFlow..."
 cd /app/deer-flow
