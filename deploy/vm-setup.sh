@@ -74,8 +74,15 @@ if ! command -v ollama &>/dev/null; then
   echo "Installing Ollama..."
   curl -fsSL https://ollama.com/install.sh | sh
 fi
+# Configure Ollama to listen on all interfaces so Docker containers can reach it
+sudo mkdir -p /etc/systemd/system/ollama.service.d
+sudo tee /etc/systemd/system/ollama.service.d/env.conf > /dev/null << 'OLLAMA_ENV'
+[Service]
+Environment="OLLAMA_HOST=0.0.0.0"
+OLLAMA_ENV
+sudo systemctl daemon-reload
 sudo systemctl enable ollama 2>/dev/null || true
-sudo systemctl start ollama  2>/dev/null || true
+sudo systemctl restart ollama
 
 echo "Waiting for Ollama..."
 for i in $(seq 1 15); do
