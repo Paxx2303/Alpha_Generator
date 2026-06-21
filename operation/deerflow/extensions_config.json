@@ -1,14 +1,9 @@
 {
   "mcpServers": {
     "alpha-wqb": {
-      "enabled": false,
-      "type": "stdio",
-      "command": "python",
-      "args": ["/app/alpha-generator/core/mcp/server.py"],
-      "env": {
-        "WQB_EMAIL": "$WQB_EMAIL",
-        "WQB_PASSWORD": "$WQB_PASSWORD"
-      },
+      "enabled": true,
+      "type": "sse",
+      "url": "http://host.docker.internal:8765/sse",
       "description": "WorldQuant Brain simulation + knowledge search tools"
     }
   }

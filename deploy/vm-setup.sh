@@ -98,8 +98,9 @@ if [ ! -f /app/alpha-generator/data/research_status.json ]; then
 EOF
 fi
 
-# ── Python deps for runner.py ─────────────────────────────────────────────────
+# ── Python deps for runner.py + MCP server ────────────────────────────────────
 pip3 install requests python-dotenv --quiet 2>/dev/null || true
+pip3 install "mcp>=1.2.0" structlog tenacity pydantic --quiet 2>/dev/null || true
 
 # ── Cronjob: research cycle every 6 hours ────────────────────────────────────
 CRON_JOB="0 */6 * * * cd /app/alpha-generator && python3 operation/runner.py >> /app/logs/runner.log 2>&1"
@@ -125,7 +126,34 @@ docker compose \
   -f /app/alpha-generator/deploy/docker-compose.override.yml \
   up -d --build
 
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+# ── MCP server (SSE on host port 8765) ───────────────────────────────────────
+echo "Starting MCP server (SSE mode)..."
+
+# Load credentials from .env
+if [ -f /app/deer-flow/.env ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source /app/deer-flow/.env
+  set +a
+fi
+
+# Kill old MCP server process if running
+pkill -f "alpha-generator/core/mcp/server.py" 2>/dev/null || true
+sleep 1
+
+# Start MCP server in background
+MCP_TRANSPORT=sse MCP_PORT=8765 \
+  nohup python3 /app/alpha-generator/core/mcp/server.py \
+  >> /app/logs/mcp-server.log 2>&1 &
+echo "MCP server PID $!"
+
+# Wait for SSE endpoint to be ready
+for i in $(seq 1 10); do
+  curl -s --max-time 2 http://localhost:8765/sse >/dev/null 2>&1 && echo "MCP SSE ready." && break
+  sleep 1
+done
 
 VM_IP=$(curl -s --max-time 5 ifconfig.me 2>/dev/null || echo "<VM_IP>")
 echo ""

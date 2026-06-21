@@ -44,8 +44,16 @@ mcp.tool()(update_skill)
 mcp.tool()(save_theory)
 
 if __name__ == "__main__":
+    import os
     import atexit
     from core.mcp.tools.alpha import _cleanup_automation
     atexit.register(_cleanup_automation)
-    logging.info("Starting Alpha Generator MCP Server (stdio)…")
-    mcp.run()
+
+    transport = os.getenv("MCP_TRANSPORT", "stdio")
+    if transport == "sse":
+        port = int(os.getenv("MCP_PORT", "8765"))
+        logging.info(f"Starting Alpha Generator MCP Server (SSE port {port})…")
+        mcp.run(transport="sse", host="0.0.0.0", port=port)
+    else:
+        logging.info("Starting Alpha Generator MCP Server (stdio)…")
+        mcp.run()
