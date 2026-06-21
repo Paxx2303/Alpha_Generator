@@ -42,9 +42,11 @@ fi
 echo "Syncing DeerFlow configs..."
 cp /app/alpha-generator/operation/deerflow/config.yaml /app/deer-flow/config.yaml
 cp /app/alpha-generator/operation/deerflow/extensions_config.json /app/deer-flow/extensions_config.json
-mkdir -p /app/deer-flow/skills/custom/alpha-research
-cp /app/alpha-generator/operation/deerflow/skills/alpha-research/SKILL.md \
+# /app/deer-flow is owned by root (Docker creates it) — need sudo
+sudo mkdir -p /app/deer-flow/skills/custom/alpha-research
+sudo cp /app/alpha-generator/operation/deerflow/skills/alpha-research/SKILL.md \
    /app/deer-flow/skills/custom/alpha-research/SKILL.md
+sudo chmod -R 755 /app/deer-flow/skills/custom/
 
 # ── .env guard ───────────────────────────────────────────────────────────────
 if [ -f /tmp/alpha-deerflow.env ]; then
@@ -126,12 +128,13 @@ done
 echo "Starting DeerFlow..."
 cd /app/deer-flow
 # --env-file: compose file is in docker/, so Compose looks for .env in docker/ by default
-# override: adds host.docker.internal so containers can reach Ollama on host
+# override: adds host.docker.internal and skills volume mount
+# --force-recreate: ensure all containers pick up new env vars / config
 docker compose \
   --env-file /app/deer-flow/.env \
   -f docker/docker-compose.yaml \
   -f /app/alpha-generator/deploy/docker-compose.override.yml \
-  up -d --build
+  up -d --build --force-recreate
 
 sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 

@@ -8,6 +8,10 @@ services:
   gateway:
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      # Mount custom skills so DeerFlow can load them at runtime
+      - /app/deer-flow/skills/custom:/app/skills/custom:ro
+      - /app/deer-flow/skills/custom:/skills/custom:ro
 
   provisioner:
     entrypoint: ["sh", "-c", "echo 'Provisioner disabled (LocalSandbox mode)' && exit 0"]

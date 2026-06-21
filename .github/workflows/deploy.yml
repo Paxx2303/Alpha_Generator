@@ -91,8 +91,13 @@ jobs:
 
       - name: Write .env to VM
         run: |
-          AUTH_TOKEN=$(openssl rand -hex 32)
-          AUTH_SECRET=$(openssl rand -hex 32)
+          # Use stable secrets so browser sessions survive redeployment.
+          # If DEERFLOW_AUTH_TOKEN / DEERFLOW_AUTH_SECRET not set as GitHub secrets,
+          # fall back to a random value (first deploy only).
+          AUTH_TOKEN="${{ secrets.DEERFLOW_AUTH_TOKEN }}"
+          AUTH_SECRET="${{ secrets.DEERFLOW_AUTH_SECRET }}"
+          [ -z "$AUTH_TOKEN" ] && AUTH_TOKEN=$(openssl rand -hex 32)
+          [ -z "$AUTH_SECRET" ] && AUTH_SECRET=$(openssl rand -hex 32)
           ENV_B64=$(printf '%s\n' \
             "WQB_EMAIL=${{ secrets.WQB_EMAIL }}" \
             "WQB_PASSWORD=${{ secrets.WQB_PASSWORD }}" \
