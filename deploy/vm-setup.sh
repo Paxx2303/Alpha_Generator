@@ -108,7 +108,11 @@ CRON_JOB="0 */6 * * * cd /app/alpha-generator && python3 operation/runner.py >> 
 # ── Start DeerFlow via Docker Compose ────────────────────────────────────────
 echo "Starting DeerFlow..."
 cd /app/deer-flow
-docker compose -f docker/docker-compose.yaml up -d --build
+# --env-file needed: with -f docker/..., Compose looks for .env in docker/ not root
+docker compose \
+  --env-file /app/deer-flow/.env \
+  -f docker/docker-compose.yaml \
+  up -d --build
 
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
