@@ -9,9 +9,9 @@
 
 models:
   - name: qwen
-    display_name: Qwen2.5:14b (Ollama local)
+    display_name: Qwen2.5:32b (Ollama local)
     use: langchain_openai:ChatOpenAI
-    model: qwen2.5:14b
+    model: qwen2.5:32b
     api_key: ollama
     base_url: http://localhost:11434/v1
     max_tokens: 8192
