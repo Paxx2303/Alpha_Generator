@@ -59,6 +59,36 @@ if [ ! -f /app/deer-flow/.env ]; then
   echo "WARNING: /app/deer-flow/.env missing — copied from example. Fill in real credentials."
 fi
 
+# ── Ollama (local LLM — Qwen2.5:14b) ─────────────────────────────────────────
+if ! command -v ollama &>/dev/null; then
+  echo "Installing Ollama..."
+  curl -fsSL https://ollama.com/install.sh | sh
+fi
+
+# Enable and start Ollama service
+sudo systemctl enable ollama 2>/dev/null || true
+sudo systemctl start ollama  2>/dev/null || true
+
+# Wait for Ollama to be ready
+echo "Waiting for Ollama to start..."
+for i in $(seq 1 15); do
+  if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+    echo "Ollama ready."
+    break
+  fi
+  sleep 2
+done
+
+# Pull Qwen2.5:14b (non-blocking on first run — model is ~9GB)
+# Subsequent runs skip if already present.
+if ! ollama list 2>/dev/null | grep -q "qwen2.5:14b"; then
+  echo "Pulling qwen2.5:14b in background (~9GB, takes 5-10 min)..."
+  nohup ollama pull qwen2.5:14b >> /app/logs/ollama-pull.log 2>&1 &
+  echo "Pull running in background. Check: tail -f /app/logs/ollama-pull.log"
+else
+  echo "qwen2.5:14b already present — skipping pull."
+fi
+
 # ── DeerFlow Python environment ───────────────────────────────────────────────
 cd /app/deer-flow
 if [ ! -d .venv ]; then

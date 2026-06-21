@@ -78,7 +78,8 @@ jobs:
   #   Settings → Variables → Actions → New repository variable
   #
   # Required GitHub Secrets for this job:
-  #   WQB_EMAIL, WQB_PASSWORD, GLM_BASE_URL, GLM_API_KEY, GCS_BACKUP_BUCKET
+  #   WQB_EMAIL, WQB_PASSWORD, GCS_BACKUP_BUCKET (optional)
+  # LLM runs locally via Ollama — no external LLM secrets needed.
   #
   # Optional GitHub Variables (override VM identity):
   #   VM_NAME, VM_ZONE
@@ -102,13 +103,13 @@ jobs:
 
       # Write .env to VM from GitHub Secrets.
       # base64 encoding handles special characters in passwords.
+      # LLM runs locally via Ollama — no external LLM secrets needed.
       - name: Write .env to VM
         run: |
           ENV_B64=$(printf '%s\n' \
             "WQB_EMAIL=${{ secrets.WQB_EMAIL }}" \
             "WQB_PASSWORD=${{ secrets.WQB_PASSWORD }}" \
-            "GLM_BASE_URL=${{ secrets.GLM_BASE_URL }}" \
-            "GLM_API_KEY=${{ secrets.GLM_API_KEY }}" \
+            "OLLAMA_HOST=http://localhost:11434" \
             "DEERFLOW_URL=http://localhost:8000" \
             "GCS_BACKUP_BUCKET=${{ secrets.GCS_BACKUP_BUCKET }}" \
             | base64 -w0)
