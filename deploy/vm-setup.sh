@@ -99,12 +99,12 @@ done
 
 # Pull Qwen2.5:14b (non-blocking on first run — model is ~9GB)
 # Subsequent runs skip if already present.
-if ! ollama list 2>/dev/null | grep -q "qwen2.5:32b"; then
-  echo "Pulling qwen2.5:32b in background (~9GB, takes 5-10 min)..."
-  nohup ollama pull qwen2.5:32b >> /app/logs/ollama-pull.log 2>&1 &
+if ! ollama list 2>/dev/null | grep -q "qwen2.5:14b"; then
+  echo "Pulling qwen2.5:14b in background (~9GB, takes 5-10 min)..."
+  nohup ollama pull qwen2.5:14b >> /app/logs/ollama-pull.log 2>&1 &
   echo "Pull running. Monitor: tail -f /app/logs/ollama-pull.log"
 else
-  echo "qwen2.5:32b already present — skipping pull."
+  echo "qwen2.5:14b already present — skipping pull."
 fi
 
 # ── DeerFlow Python environment ───────────────────────────────────────────────
