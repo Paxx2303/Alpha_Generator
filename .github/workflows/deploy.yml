@@ -111,6 +111,7 @@ jobs:
             "DEER_FLOW_EXTENSIONS_CONFIG_PATH=/app/deer-flow/extensions_config.json" \
             "DEER_FLOW_INTERNAL_AUTH_TOKEN=${AUTH_TOKEN}" \
             "BETTER_AUTH_SECRET=${AUTH_SECRET}" \
+            "BETTER_AUTH_URL=http://34.81.142.38" \
             | base64 -w0)
           gcloud compute ssh alpha-vm \
             --zone asia-east1-c \
