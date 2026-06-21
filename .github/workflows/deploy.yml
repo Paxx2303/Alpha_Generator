@@ -8,11 +8,6 @@ permissions:
   contents: read
   id-token: write
 
-# VM identity — override via GitHub repo Variables if VM is renamed/moved
-env:
-  VM_NAME: ${{ vars.VM_NAME || 'instance-20260620-094221' }}
-  VM_ZONE: ${{ vars.VM_ZONE || 'asia-east1-b' }}
-
 jobs:
   # ─── Job 1: Deploy Streamlit dashboard to Cloud Run ───────────────────────
   deploy-observation:
@@ -71,23 +66,16 @@ jobs:
           echo "Dashboard live at: $URL"
 
   # ─── Job 2: Deploy DeerFlow on GCE VM ─────────────────────────────────────
+  # Runs on every push to main.
   # First push: installs Docker, clones repos, runs DeerFlow make setup, starts compose.
   # Subsequent pushes: git pull, syncs configs, restarts observation container.
   #
-  # Enable by setting GitHub repo variable VM_READY=true:
-  #   Settings → Variables → Actions → New repository variable
-  #
-  # Required GitHub Secrets for this job:
-  #   WQB_EMAIL, WQB_PASSWORD, GCS_BACKUP_BUCKET (optional)
-  # LLM runs locally via Ollama — no external LLM secrets needed.
-  #
-  # Optional GitHub Variables (override VM identity):
-  #   VM_NAME, VM_ZONE
+  # Required GitHub Secrets: WQB_EMAIL, WQB_PASSWORD
+  # Optional GitHub Secrets: GCS_BACKUP_BUCKET
   deploy-vm:
     name: Deploy DeerFlow on VM
     runs-on: ubuntu-latest
     needs: deploy-observation
-    if: vars.VM_READY == 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -101,9 +89,6 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      # Write .env to VM from GitHub Secrets.
-      # base64 encoding handles special characters in passwords.
-      # LLM runs locally via Ollama — no external LLM secrets needed.
       - name: Write .env to VM
         run: |
           ENV_B64=$(printf '%s\n' \
@@ -113,19 +98,17 @@ jobs:
             "DEERFLOW_URL=http://localhost:8000" \
             "GCS_BACKUP_BUCKET=${{ secrets.GCS_BACKUP_BUCKET }}" \
             | base64 -w0)
-          gcloud compute ssh ${{ env.VM_NAME }} \
-            --zone ${{ env.VM_ZONE }} \
+          gcloud compute ssh instance-20260620-094221 \
+            --zone asia-east1-b \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --tunnel-through-iap \
             --quiet \
             --command="mkdir -p /app/deer-flow && echo '${ENV_B64}' | base64 -d > /app/deer-flow/.env"
 
-      # First run: bootstrap everything from scratch via vm-setup.sh.
-      # Subsequent runs: git pull + restart only the observation container.
       - name: Bootstrap or update VM
         run: |
-          gcloud compute ssh ${{ env.VM_NAME }} \
-            --zone ${{ env.VM_ZONE }} \
+          gcloud compute ssh instance-20260620-094221 \
+            --zone asia-east1-b \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --tunnel-through-iap \
             --quiet \
@@ -154,8 +137,8 @@ jobs:
 
       - name: Print VM URLs
         run: |
-          VM_IP=$(gcloud compute instances describe ${{ env.VM_NAME }} \
-            --zone ${{ env.VM_ZONE }} \
+          VM_IP=$(gcloud compute instances describe instance-20260620-094221 \
+            --zone asia-east1-b \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --format='value(networkInterfaces[0].accessConfigs[0].natIP)')
           echo "DeerFlow UI:  http://${VM_IP}/"
