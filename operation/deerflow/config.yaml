@@ -1,22 +1,18 @@
 # DeerFlow config for Alpha Generator
-# Place this file in /app/deer-flow/ (DeerFlow repo root) on the VM.
-# vm-setup.sh and deploy.yml copy it there automatically.
-#
-# LLM: Qwen2.5:14b via Ollama running locally on the VM.
-# Ollama serves an OpenAI-compatible API at http://localhost:11434/v1.
-# No GPU needed — runs on CPU (e2-standard-4 / 16GB RAM).
-# Model pull happens in vm-setup.sh during first deploy.
+# LLM: OpenRouter (cloud API) — no GPU/RAM required on VM.
+# Switch model by changing the `model` field below.
+# Free models: google/gemini-2.0-flash-exp:free, meta-llama/llama-3.3-70b-instruct:free
 
 models:
-  - name: qwen
-    display_name: Qwen2.5:14b (Ollama local)
+  - name: openrouter
+    display_name: Gemini 2.0 Flash (OpenRouter)
     use: langchain_openai:ChatOpenAI
-    model: qwen2.5:14b
-    api_key: ollama
-    base_url: http://host.docker.internal:11434/v1
+    model: google/gemini-2.0-flash-exp:free
+    api_key: $OPENROUTER_KEY
+    base_url: https://openrouter.ai/api/v1
     max_tokens: 8192
     temperature: 0.7
-    request_timeout: 600.0
+    request_timeout: 120.0
     max_retries: 3
 
 sandbox:

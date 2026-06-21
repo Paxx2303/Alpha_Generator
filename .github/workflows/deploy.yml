@@ -96,6 +96,7 @@ jobs:
           ENV_B64=$(printf '%s\n' \
             "WQB_EMAIL=${{ secrets.WQB_EMAIL }}" \
             "WQB_PASSWORD=${{ secrets.WQB_PASSWORD }}" \
+            "OPENROUTER_KEY=${{ secrets.OPENROUTER_KEY }}" \
             "OLLAMA_HOST=http://localhost:11434" \
             "DEERFLOW_URL=http://localhost:8000" \
             "GCS_BACKUP_BUCKET=${{ secrets.GCS_BACKUP_BUCKET }}" \
