@@ -115,11 +115,11 @@ if ! command -v uv &>/dev/null; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
   export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
 fi
-cd /app/deer-flow
+cd /app/deer-flow/backend
 if [ ! -d .venv ]; then
   echo "Installing DeerFlow dependencies (uv sync)..."
   # make setup has an interactive wizard that exits in non-TTY environments.
-  # uv sync is all we need — config.yaml and .env are already in place.
+  # pyproject.toml lives in backend/ — run uv sync from there.
   uv sync
 fi
 
