@@ -13,6 +13,13 @@ services:
       - /app/deer-flow/skills/custom:/app/skills/custom:ro
       - /app/deer-flow/skills/custom:/skills/custom:ro
 
+  frontend:
+    environment:
+      # Fix: Next.js SSR must reach gateway via Docker DNS, not localhost
+      - DEER_FLOW_INTERNAL_GATEWAY_BASE_URL=http://gateway:8001
+      # Allow browser requests from the VM's external IP
+      - DEER_FLOW_TRUSTED_ORIGINS=http://34.81.142.38:2026,http://34.81.142.38
+
   provisioner:
     entrypoint: ["sh", "-c", "echo 'Provisioner disabled (LocalSandbox mode)' && exit 0"]
     restart: "no"
