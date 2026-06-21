@@ -42,9 +42,9 @@ fi
 echo "Syncing DeerFlow configs..."
 cp /app/alpha-generator/operation/deerflow/config.yaml /app/deer-flow/config.yaml
 cp /app/alpha-generator/operation/deerflow/extensions_config.json /app/deer-flow/extensions_config.json
-mkdir -p /app/deer-flow/skills/alpha-research
+mkdir -p /app/deer-flow/skills/custom/alpha-research
 cp /app/alpha-generator/operation/deerflow/skills/alpha-research/SKILL.md \
-   /app/deer-flow/skills/alpha-research/SKILL.md
+   /app/deer-flow/skills/custom/alpha-research/SKILL.md
 
 # ── .env guard ───────────────────────────────────────────────────────────────
 if [ -f /tmp/alpha-deerflow.env ]; then
