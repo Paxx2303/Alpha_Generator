@@ -18,7 +18,7 @@ if ! command -v docker &>/dev/null; then
   curl -fsSL https://get.docker.com | sh
   sudo usermod -aG docker "$USER"
   # Re-exec with docker group active
-  exec sg docker "$0 $*"
+  exec sg docker "bash $0 $*"
 fi
 
 if ! docker compose version &>/dev/null; then
