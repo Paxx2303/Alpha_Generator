@@ -109,6 +109,12 @@ fi
 
 # ── DeerFlow Python environment ───────────────────────────────────────────────
 command -v make &>/dev/null || sudo apt-get install -y make
+# uv is required by DeerFlow's Makefile
+if ! command -v uv &>/dev/null; then
+  echo "Installing uv..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
+fi
 cd /app/deer-flow
 if [ ! -d .venv ]; then
   echo "Running DeerFlow make setup..."
