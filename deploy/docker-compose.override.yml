@@ -12,7 +12,3 @@ services:
   provisioner:
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  deer-flow:
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
