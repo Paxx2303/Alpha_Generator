@@ -1,17 +1,15 @@
 # Add Streamlit observation dashboard to DeerFlow's docker-compose.
-# Place this file alongside DeerFlow's docker-compose.yml on the GCE VM.
-#
-# Usage: docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+# Paths are relative to THIS file's directory: /app/alpha-generator/deploy/
 
 services:
   observation:
     build:
-      context: ../alpha-generator
+      context: ..
       dockerfile: deploy/Dockerfile.observation
     ports:
       - "8080:8080"
     volumes:
-      - ../alpha-generator/data:/app/data:ro
+      - ../data:/app/data:ro
     environment:
       - PYTHONPATH=/app
       - STREAMLIT_SERVER_BASE_URL_PATH=/observe
@@ -20,4 +18,4 @@ services:
   # Override DeerFlow's nginx to add /observe/ route
   nginx:
     volumes:
-      - ../alpha-generator/deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
