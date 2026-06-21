@@ -139,8 +139,11 @@ gcloud iam workload-identity-pools providers describe my-github-provider \
 - [x] GitHub secrets set (3 secrets)
 - [x] Workflow fix: `gcloud auth print-access-token` (run #7)
 
+### Done ✓ (continued)
+- [x] Cloud Run `alpha-observation` deployed successfully
+- [x] Dashboard URL: https://alpha-observation-no72fxhs6a-uc.a.run.app
+
 ### Pending
-- [ ] **Run #7: First successful Cloud Run deploy**
 - [ ] Tạo VM `alpha-vm` + chạy `deploy/vm-setup.sh`
 - [ ] Set GitHub var `VM_READY=true`
 - [ ] GLM-5.2 Cloud Run GPU (cần GPU quota)
