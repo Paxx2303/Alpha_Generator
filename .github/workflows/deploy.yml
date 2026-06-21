@@ -98,8 +98,8 @@ jobs:
             "DEERFLOW_URL=http://localhost:8000" \
             "GCS_BACKUP_BUCKET=${{ secrets.GCS_BACKUP_BUCKET }}" \
             | base64 -w0)
-          gcloud compute ssh instance-20260620-094221 \
-            --zone asia-east1-b \
+          gcloud compute ssh alpha-vm \
+            --zone asia-east1-c \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --tunnel-through-iap \
             --quiet \
@@ -107,8 +107,8 @@ jobs:
 
       - name: Bootstrap or update VM
         run: |
-          gcloud compute ssh instance-20260620-094221 \
-            --zone asia-east1-b \
+          gcloud compute ssh alpha-vm \
+            --zone asia-east1-c \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --tunnel-through-iap \
             --quiet \
@@ -130,8 +130,8 @@ jobs:
 
       - name: Print VM URLs
         run: |
-          VM_IP=$(gcloud compute instances describe instance-20260620-094221 \
-            --zone asia-east1-b \
+          VM_IP=$(gcloud compute instances describe alpha-vm \
+            --zone asia-east1-c \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --format='value(networkInterfaces[0].accessConfigs[0].natIP)')
           echo "DeerFlow UI:  http://${VM_IP}/"
