@@ -117,10 +117,12 @@ done
 # ── Start DeerFlow via Docker Compose ────────────────────────────────────────
 echo "Starting DeerFlow..."
 cd /app/deer-flow
-# --env-file needed: with -f docker/..., Compose looks for .env in docker/ not root
+# --env-file: compose file is in docker/, so Compose looks for .env in docker/ by default
+# override: adds host.docker.internal so containers can reach Ollama on host
 docker compose \
   --env-file /app/deer-flow/.env \
   -f docker/docker-compose.yaml \
+  -f /app/alpha-generator/deploy/docker-compose.override.yml \
   up -d --build
 
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"

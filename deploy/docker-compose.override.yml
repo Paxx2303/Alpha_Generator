@@ -1,21 +1,17 @@
-# Add Streamlit observation dashboard to DeerFlow's docker-compose.
-# Paths are relative to THIS file's directory: /app/alpha-generator/deploy/
+# Override DeerFlow's docker/docker-compose.yaml.
+# Used with: docker compose -f docker/docker-compose.yaml -f /app/alpha-generator/deploy/docker-compose.override.yml
+#
+# Adds host.docker.internal so backend containers can reach Ollama on the host (port 11434).
+# Observation dashboard runs on Cloud Run — no need for a VM container.
+#
+# Service names to verify against actual DeerFlow compose:
+#   grep -E '^  [a-z_-]+:' /app/deer-flow/docker/docker-compose.yaml
 
 services:
-  observation:
-    build:
-      context: ..
-      dockerfile: deploy/Dockerfile.observation
-    ports:
-      - "8080:8080"
-    volumes:
-      - ../data:/app/data:ro
-    environment:
-      - PYTHONPATH=/app
-      - STREAMLIT_SERVER_BASE_URL_PATH=/observe
-    restart: unless-stopped
+  gateway:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-  # Override DeerFlow's nginx to add /observe/ route
-  nginx:
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  worker:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

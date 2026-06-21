@@ -1,10 +1,10 @@
 {
   "mcpServers": {
     "alpha-wqb": {
-      "enabled": true,
+      "enabled": false,
       "type": "stdio",
       "command": "python",
-      "args": ["../../core/mcp/server.py"],
+      "args": ["/app/alpha-generator/core/mcp/server.py"],
       "env": {
         "WQB_EMAIL": "$WQB_EMAIL",
         "WQB_PASSWORD": "$WQB_PASSWORD"
