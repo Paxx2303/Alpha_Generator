@@ -52,9 +52,12 @@ cp /app/alpha-generator/operation/deerflow/skills/alpha-research/SKILL.md \
    /app/deer-flow/skills/alpha-research/SKILL.md
 
 # ── .env guard ───────────────────────────────────────────────────────────────
-# .env must have been written by the deploy job before this script runs.
-# If it's missing (manual run), copy the example so DeerFlow doesn't crash.
-if [ ! -f /app/deer-flow/.env ]; then
+# Deploy job writes /tmp/alpha-deerflow.env before this script runs.
+# Move it into place after deer-flow is cloned.
+if [ -f /tmp/alpha-deerflow.env ]; then
+  cp /tmp/alpha-deerflow.env /app/deer-flow/.env
+  rm /tmp/alpha-deerflow.env
+elif [ ! -f /app/deer-flow/.env ]; then
   cp /app/alpha-generator/operation/deerflow/.env.example /app/deer-flow/.env
   echo "WARNING: /app/deer-flow/.env missing — copied from example. Fill in real credentials."
 fi
