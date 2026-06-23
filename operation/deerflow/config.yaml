@@ -13,9 +13,9 @@ max_search_results: 10          # More context per search query
 # ── Models ──────────────────────────────────────────────────────────────────
 models:
   - name: openrouter
-    display_name: Owl Alpha (OpenRouter) — Ultra
+    display_name: DeepSeek Chat (OpenRouter) — Ultra
     use: langchain_openai:ChatOpenAI
-    model: openrouter/owl-alpha
+    model: deepseek/deepseek-chat
     api_key: $OPENROUTER_KEY
     base_url: https://openrouter.ai/api/v1
     max_tokens: 16384

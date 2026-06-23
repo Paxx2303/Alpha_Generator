@@ -62,6 +62,7 @@ def submit_alpha(formula: str, settings: dict = None) -> str:
         # Record result in DB
         try:
             from storage.store import Store
+            import hashlib
             s = Store()
             s.save_alpha_result({
                 "formula": formula,
@@ -69,7 +70,10 @@ def submit_alpha(formula: str, settings: dict = None) -> str:
                 **result,
             })
             if _is_gold(result):
-                s.upsert_gold_alpha({"formula": formula, "settings": settings_str, **result})
+                # Ensure id exists — WQB returns one, but fall back to formula hash
+                gold_id = (result.get("id")
+                           or hashlib.sha256(f"{formula}|{settings_str}".encode()).hexdigest()[:16])
+                s.upsert_gold_alpha({"id": gold_id, "formula": formula, "settings": settings_str, **result})
             s.close()
         except Exception:
             pass

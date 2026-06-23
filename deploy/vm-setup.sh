@@ -108,7 +108,9 @@ EOF
 fi
 
 # ── Python deps for MCP server ────────────────────────────────────────────────
-pip3 install -r /app/alpha-generator/requirements.txt --quiet || echo "WARNING: some pip packages failed to install"
+pip3 install -r /app/alpha-generator/requirements.txt 2>&1 | tail -5 || echo "WARNING: some pip packages failed"
+# Ensure uvicorn is available for FastMCP SSE transport
+pip3 install 'mcp[cli]>=1.2.0' uvicorn 2>&1 | tail -3 || true
 
 # ── Ensure DeerFlow sub-env files exist (setup wizard normally does this) ────
 for example in /app/deer-flow/frontend/.env.example /app/deer-flow/backend/.env.example; do
@@ -184,8 +186,9 @@ SYSTEMD_MCP
 sudo tee /etc/systemd/system/alpha-research.service > /dev/null << 'SYSTEMD_RESEARCH'
 [Unit]
 Description=Alpha Research Daemon (autonomous market rotation)
-After=network.target alpha-mcp.service
-Requires=alpha-mcp.service
+After=network.target
+# No hard dependency on MCP — DeerFlow spawns MCP via extensions_config.json (SSE).
+# Daemon only needs DeerFlow gateway reachable on localhost:8001.
 
 [Service]
 Type=simple
@@ -206,10 +209,14 @@ SYSTEMD_RESEARCH
 sudo systemctl daemon-reload
 sudo systemctl enable alpha-mcp alpha-research
 sudo systemctl restart alpha-mcp
-echo "Waiting for MCP SSE..."
+echo "Waiting for MCP SSE (up to 30s)..."
 for i in $(seq 1 15); do
   curl -s --max-time 2 http://localhost:8765/sse >/dev/null 2>&1 && echo "MCP SSE ready." && break
   sleep 2
+  if [ "$i" -eq 15 ]; then
+    echo "WARNING: MCP SSE did not come up — check: sudo journalctl -u alpha-mcp -n 30"
+    echo "  Research daemon will start anyway (it only needs DeerFlow gateway)."
+  fi
 done
 sudo systemctl restart alpha-research
 

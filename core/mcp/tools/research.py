@@ -9,6 +9,9 @@ if str(_ROOT) not in sys.path:
 
 THEORY_LOG_PATH = _ROOT / "data" / "theory_log.json"
 
+# Reuse the shared WQB session from alpha tools — one login, shared across all tools.
+from core.mcp.tools.alpha import _get_automation  # noqa: E402
+
 
 def search_data_fields(query: str, limit: int = 20) -> str:
     """
@@ -22,14 +25,8 @@ def search_data_fields(query: str, limit: int = 20) -> str:
         limit: max results to return (default 20)
     """
     try:
-        from wqb_automation import WQBAutomation, load_config
-        config = load_config()
-        auto = WQBAutomation(config)
-        auto.start()
-        if not auto.login():
-            return json.dumps({"error": "WQB login failed"})
+        auto = _get_automation()
         results = auto.search_data_fields(query, limit)
-        auto.stop()
         return json.dumps(results, indent=2)
     except Exception as e:
         return json.dumps({"error": str(e)})
