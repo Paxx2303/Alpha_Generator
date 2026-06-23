@@ -38,6 +38,18 @@ STATE_PATH = _ROOT / "data" / "research_state.json"
 DEERFLOW_API = os.getenv("DEERFLOW_GATEWAY_URL", "http://localhost:8001")
 INTERNAL_TOKEN = os.getenv("DEER_FLOW_INTERNAL_AUTH_TOKEN", "")
 
+# Shared session keeps CSRF cookies across requests
+_session = requests.Session()
+
+
+def _get_csrf_token() -> str:
+    """GET any DeerFlow endpoint to receive the CSRF cookie (double-submit pattern)."""
+    try:
+        _session.get(f"{DEERFLOW_API}/api/models", timeout=10)
+        return _session.cookies.get("deer-flow-csrf-token", "")
+    except Exception:
+        return ""
+
 # Full WQB market rotation — ordered by empirical priority (best settings first)
 # Format: "UNIVERSE|NEUTRALIZATION|DECAY|TRUNCATION"
 MARKET_ROTATION = [
@@ -114,12 +126,19 @@ def call_deerflow_research(setting: str) -> bool:
         f"then compare backtest results against those theories after each test."
     )
     try:
-        # X-Internal-Token bypasses DeerFlow's CSRF check for server-to-server calls.
-        headers = {"X-Internal-Token": INTERNAL_TOKEN} if INTERNAL_TOKEN else {}
+        # Build headers: prefer X-Internal-Token (server-to-server bypass),
+        # fall back to CSRF double-submit cookie if token env var is empty.
+        headers: dict = {}
+        if INTERNAL_TOKEN:
+            headers["X-Internal-Token"] = INTERNAL_TOKEN
+        else:
+            csrf = _get_csrf_token()
+            if csrf:
+                headers["X-CSRF-Token"] = csrf
 
         # Ultra mode: 5 plan iterations, 30 steps, background investigation.
         # We trigger the stream and don't consume it — DeerFlow researches in Docker.
-        with requests.post(
+        with _session.post(
             f"{DEERFLOW_API}/api/chat/stream",
             json={
                 "messages": [{"role": "user", "content": prompt}],

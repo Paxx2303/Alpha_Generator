@@ -15,6 +15,8 @@ services:
       - "127.0.0.1:8001:8001"
     environment:
       - ENABLE_CUSTOM_AGENT_MANAGEMENT=true
+      # Pass internal token so CSRF middleware can validate X-Internal-Token header
+      - DEER_FLOW_INTERNAL_AUTH_TOKEN=${DEER_FLOW_INTERNAL_AUTH_TOKEN}
     volumes:
       # Mount custom skills so DeerFlow can load them at runtime
       - /app/deer-flow/skills/custom:/app/skills/custom:ro
