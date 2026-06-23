@@ -14,7 +14,6 @@ ROOT = Path(__file__).parent.parent.parent
 DB_PATH = ROOT / "data" / "alpha_store.db"
 GOLD_ALPHAS_PATH = ROOT / "gold_alphas.json"
 RESEARCH_LOG_PATH = ROOT / "RESEARCH_LOG.md"
-MCP_SKILL_PATH = ROOT / "mcp_skill.md"
 THEORY_LOG_PATH = ROOT / "data" / "theory_log.json"
 RESEARCH_STATUS_PATH = ROOT / "data" / "research_status.json"
 
@@ -33,7 +32,7 @@ def get_gold_alphas() -> pd.DataFrame:
         return pd.DataFrame()
     try:
         df = pd.read_sql_query(
-            "SELECT * FROM gold_alphas ORDER BY created_at DESC",
+            "SELECT * FROM gold_alphas",
             conn,
         )
     except Exception:
@@ -63,7 +62,7 @@ def get_simulations() -> pd.DataFrame:
         return pd.DataFrame()
     try:
         df = pd.read_sql_query(
-            "SELECT * FROM simulations ORDER BY created_at DESC LIMIT 500",
+            "SELECT * FROM simulations ORDER BY ts DESC LIMIT 500",
             conn,
         )
         return df
@@ -143,7 +142,3 @@ def get_research_log() -> str:
     return "_No RESEARCH_LOG.md found._"
 
 
-def get_mcp_skill() -> str:
-    if MCP_SKILL_PATH.exists():
-        return MCP_SKILL_PATH.read_text(encoding="utf-8")
-    return "_No mcp_skill.md found._"

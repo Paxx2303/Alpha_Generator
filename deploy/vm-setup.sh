@@ -107,13 +107,8 @@ if [ ! -f /app/alpha-generator/data/research_status.json ]; then
 EOF
 fi
 
-# ── Python deps for runner.py + MCP server ────────────────────────────────────
-pip3 install requests python-dotenv --quiet 2>/dev/null || true
-pip3 install "mcp>=1.2.0" structlog tenacity pydantic --quiet 2>/dev/null || true
-
-# ── Cronjob: research cycle every 6 hours ────────────────────────────────────
-CRON_JOB="0 */6 * * * cd /app/alpha-generator && python3 operation/runner.py >> /app/logs/runner.log 2>&1"
-( crontab -l 2>/dev/null | grep -v "runner.py"; echo "$CRON_JOB" ) | crontab -
+# ── Python deps for MCP server ────────────────────────────────────────────────
+pip3 install -r /app/alpha-generator/requirements.txt --quiet 2>/dev/null || true
 
 # ── Ensure DeerFlow sub-env files exist (setup wizard normally does this) ────
 for example in /app/deer-flow/frontend/.env.example /app/deer-flow/backend/.env.example; do
@@ -149,27 +144,69 @@ if [ -f /app/deer-flow/.env ]; then
   set +a
 fi
 
-# Kill old MCP server process if running
-pkill -f "alpha-generator/core/mcp/server.py" 2>/dev/null || true
-sleep 1
+# ── MCP server (systemd service) ──────────────────────────────────────────────
+sudo tee /etc/systemd/system/alpha-mcp.service > /dev/null << 'SYSTEMD_MCP'
+[Unit]
+Description=Alpha Generator MCP Server (SSE)
+After=network.target
 
-# Start MCP server in background
-MCP_TRANSPORT=sse MCP_PORT=8765 \
-  nohup python3 /app/alpha-generator/core/mcp/server.py \
-  >> /app/logs/mcp-server.log 2>&1 &
-echo "MCP server PID $!"
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/app/alpha-generator
+EnvironmentFile=/app/deer-flow/.env
+Environment=MCP_TRANSPORT=sse
+Environment=MCP_PORT=8765
+ExecStart=/usr/bin/python3 /app/alpha-generator/core/mcp/server.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/app/logs/mcp-server.log
+StandardError=append:/app/logs/mcp-server.log
 
-# Wait for SSE endpoint to be ready
-for i in $(seq 1 10); do
+[Install]
+WantedBy=multi-user.target
+SYSTEMD_MCP
+
+# ── Research daemon (systemd service) ─────────────────────────────────────────
+sudo tee /etc/systemd/system/alpha-research.service > /dev/null << 'SYSTEMD_RESEARCH'
+[Unit]
+Description=Alpha Research Daemon (autonomous market rotation)
+After=network.target alpha-mcp.service
+Requires=alpha-mcp.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/app/alpha-generator
+EnvironmentFile=/app/deer-flow/.env
+Environment=DEERFLOW_GATEWAY_URL=http://localhost:8001
+ExecStart=/usr/bin/python3 /app/alpha-generator/operation/research_daemon.py
+Restart=always
+RestartSec=30
+StandardOutput=append:/app/logs/research-daemon.log
+StandardError=append:/app/logs/research-daemon.log
+
+[Install]
+WantedBy=multi-user.target
+SYSTEMD_RESEARCH
+
+sudo systemctl daemon-reload
+sudo systemctl enable alpha-mcp alpha-research
+sudo systemctl restart alpha-mcp
+echo "Waiting for MCP SSE..."
+for i in $(seq 1 15); do
   curl -s --max-time 2 http://localhost:8765/sse >/dev/null 2>&1 && echo "MCP SSE ready." && break
-  sleep 1
+  sleep 2
 done
+sudo systemctl restart alpha-research
 
 VM_IP=$(curl -s --max-time 5 ifconfig.me 2>/dev/null || echo "<VM_IP>")
 echo ""
 echo "===================================================="
-echo "  DeerFlow:   http://${VM_IP}/"
-echo "  Ollama:     http://${VM_IP}:11434"
-echo "  Logs:       docker compose -f /app/deer-flow/docker/docker-compose.yaml logs -f"
-echo "  Runner:     cd /app/alpha-generator && python3 operation/runner.py --dry-run"
+echo "  DeerFlow:       http://${VM_IP}/"
+echo "  Ollama:         http://${VM_IP}:11434"
+echo "  MCP status:     sudo systemctl status alpha-mcp"
+echo "  Research status:sudo systemctl status alpha-research"
+echo "  MCP logs:       tail -f /app/logs/mcp-server.log"
+echo "  Research logs:  tail -f /app/logs/research-daemon.log"
 echo "===================================================="

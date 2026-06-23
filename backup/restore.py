@@ -5,7 +5,6 @@ Usage:
     python backup/restore.py --latest --source local
     python backup/restore.py --latest --source gcs
     python backup/restore.py --timestamp 2026-06-19_14-30 --source local
-    python backup/restore.py --latest --source local --dry-run
 """
 import argparse
 import os
@@ -35,21 +34,17 @@ def _latest_gcs(bucket: str) -> str | None:
         return None
 
 
-def _restore_local(ts_dir: Path, dry_run: bool) -> None:
+def _restore_local(ts_dir: Path) -> None:
     for f in ts_dir.iterdir():
         dest = ROOT / "data" / f.name
-        # mcp_skill.md and legacy_sources.md go to root / docs
-        if f.name == "mcp_skill.md":
-            dest = ROOT / f.name
-        elif f.name == "legacy_sources.md":
+        if f.name == "legacy_sources.md":
             dest = ROOT / "docs" / f.name
-        print(f"  {f} → {dest}")
-        if not dry_run:
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(f, dest)
+        print(f"  {f} -> {dest}")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(f, dest)
 
 
-def _restore_gcs(ts: str, bucket: str, dry_run: bool) -> None:
+def _restore_gcs(ts: str, bucket: str) -> None:
     try:
         from google.cloud import storage as gcs
         client = gcs.Client()
@@ -57,24 +52,21 @@ def _restore_gcs(ts: str, bucket: str, dry_run: bool) -> None:
         blobs = list(b.list_blobs(prefix=f"backups/{ts}/"))
         for blob in blobs:
             fname = blob.name.split("/")[-1]
-            if fname == "mcp_skill.md":
-                dest = ROOT / fname
-            elif fname == "legacy_sources.md":
+            if fname == "legacy_sources.md":
                 dest = ROOT / "docs" / fname
             else:
                 dest = ROOT / "data" / fname
-            print(f"  gs://{bucket}/{blob.name} → {dest}")
-            if not dry_run:
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                blob.download_to_filename(str(dest))
+            print(f"  gs://{bucket}/{blob.name} -> {dest}")
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            blob.download_to_filename(str(dest))
     except ImportError:
         print("[restore] google-cloud-storage not installed.")
     except Exception as e:
         print(f"[restore] GCS restore error: {e}")
 
 
-def run(source: str, timestamp: str | None, dry_run: bool) -> None:
-    print(f"[restore] source={source} ts={timestamp or 'latest'} dry_run={dry_run}")
+def run(source: str, timestamp: str | None) -> None:
+    print(f"[restore] source={source} ts={timestamp or 'latest'}")
 
     if source == "local":
         if timestamp:
@@ -85,7 +77,7 @@ def run(source: str, timestamp: str | None, dry_run: bool) -> None:
             print("[restore] No local backup found.")
             sys.exit(1)
         print(f"[restore] Restoring from: {ts_dir}")
-        _restore_local(ts_dir, dry_run)
+        _restore_local(ts_dir)
 
     elif source == "gcs":
         bucket = os.getenv("GCS_BACKUP_BUCKET", "")
@@ -97,12 +89,9 @@ def run(source: str, timestamp: str | None, dry_run: bool) -> None:
             print("[restore] No GCS backup found.")
             sys.exit(1)
         print(f"[restore] Restoring from GCS: {ts}")
-        _restore_gcs(ts, bucket, dry_run)
+        _restore_gcs(ts, bucket)
 
-    if dry_run:
-        print("[restore] Dry-run complete — no files written.")
-    else:
-        print("[restore] Restore complete.")
+    print("[restore] Restore complete.")
 
 
 if __name__ == "__main__":
@@ -110,6 +99,5 @@ if __name__ == "__main__":
     ap.add_argument("--source",    choices=["local", "gcs"], default="local")
     ap.add_argument("--timestamp", default=None, help="e.g. 2026-06-19_14-30")
     ap.add_argument("--latest",    action="store_true", help="Use the most recent backup")
-    ap.add_argument("--dry-run",   action="store_true")
     args = ap.parse_args()
-    run(source=args.source, timestamp=args.timestamp, dry_run=args.dry_run)
+    run(source=args.source, timestamp=args.timestamp)

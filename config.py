@@ -2,20 +2,8 @@
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
-ALPHA_SKILLS_DIR = BASE_DIR / "alpha_skills"
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-RAW_DATA_DIR       = ALPHA_SKILLS_DIR / "rawdata"
-PROCESSED_DATA_DIR = ALPHA_SKILLS_DIR / "processed_data"
-CHUNKS_DIR         = ALPHA_SKILLS_DIR / "chunks"
-FINAL_DATASET_DIR  = ALPHA_SKILLS_DIR / "final_dataset"
-REFERENCE_DIR      = ALPHA_SKILLS_DIR / "reference"
-
-GOLD_ALPHAS_PATH   = BASE_DIR / "gold_alphas.json"
-SKILL_PATH         = ALPHA_SKILLS_DIR / "wq-alpha.skill"
-MCP_SKILL_PATH     = BASE_DIR / "mcp_skill.md"
-
-# ── v2 Storage Layer ───────────────────────────────────────────────────────────
 DATA_DIR   = BASE_DIR / "data"
 STORE_DB   = DATA_DIR / "alpha_store.db"
 
@@ -29,10 +17,10 @@ CRAWL_RATE_QPS    = 2.0        # token-bucket: requests/giây cho BaseCrawler
 CRAWL_PAGE_LIMIT  = 20         # offset paging size
 
 # ── v2 Embeddings (Processing Layer) ───────────────────────────────────────────
-# "hashing"  → vector numpy nhẹ, không cần tải model (mặc định, không phụ thuộc)
-# "st:<name>"→ sentence-transformers (vd "st:all-MiniLM-L6-v2") nếu môi trường cho phép
-EMBED_MODEL  = "hashing"
-EMBED_DIM    = 256            # dùng cho hashing embedder
+# "hashing"  → vector numpy nhẹ, không cần tải model (chỉ dùng cho offline/test)
+# "st:<name>"→ sentence-transformers — dùng cho production semantic search
+EMBED_MODEL  = "st:all-MiniLM-L6-v2"
+EMBED_DIM    = 384            # all-MiniLM-L6-v2 output dim (hashing dùng 256)
 
 # ── Document quality gates ─────────────────────────────────────────────────────
 MIN_WORDS_PER_DOC  = 50        # Docs shorter than this are rejected

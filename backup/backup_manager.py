@@ -20,7 +20,6 @@ FILES_TO_BACKUP = [
     "data/alpha_store.db",
     "data/theory_log.json",
     "data/research_status.json",
-    "mcp_skill.md",
     "docs/legacy_sources.md",
 ]
 

@@ -34,7 +34,7 @@ def _cleanup_automation():
         _auto_instance.stop()
 
 
-def submit_alpha(formula: str, settings: dict = None, dry_run: bool = False) -> str:
+def submit_alpha(formula: str, settings: dict = None) -> str:
     """
     Submit an alpha formula to WorldQuant Brain for simulation.
 
@@ -42,10 +42,9 @@ def submit_alpha(formula: str, settings: dict = None, dry_run: bool = False) -> 
         formula:  WQB expression (e.g. "group_rank(-ts_corr(est_ptp, est_fcf, 20), market)")
         settings: dict with universe, neutralization, decay, truncation.
                   Defaults to TOP3000|Subindustry|3|0.08.
-        dry_run:  If True, validate formula syntax only — no WQB call.
 
     Returns JSON string with sharpe, fitness, turnover, status.
-    Pass criteria: Sharpe ≥ 1.25, Fitness ≥ 1.0, Turnover 10-70%.
+    Pass criteria: Sharpe >= 1.25, Fitness >= 1.0, Turnover 10-70%.
     """
     if not settings:
         settings = {"universe": "TOP3000", "neutralization": "Subindustry", "decay": 3, "truncation": 0.08}
@@ -56,9 +55,6 @@ def submit_alpha(formula: str, settings: dict = None, dry_run: bool = False) -> 
         f"{settings.get('decay',3)}|"
         f"{settings.get('truncation',0.08)}"
     )
-
-    if dry_run:
-        return json.dumps({"dry_run": True, "formula": formula, "settings": settings_str}, indent=2)
 
     try:
         auto = _get_automation()

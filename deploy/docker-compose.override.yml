@@ -2,7 +2,8 @@
 # Used with: docker compose -f docker/docker-compose.yaml -f /app/alpha-generator/deploy/docker-compose.override.yml
 #
 # Adds host.docker.internal so backend containers can reach Ollama on the host (port 11434).
-# Observation dashboard runs on Cloud Run — no VM container needed.
+# Observation dashboard runs as a container on this VM (not Cloud Run) so it can read
+# alpha_store.db, research_status.json, and theory_log.json directly via volume mount.
 
 services:
   gateway:
@@ -23,3 +24,18 @@ services:
   provisioner:
     entrypoint: ["sh", "-c", "echo 'Provisioner disabled (LocalSandbox mode)' && exit 0"]
     restart: "no"
+
+  # Observation dashboard — co-located with the agent so it can read local data files.
+  streamlit:
+    build:
+      context: /app/alpha-generator
+      dockerfile: deploy/Dockerfile.observation
+    ports:
+      - "8080:8080"
+    volumes:
+      # Read-only mount: gives the dashboard access to live SQLite + JSON state files
+      - /app/alpha-generator/data:/app/data:ro
+      - /app/alpha-generator/RESEARCH_LOG.md:/app/RESEARCH_LOG.md:ro
+    environment:
+      - PYTHONPATH=/app
+    restart: unless-stopped

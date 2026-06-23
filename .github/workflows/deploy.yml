@@ -9,73 +9,15 @@ permissions:
   id-token: write
 
 jobs:
-  # ─── Job 1: Deploy Streamlit dashboard to Cloud Run ───────────────────────
-  deploy-observation:
-    name: Deploy Observation Dashboard
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Login to GCR
-        run: |
-          gcloud auth print-access-token \
-            | docker login -u oauth2accesstoken --password-stdin gcr.io
-
-      - name: Build and push observation image
-        run: |
-          IMAGE=gcr.io/${{ secrets.GCP_PROJECT_ID }}/alpha-observation
-          docker build \
-            -f deploy/Dockerfile.observation \
-            -t $IMAGE:${{ github.sha }} \
-            -t $IMAGE:latest \
-            .
-          docker push $IMAGE:${{ github.sha }}
-          docker push $IMAGE:latest
-
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy alpha-observation \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/alpha-observation:${{ github.sha }} \
-            --region us-central1 \
-            --platform managed \
-            --port 8080 \
-            --memory 2Gi \
-            --cpu 1 \
-            --min-instances 0 \
-            --max-instances 1 \
-            --allow-unauthenticated \
-            --service-account ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }} \
-            --project ${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Print dashboard URL
-        run: |
-          URL=$(gcloud run services describe alpha-observation \
-            --region us-central1 \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
-            --format 'value(status.url)')
-          echo "Dashboard live at: $URL"
-
-  # ─── Job 2: Deploy DeerFlow on GCE VM ─────────────────────────────────────
-  # Runs on every push to main.
-  # First push: installs Docker, clones repos, runs DeerFlow make setup, starts compose.
-  # Subsequent pushes: git pull, syncs configs, restarts observation container.
+  # ─── Deploy DeerFlow + Streamlit on GCE VM ────────────────────────────────
+  # Streamlit runs as a Docker container on the VM (not Cloud Run) so it can
+  # read alpha_store.db and JSON state files directly via volume mount.
   #
-  # Required GitHub Secrets: WQB_EMAIL, WQB_PASSWORD
-  # Optional GitHub Secrets: GCS_BACKUP_BUCKET
+  # Required GitHub Secrets: WQB_EMAIL, WQB_PASSWORD, OPENROUTER_KEY
+  # Optional GitHub Secrets: GCS_BACKUP_BUCKET, DEERFLOW_AUTH_TOKEN, DEERFLOW_AUTH_SECRET
   deploy-vm:
-    name: Deploy DeerFlow on VM
+    name: Deploy to VM
     runs-on: ubuntu-latest
-    needs: deploy-observation
 
     steps:
       - uses: actions/checkout@v4
@@ -150,4 +92,4 @@ jobs:
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --format='value(networkInterfaces[0].accessConfigs[0].natIP)')
           echo "DeerFlow UI:  http://${VM_IP}/"
-          echo "Dashboard:    http://${VM_IP}/observe/"
+          echo "Dashboard:    http://${VM_IP}:8080/"

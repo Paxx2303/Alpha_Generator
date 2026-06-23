@@ -223,26 +223,40 @@ class WQBAutomation:
                                 if metrics.get("sharpe", 0) >= 1.25 and metrics.get("fitness", 0) >= 1.0 and 0.01 <= metrics.get("turnover", 1.0) <= 0.7:
                                     logger.info("Alpha meets IS criteria.")
 
-                                    # ── Self-correlation check (WQB rule) ──────────────────────
-                                    corr_info = self.check_self_correlation(alpha_id)
-                                    metrics["self_correlation"] = corr_info.get("value")
-                                    if corr_info.get("passes") is False:
-                                        logger.warning("SELF_CORRELATION FAIL — skipping gold save",
-                                                       alpha_id=alpha_id, detail=corr_info["detail"])
-                                        metrics["status"] = "CORRELATED"
+                                    # ── Full IS check: weight concentration + all hard fails ───
+                                    is_check = self.check_all_is_checks(alpha_id)
+                                    metrics["is_checks_detail"] = is_check.get("detail", "")
+                                    hard_fails = [
+                                        c for c in is_check.get("failures", [])
+                                        if c.get("name") != "SELF_CORRELATION"
+                                    ]
+                                    if hard_fails:
+                                        fail_names = [c.get("name") for c in hard_fails]
+                                        logger.warning("IS hard check FAIL — skipping gold save",
+                                                       alpha_id=alpha_id, checks=fail_names)
+                                        metrics["status"] = f"FAIL_CHECKS"
                                         self._save_failed_combination(metrics)
                                     else:
-                                        metrics["name"] = name or "Untitled Alpha"
-                                        metrics["status"] = "UNSUBMITTED"
-                                        if corr_info.get("value") is not None:
-                                            logger.info("Self-correlation OK", corr=corr_info["value"])
-                                        if auto_submit:
-                                            logger.info("Attempting to submit...")
-                                            submit_res = self._submit_to_exchange(alpha_id)
-                                            metrics["submit_status"] = submit_res
-                                            if submit_res.get("status") == "SUCCESS":
-                                                metrics["status"] = "SUBMITTED_SUCCESS"
-                                        self._save_gold_alpha(metrics)
+                                        # ── Self-correlation check (WQB rule) ──────────────────
+                                        corr_info = self.check_self_correlation(alpha_id)
+                                        metrics["self_correlation"] = corr_info.get("value")
+                                        if corr_info.get("passes") is False:
+                                            logger.warning("SELF_CORRELATION FAIL — skipping gold save",
+                                                           alpha_id=alpha_id, detail=corr_info["detail"])
+                                            metrics["status"] = "CORRELATED"
+                                            self._save_failed_combination(metrics)
+                                        else:
+                                            metrics["name"] = name or "Untitled Alpha"
+                                            metrics["status"] = "UNSUBMITTED"
+                                            if corr_info.get("value") is not None:
+                                                logger.info("Self-correlation OK", corr=corr_info["value"])
+                                            if auto_submit:
+                                                logger.info("Attempting to submit...")
+                                                submit_res = self._submit_to_exchange(alpha_id)
+                                                metrics["submit_status"] = submit_res
+                                                if submit_res.get("status") == "SUCCESS":
+                                                    metrics["status"] = "SUBMITTED_SUCCESS"
+                                            self._save_gold_alpha(metrics)
                                 else:
                                     # Add to failed combinations if it does not meet gold criteria
                                     self._save_failed_combination(metrics)
@@ -388,6 +402,42 @@ class WQBAutomation:
             logger.error("self_correlation check failed", error=str(e))
             return {"value": None, "passes": None, "detail": str(e)}
 
+    def check_all_is_checks(self, alpha_id: str) -> dict:
+        """Check ALL IS checks (not just self-corr) for hard failures.
+
+        WQB runs multiple checks: WEIGHT_CONCENTRATION, SELF_CORRELATION,
+        SHARPE, TURNOVER, LOW_UNIVERSE_COVERAGE, etc.
+        Any check with result=FAIL blocks submission.
+
+        Returns {"passes": bool, "failures": [...], "all_checks": [...], "detail": str}
+        """
+        try:
+            res = self.session.get(f"{self.base_url}/alphas/{alpha_id}", headers=self.headers)
+            if res.status_code != 200:
+                return {"passes": None, "failures": [], "detail": f"HTTP {res.status_code}"}
+            data = res.json()
+            is_stats = data.get("is", {})
+            all_checks = is_stats.get("checks", [])
+            failures = [c for c in all_checks if c.get("result") == "FAIL"]
+            passes = len(failures) == 0
+            detail_parts = []
+            for c in all_checks:
+                name = c.get("name", "?")
+                result = c.get("result", "?")
+                val = c.get("value")
+                val_str = f"={val:.4f}" if isinstance(val, float) else (f"={val}" if val is not None else "")
+                detail_parts.append(f"{name}{val_str}[{result}]")
+            detail = " | ".join(detail_parts)
+            if failures:
+                fail_names = [f"{c.get('name')}={c.get('value')}" for c in failures]
+                logger.warning("IS check FAIL", alpha_id=alpha_id, failures=fail_names)
+            else:
+                logger.info("All IS checks pass/pending", alpha_id=alpha_id)
+            return {"passes": passes, "failures": failures, "all_checks": all_checks, "detail": detail}
+        except Exception as e:
+            logger.error("check_all_is_checks failed", error=str(e))
+            return {"passes": None, "failures": [], "detail": str(e)}
+
     def _submit_to_exchange(self, alpha_id: str) -> dict:
         try:
             submit_url = f"{self.base_url}/alphas/{alpha_id}/submit"
@@ -473,6 +523,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="WQB API Automation")
     parser.add_argument("--formula", type=str, help="Formula to test")
+    parser.add_argument("--settings", type=str, default="TOP3000|MARKET|0|0.05",
+                        help="Settings string: UNIVERSE|NEUTRALIZATION|DECAY|TRUNCATION")
     parser.add_argument("--auto-submit", action="store_true", help="Auto submit if IS passes")
     args = parser.parse_args()
 
