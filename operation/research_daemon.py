@@ -113,13 +113,18 @@ def call_deerflow_research(setting: str) -> bool:
         f"then compare backtest results against those theories after each test."
     )
     try:
-        # /api/chat/stream is DeerFlow's streaming endpoint; we trigger and don't
-        # wait for the full stream — just check it accepted the request (200 headers).
+        # Ultra mode: 5 plan iterations, 30 steps, background investigation.
+        # We trigger the stream and don't consume it — DeerFlow researches in Docker.
         with requests.post(
             f"{DEERFLOW_API}/api/chat/stream",
-            json={"messages": [{"role": "user", "content": prompt}]},
+            json={
+                "messages": [{"role": "user", "content": prompt}],
+                "max_plan_iterations": 5,
+                "max_step_num": 30,
+                "enable_background_investigation": True,
+            },
             stream=True,
-            timeout=30,
+            timeout=60,   # Ultra mode with background investigation starts slower
         ) as res:
             if res.status_code == 200:
                 # Read first chunk to confirm stream started, then release

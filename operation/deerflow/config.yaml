@@ -1,19 +1,29 @@
 # DeerFlow config for Alpha Generator
 # LLM: OpenRouter (cloud API) — no GPU/RAM required on VM.
-# Switch model by changing the `model` field below.
+# Research depth: Ultra mode — 5 plan iterations, 30 steps, background investigation ON.
 
+# ── Research depth ──────────────────────────────────────────────────────────
+# These are the server-side defaults. The research_daemon also passes them
+# per-request so every autonomous cycle uses Ultra mode regardless of UI selection.
+max_plan_iterations: 5          # Fast=1, Pro=3, Ultra=5
+max_step_num: 30                # Fast=3, Pro=10, Ultra=30
+enable_background_investigation: true   # Always pre-search before planning
+max_search_results: 10          # More context per search query
+
+# ── Models ──────────────────────────────────────────────────────────────────
 models:
   - name: openrouter
-    display_name: Owl Alpha (OpenRouter)
+    display_name: Owl Alpha (OpenRouter) — Ultra
     use: langchain_openai:ChatOpenAI
     model: openrouter/owl-alpha
     api_key: $OPENROUTER_KEY
     base_url: https://openrouter.ai/api/v1
-    max_tokens: 8192
-    temperature: 0.7
-    request_timeout: 120.0
+    max_tokens: 16384
+    temperature: 0.6
+    request_timeout: 600.0      # Ultra research sessions can take 10+ min
     max_retries: 3
 
+# ── Sandbox ─────────────────────────────────────────────────────────────────
 sandbox:
   use: deerflow.sandbox.local:LocalSandboxProvider
   allow_host_bash: false
