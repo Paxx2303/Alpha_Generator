@@ -98,7 +98,8 @@ def get_gold_count_in_db() -> int:
 def call_deerflow_research(setting: str) -> bool:
     """
     Trigger a DeerFlow research session for the given market setting.
-    Returns True if call succeeded (DeerFlow accepted the task).
+    Calls gateway directly on localhost:8001 (exposed by docker-compose.override.yml)
+    so we bypass nginx auth. Returns True if DeerFlow accepted the task.
     """
     universe, neutralization, decay, truncation = setting.split("|")
     prompt = (
@@ -112,16 +113,23 @@ def call_deerflow_research(setting: str) -> bool:
         f"then compare backtest results against those theories after each test."
     )
     try:
-        res = requests.post(
-            f"{DEERFLOW_API}/api/chat",
+        # /api/chat/stream is DeerFlow's streaming endpoint; we trigger and don't
+        # wait for the full stream — just check it accepted the request (200 headers).
+        with requests.post(
+            f"{DEERFLOW_API}/api/chat/stream",
             json={"messages": [{"role": "user", "content": prompt}]},
-            timeout=10,
-        )
-        if res.status_code in (200, 201, 202):
-            log.info(f"DeerFlow research triggered for {setting}")
-            return True
-        log.warning(f"DeerFlow returned {res.status_code}: {res.text[:200]}")
-        return False
+            stream=True,
+            timeout=30,
+        ) as res:
+            if res.status_code == 200:
+                # Read first chunk to confirm stream started, then release
+                for chunk in res.iter_content(chunk_size=256):
+                    if chunk:
+                        break
+                log.info(f"DeerFlow research triggered for {setting}")
+                return True
+            log.warning(f"DeerFlow returned {res.status_code}: {res.text[:200]}")
+            return False
     except requests.exceptions.ConnectionError:
         log.warning(f"DeerFlow not reachable at {DEERFLOW_API} — research cycle skipped")
         return False

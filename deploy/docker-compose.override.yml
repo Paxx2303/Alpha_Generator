@@ -9,6 +9,12 @@ services:
   gateway:
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    ports:
+      # Expose gateway to host so research_daemon.py can call it directly
+      # (bypasses nginx + auth; only accessible from VM localhost)
+      - "127.0.0.1:8001:8001"
+    environment:
+      - ENABLE_CUSTOM_AGENT_MANAGEMENT=true
     volumes:
       # Mount custom skills so DeerFlow can load them at runtime
       - /app/deer-flow/skills/custom:/app/skills/custom:ro
@@ -20,6 +26,7 @@ services:
       - DEER_FLOW_INTERNAL_GATEWAY_BASE_URL=http://gateway:8001
       # Allow browser requests from the VM's external IP
       - DEER_FLOW_TRUSTED_ORIGINS=http://34.81.142.38:2026,http://34.81.142.38
+      - NEXT_PUBLIC_ENABLE_CUSTOM_AGENT_MANAGEMENT=true
 
   provisioner:
     entrypoint: ["sh", "-c", "echo 'Provisioner disabled (LocalSandbox mode)' && exit 0"]
