@@ -108,7 +108,7 @@ EOF
 fi
 
 # ── Python deps for MCP server ────────────────────────────────────────────────
-pip3 install -r /app/alpha-generator/requirements.txt --quiet 2>/dev/null || true
+pip3 install -r /app/alpha-generator/requirements.txt --quiet || echo "WARNING: some pip packages failed to install"
 
 # ── Ensure DeerFlow sub-env files exist (setup wizard normally does this) ────
 for example in /app/deer-flow/frontend/.env.example /app/deer-flow/backend/.env.example; do

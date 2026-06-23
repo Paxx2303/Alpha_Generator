@@ -36,6 +36,7 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 STATE_PATH = _ROOT / "data" / "research_state.json"
 DEERFLOW_API = os.getenv("DEERFLOW_GATEWAY_URL", "http://localhost:8001")
+INTERNAL_TOKEN = os.getenv("DEER_FLOW_INTERNAL_AUTH_TOKEN", "")
 
 # Full WQB market rotation — ordered by empirical priority (best settings first)
 # Format: "UNIVERSE|NEUTRALIZATION|DECAY|TRUNCATION"
@@ -113,6 +114,9 @@ def call_deerflow_research(setting: str) -> bool:
         f"then compare backtest results against those theories after each test."
     )
     try:
+        # X-Internal-Token bypasses DeerFlow's CSRF check for server-to-server calls.
+        headers = {"X-Internal-Token": INTERNAL_TOKEN} if INTERNAL_TOKEN else {}
+
         # Ultra mode: 5 plan iterations, 30 steps, background investigation.
         # We trigger the stream and don't consume it — DeerFlow researches in Docker.
         with requests.post(
@@ -123,8 +127,9 @@ def call_deerflow_research(setting: str) -> bool:
                 "max_step_num": 30,
                 "enable_background_investigation": True,
             },
+            headers=headers,
             stream=True,
-            timeout=60,   # Ultra mode with background investigation starts slower
+            timeout=60,
         ) as res:
             if res.status_code == 200:
                 # Read first chunk to confirm stream started, then release
