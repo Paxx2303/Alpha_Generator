@@ -14,22 +14,26 @@ import logging
 import os
 import sys
 import time
-from datetime import datetime, UTC
+from datetime import datetime, timezone
+UTC = timezone.utc
 from pathlib import Path
 
 import requests
+
+_ROOT = Path(__file__).parent.parent
+
+_LOG_DIR = Path("/app/logs") if Path("/app/logs").exists() else _ROOT / "logs"
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [daemon] %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler("/app/logs/research-daemon.log", mode="a"),
+        logging.FileHandler(str(_LOG_DIR / "research-daemon.log"), mode="a"),
     ],
 )
 log = logging.getLogger(__name__)
-
-_ROOT = Path(__file__).parent.parent
 STATE_PATH = _ROOT / "data" / "research_state.json"
 DEERFLOW_API = os.getenv("DEERFLOW_GATEWAY_URL", "http://localhost:8001")
 

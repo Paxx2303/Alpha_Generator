@@ -1,7 +1,8 @@
 """Memory tools: persist lessons and theories across research sessions."""
 import json
 import sys
-from datetime import datetime, UTC
+from datetime import datetime, timezone
+UTC = timezone.utc
 from pathlib import Path
 
 _ROOT = Path(__file__).parent.parent.parent.parent
