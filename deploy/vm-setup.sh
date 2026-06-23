@@ -119,6 +119,19 @@ for example in /app/deer-flow/frontend/.env.example /app/deer-flow/backend/.env.
   fi
 done
 
+# ── Inject build-time env vars into frontend/.env (NEXT_PUBLIC_* are baked at build) ──
+FRONTEND_ENV=/app/deer-flow/frontend/.env
+touch "$FRONTEND_ENV"
+# Custom agent management — enables /workspace/agents UI and POST /api/agents
+grep -q "NEXT_PUBLIC_ENABLE_CUSTOM_AGENT_MANAGEMENT" "$FRONTEND_ENV" \
+  || echo "NEXT_PUBLIC_ENABLE_CUSTOM_AGENT_MANAGEMENT=true" >> "$FRONTEND_ENV"
+# Inject backend env vars for gateway build (non-NEXT_PUBLIC)
+BACKEND_ENV=/app/deer-flow/backend/.env
+touch "$BACKEND_ENV"
+grep -q "ENABLE_CUSTOM_AGENT_MANAGEMENT" "$BACKEND_ENV" \
+  || echo "ENABLE_CUSTOM_AGENT_MANAGEMENT=true" >> "$BACKEND_ENV"
+echo "Frontend/backend .env patched for agent management."
+
 # ── Start DeerFlow via Docker Compose ────────────────────────────────────────
 echo "Starting DeerFlow..."
 cd /app/deer-flow
