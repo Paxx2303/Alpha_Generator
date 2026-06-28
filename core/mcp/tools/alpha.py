@@ -59,35 +59,29 @@ def submit_alpha(formula: str, settings: dict = None) -> str:
     try:
         auto = _get_automation()
         result = auto.submit_alpha(formula, settings_str)
-        # Record result in DB
+
+        # The automation layer is the single source of truth for the gold verdict:
+        # it ran the full Submission Check (IS hard checks + self-correlation) and
+        # already wrote gold_alphas / failed_alphas keyed by `status`. We must NOT
+        # recompute gold here — doing so re-promoted CORRELATED / FAIL_CHECKS alphas.
+        # See docs/adr/0001-automation-owns-gold-verdict.md.
+        #
+        # We only persist the general per-result log row (alpha_results), of which
+        # this tool is the sole writer, then surface the verdict back to DeerFlow.
         try:
             from storage.store import Store
-            import hashlib
             s = Store()
             s.save_alpha_result({
                 "formula": formula,
                 "settings": settings_str,
                 **result,
             })
-            if _is_gold(result):
-                # Ensure id exists — WQB returns one, but fall back to formula hash
-                gold_id = (result.get("id")
-                           or hashlib.sha256(f"{formula}|{settings_str}".encode()).hexdigest()[:16])
-                s.upsert_gold_alpha({"id": gold_id, "formula": formula, "settings": settings_str, **result})
             s.close()
         except Exception:
             pass
         return json.dumps(result, indent=2)
     except Exception as e:
         return json.dumps({"error": str(e)})
-
-
-def _is_gold(r: dict) -> bool:
-    return (
-        float(r.get("sharpe", 0)) >= 1.25
-        and float(r.get("fitness", 0)) >= 1.0
-        and 0.10 <= float(r.get("turnover", 0)) <= 0.70
-    )
 
 
 def get_gold_alphas() -> str:

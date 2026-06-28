@@ -58,10 +58,12 @@ Apply `decay_linear(signal, N)` only if turnover > 70% after first test.
 ### Step 5 — Submit and Diagnose
 Call `alpha-wqb.submit_alpha` with formula and current market setting.
 
-The tool automatically runs:
-- IS checks (Sharpe, Fitness, Turnover)
+The tool automatically runs the full **Submission Check** and returns the verdict in `status`:
+- IS checks (Sharpe, Fitness, Turnover) + IS hard checks (weight concentration, etc.)
 - Self-correlation check (cutoff 0.7)
-- Saves gold if all pass
+- `status: UNSUBMITTED` → gold, already saved. `CORRELATED` / `FAIL_CHECKS` → rejected, saved to failed.
+
+**Trust `status` — do not judge gold yourself.** An alpha can clear Sharpe/Fitness/Turnover yet still be `CORRELATED`; that is NOT a gold. Read `status` and `self_correlation` from the result.
 
 Evaluate result:
 - **Sharpe < 1.25** → add `group_neutralize` or extend lookback ×2

@@ -1,7 +1,11 @@
 """
-core/mcp/server.py — Alpha Generator MCP Server (SSE transport, port 8765).
-Started by vm-setup.sh with MCP_TRANSPORT=sse; DeerFlow connects via
-extensions_config.json {"type": "sse", "url": "http://host.docker.internal:8765/sse"}.
+core/mcp/server.py — Alpha Generator MCP Server.
+
+Transport: SSE on port 8765 (set via MCP_TRANSPORT=sse env var in vm-setup.sh).
+DeerFlow connects via extensions_config.json:
+  {"type": "sse", "url": "http://host.docker.internal:8765/sse"}
+
+Fallback: MCP_TRANSPORT=stdio for local testing without Docker.
 """
 import logging
 import sys
