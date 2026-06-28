@@ -514,7 +514,7 @@ bot.stop()
 
 | ID | Vấn đề | Fix |
 |----|--------|-----|
-| C1 | `BETTER_AUTH_URL` hardcode IP `34.81.142.38` trong docker-compose.override.yml | Tạo static IP trên GCP |
+| C1 | **[ĐÃ FIX code]** IP hardcode `34.81.142.38` trong deploy.yml + docker-compose.override.yml → đổi sau stop/start (IP mới `104.199.179.72`) | deploy.yml lấy IP động + override dùng `${VM_EXTERNAL_IP}`. Còn lại: reserve static IP trên GCP. Xem `docs/adr/0002` |
 | C2 | Cron overlap: nếu cycle > 6h, 2 cycles chạy đồng thời → data race SQLite | Thêm `flock -n /tmp/runner.lock` |
 
 ### HIGH

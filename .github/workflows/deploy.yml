@@ -40,6 +40,14 @@ jobs:
           AUTH_SECRET="${{ secrets.DEERFLOW_AUTH_SECRET }}"
           [ -z "$AUTH_TOKEN" ] && AUTH_TOKEN=$(openssl rand -hex 32)
           [ -z "$AUTH_SECRET" ] && AUTH_SECRET=$(openssl rand -hex 32)
+          # Resolve the VM's current external IP at deploy time — never hardcode it.
+          # With a reserved static IP this is stable; without one it still self-heals
+          # after a stop/start. See docs/adr/0002-vm-external-ip-not-hardcoded.md.
+          VM_IP=$(gcloud compute instances describe alpha-vm \
+            --zone asia-east1-c \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --format='value(networkInterfaces[0].accessConfigs[0].natIP)')
+          echo "VM external IP: ${VM_IP}"
           ENV_B64=$(printf '%s\n' \
             "WQB_EMAIL=${{ secrets.WQB_EMAIL }}" \
             "WQB_PASSWORD=${{ secrets.WQB_PASSWORD }}" \
@@ -53,7 +61,8 @@ jobs:
             "DEER_FLOW_EXTENSIONS_CONFIG_PATH=/app/deer-flow/extensions_config.json" \
             "DEER_FLOW_INTERNAL_AUTH_TOKEN=${AUTH_TOKEN}" \
             "BETTER_AUTH_SECRET=${AUTH_SECRET}" \
-            "BETTER_AUTH_URL=http://34.81.142.38" \
+            "BETTER_AUTH_URL=http://${VM_IP}" \
+            "VM_EXTERNAL_IP=${VM_IP}" \
             "ENABLE_CUSTOM_AGENT_MANAGEMENT=true" \
             "NEXT_PUBLIC_ENABLE_CUSTOM_AGENT_MANAGEMENT=true" \
             | base64 -w0)
